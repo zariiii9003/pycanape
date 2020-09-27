@@ -1,0 +1,8 @@
+/venv/
+/dist/
+/.coverage
+/htmlcov/
+/.idea/
+/.tox/
+/src/pycanape.egg-info/
+/poetry.lock
