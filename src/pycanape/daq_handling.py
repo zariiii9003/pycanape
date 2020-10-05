@@ -63,9 +63,16 @@ class FifoReader:
         self.stopped = True
         self._thread.join()
 
-    def get_value(self, channel_name: str) -> Sample:
+    def get_sample(self, channel_name: str) -> Sample:
         self._lock.acquire()
         sample = self._channels[channel_name]
         self._lock.release()
 
         return sample
+
+    def get_value(self, channel_name: str) -> float:
+        self._lock.acquire()
+        sample = self._channels[channel_name]
+        self._lock.release()
+
+        return sample.value
