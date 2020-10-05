@@ -397,6 +397,15 @@ Asap3GetSelectedRecorder = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3GetVersion = CANAPEAPI.map_symbol(
+    func_name="Asap3GetVersion",
+    restype=ctypes.c_bool,
+    argtypes=[
+        ctypes.POINTER(cnp_class.version_t),    # < version_t * version
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3HasMCD3License = CANAPEAPI.map_symbol(
     func_name="Asap3HasMCD3License",
     restype=ctypes.c_bool,

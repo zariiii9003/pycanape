@@ -1,9 +1,13 @@
 import ctypes
+import typing
 from typing import List
 
-import typing
-
 from .cnp_api import cnp_class, cnp_constants, cnp_prototype
+
+
+class Sample(typing.NamedTuple):
+    timestamp: float
+    value: float
 
 
 class EcuTask:
@@ -101,7 +105,7 @@ class EcuTask:
         )
         return fifo_level
 
-    def daq_get_next_sample(self, channel_count: int) -> List[float]:
+    def daq_get_next_sample(self, channel_count: int) -> List[Sample]:
         c_time = cnp_class.TTime()
         value = ctypes.c_double()
         ptr = ctypes.pointer(ctypes.pointer(value))
@@ -112,18 +116,22 @@ class EcuTask:
             ctypes.byref(c_time),
             ptr,
         )
-        return [typing.cast(int, ptr.contents[i]) for i in range(channel_count)]
+        time_ms = c_time.value / 10
+        return [
+            Sample(time_ms, typing.cast(float, ptr.contents[i]))
+            for i in range(channel_count)
+        ]
 
-    def daq_get_current_values(self, channel_count: int) -> List[float]:
+    def daq_get_current_values(self, channel_count: int) -> List[Sample]:
         c_time = cnp_class.TTime()
-        value = ctypes.c_double()
-        ptr = ctypes.pointer(value)
+        values = (ctypes.c_double * channel_count)()
         cnp_prototype.Asap3GetCurrentValues(
             self._asap3_handle,
             self._module_handle,
             self.task_id,
             ctypes.byref(c_time),
-            ptr,
+            values,
             channel_count,
         )
-        return [typing.cast(int, ptr[i]) for i in range(channel_count)]
+        time_ms = c_time.value / 10
+        return [Sample(time_ms, values[i]) for i in range(channel_count)]

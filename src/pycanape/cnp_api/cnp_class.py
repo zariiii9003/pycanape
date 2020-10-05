@@ -1,6 +1,8 @@
 import ctypes
 from ctypes import wintypes
 
+from . import cnp_constants
+
 enum_type = ctypes.c_uint
 
 
@@ -144,4 +146,15 @@ class MeasurementListEntries(ctypes.Structure):
     _fields_ = [
         ("ItemCount", ctypes.c_uint),
         ("Entries", ctypes.POINTER(ctypes.POINTER(TMeasurementListEntry))),
+    ]
+
+
+class version_t(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [
+        ("dllMainVersion", ctypes.c_int),
+        ("dllSubVersion", ctypes.c_int),
+        ("dllRelease", ctypes.c_int),
+        ("osVersion", ctypes.c_char * cnp_constants.MAX_OS_VERSION),
+        ("osRelease", ctypes.c_int),
     ]

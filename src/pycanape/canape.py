@@ -14,6 +14,14 @@ class AppVersion(NamedTuple):
     app_name: str
 
 
+class DllVersion(NamedTuple):
+    dll_main_version: int
+    dll_sub_version: int
+    dll_release: int
+    os_version: str
+    os_release: int
+
+
 class CANape:
     def __init__(
         self,
@@ -83,6 +91,20 @@ class CANape:
             app_name=c_app_version.Application.decode("ascii"),
         )
         return app_version
+
+    @staticmethod
+    def get_dll_version() -> DllVersion:
+        """Version control"""
+        version_t = cnp_class.version_t()
+        cnp_prototype.Asap3GetVersion(ctypes.byref(version_t))
+        version = DllVersion(
+            dll_main_version=version_t.dllMainVersion,
+            dll_sub_version=version_t.dllSubVersion,
+            dll_release=version_t.dllRelease,
+            os_version=version_t.osVersion.decode("ascii"),
+            os_release=version_t.osRelease,
+        )
+        return version
 
     def get_project_directory(self) -> str:
         """Get the current project Directory."""
