@@ -17,7 +17,9 @@ class FifoReader:
         self._task = task
 
         self._setup_daq_channels(channel_list, polling_rate, save_to_file)
-        self._channels: Dict[str, Sample] = {channel: None for channel in channel_list}
+        self._channels: Dict[str, Sample] = {
+            channel: Sample(math.nan, math.nan) for channel in channel_list
+        }
         self._count = len(self._channels)
 
         self._thread = Thread(target=self._read_fifo)
