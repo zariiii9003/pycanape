@@ -3,6 +3,7 @@ __version__ = "0.1.0.dev2"
 from .cnp_api.cnp_constants import (
     Channels,
     DriverType,
+    EventCode,
     MeasurementState,
     ObjectType,
     RecorderType,

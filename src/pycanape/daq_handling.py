@@ -4,44 +4,51 @@ from threading import Thread, Lock
 from typing import List, Dict
 
 from .ecu_task import EcuTask, Sample
+from .utils import CANapeError
+from .cnp_api.cnp_constants import ErrorCodes, EventCode
+from .canape import CANape
 
 
 class FifoReader:
-    def __init__(
-        self,
-        task: EcuTask,
-        channel_list: List[str],
-        polling_rate: int,
-        save_to_file: bool,
-    ):
+    def __init__(self, canape_instance: CANape, task: EcuTask):
         self._task = task
 
-        self._setup_daq_channels(channel_list, polling_rate, save_to_file)
-        self._channels: Dict[str, Sample] = {
-            channel: Sample(math.nan, math.nan) for channel in channel_list
-        }
-        self._count = len(self._channels)
+        # register callbacks
+        self._canape = canape_instance
+        self._canape.register_callback(
+            event_code=EventCode.et_ON_DATA_ACQ_START, callback_func=self._start
+        )
+        self._canape.register_callback(
+            event_code=EventCode.et_ON_DATA_ACQ_STOP, callback_func=self._stop
+        )
+
+        self._channels: Dict[str, Sample] = {}
+        self._count = 0
 
         self._thread = Thread(target=self._read_fifo)
         self._lock = Lock()
         self.stopped = True
         self.refresh_rate = 0.001  # seconds
 
-    def _setup_daq_channels(
-        self, channel_list: List[str], polling_rate: int, save_to_file: bool
-    ):
-        for channel_name in channel_list:
-            self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)
+    def add_channel(self, channel_name: str, polling_rate: int, save_to_file: bool):
+        self._lock.acquire()
+        self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)
+        self._channels[channel_name] = Sample(math.nan, math.nan)
+        self._count = len(self._channels)
+        self._lock.release()
 
     @property
     def channel_names(self) -> List[str]:
-        return list(self._channels)
+        self._lock.acquire()
+        names = list(self._channels)
+        self._lock.release()
+        return names
 
     @property
     def task(self) -> EcuTask:
         return self._task
 
-    def start(self):
+    def _start(self):
         self.stopped = False
         self._thread.start()
 
@@ -49,19 +56,28 @@ class FifoReader:
         self._task.daq_check_overrun(reset_overrun=True)
 
         while not self.stopped:
-            self._task.daq_check_overrun()
-            for i in range(self._task.daq_get_fifo_level()):
-                samples = self._task.daq_get_next_sample(self._count)
+            self._lock.acquire()
 
-                self._lock.acquire()
-                for j, channel_name in enumerate(self._channels):
-                    if not math.isnan(samples[j].value):
-                        self._channels[channel_name] = samples[j]
+            try:
+                self._task.daq_check_overrun()
+                for i in range(self._task.daq_get_fifo_level()):
+                    samples = self._task.daq_get_next_sample(self._count)
+
+                    for j, channel_name in enumerate(self._channels):
+                        if not math.isnan(samples[j].value):
+                            self._channels[channel_name] = samples[j]
+
                 self._lock.release()
+
+            except CANapeError as e:
+                if e.error_code == ErrorCodes.AEC_NO_VALUES_SAMPLED:
+                    pass
+                else:
+                    raise e
 
             time.sleep(self.refresh_rate)
 
-    def stop(self):
+    def _stop(self):
         self.stopped = True
         self._thread.join()
 
@@ -78,3 +94,12 @@ class FifoReader:
         self._lock.release()
 
         return sample.value
+
+    def __del__(self):
+        self._stop()
+        self._canape.unregister_callback(
+            event_code=EventCode.et_ON_DATA_ACQ_START, callback_func=self._start
+        )
+        self._canape.unregister_callback(
+            event_code=EventCode.et_ON_DATA_ACQ_STOP, callback_func=self._stop
+        )

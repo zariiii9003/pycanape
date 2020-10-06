@@ -1,10 +1,11 @@
 import ctypes
-from typing import NamedTuple, Dict
+from typing import NamedTuple, Dict, Callable, Set
 
 from . import RecorderType, MeasurementState
 from .recorder import Recorder
 from .module import Module
 from .cnp_api import cnp_class, cnp_constants, cnp_prototype
+from .cnp_api.cnp_constants import EventCode
 
 
 class AppVersion(NamedTuple):
@@ -76,6 +77,29 @@ class CANape:
         self.asap3_handle = ptr.contents
 
         self._modules: Dict[int, Module] = {}
+        self._callbacks: Dict[EventCode, Set[Callable]] = {}
+
+        # register callbacks for every event type
+        self._c_event_callback = cnp_class.EVENT_CALLBACK(self._on_event)
+        for event_code in EventCode:
+            self._callbacks[event_code] = set()
+            cnp_prototype.Asap3RegisterCallBack(
+                self.asap3_handle,
+                event_code,
+                self._c_event_callback,
+                event_code,
+            )
+
+    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int):
+        """This function is called by CANape."""
+        for func in self._callbacks[EventCode(private_data)]:
+            func()
+
+    def register_callback(self, event_code: EventCode, callback_func: Callable):
+        self._callbacks[event_code].add(callback_func)
+
+    def unregister_callback(self, event_code: EventCode, callback_func: Callable):
+        self._callbacks[event_code].remove(callback_func)
 
     def get_application_version(self) -> AppVersion:
         """Call this function to get the current version of the server application."""
@@ -173,7 +197,7 @@ class CANape:
             channel.value,                          # short channelNo
             go_online,                              # bool goOnline
             enable_cache,                           # short enablecache
-            ctypes.byref(module_handle),                                    # TModulHdl * module
+            ctypes.byref(module_handle),            # TModulHdl * module
         )
         # fmt: on
 

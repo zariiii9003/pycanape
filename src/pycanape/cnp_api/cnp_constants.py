@@ -375,3 +375,12 @@ class MeasurementState(IntEnum):
     eT_MEASUREMENT_EXIT = 3  # Messung ist gestoppt, aber noch nicht beendet
     eT_MEASUREMENT_THREAD_RUNNING = 4  # Messung gestartet, Messthread laeuft
     eT_MEASUREMENT_RUNNING = 5  # Messschleife laeuft
+
+
+class EventCode(IntEnum):
+    et_ON_DATA_ACQ_START = 0
+    et_ON_DATA_ACQ_STOP = 1
+    et_ON_BEFORE_DATA_ACQ_START = 2
+    et_ON_CLOSEPROJECT = 3
+    et_ON_OPENPROJECT = 4
+    et_ON_CLOSECANAPE = 5

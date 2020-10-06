@@ -548,6 +548,18 @@ Asap3ReadObjectParameter = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3RegisterCallBack = CANAPEAPI.map_symbol(
+    func_name="Asap3RegisterCallBack",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.enum_type,                    # > ASAP3_EVENT_CODE eventID
+        cnp_class.EVENT_CALLBACK,               # > void *fnc
+        ctypes.c_ulong,                         # > unsigned long privateData
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3ReleaseModule = CANAPEAPI.map_symbol(
     func_name="Asap3ReleaseModule",
     restype=ctypes.c_bool,
