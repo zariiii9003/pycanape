@@ -1,9 +1,29 @@
-import ctypes
 import winreg
+import ctypes
 from ctypes.util import find_library
 import logging
+from threading import Lock
 
 LOG = logging.getLogger(__name__)
+LOCK = Lock()
+
+
+def _synchronization_wrapper(func, func_name: str):
+    """Use locks to assure thread safety.
+
+    Without synchronization it is possible that Asap3GetLastError
+    retrieves the error of the wrong function."""
+
+    if func_name in ("Asap3GetLastError", "Asap3ErrorText"):
+        return func
+
+    def wrapper(*args, **kwargs):
+        LOCK.acquire()
+        res = func(*args, **kwargs)
+        LOCK.release()
+        return res
+
+    return wrapper
 
 
 class CLibrary(ctypes.WinDLL):
@@ -43,15 +63,14 @@ class CLibrary(ctypes.WinDLL):
             )
 
         setattr(symbol, "__name__", func_name)
-        LOG.debug(
-            f'Wrapped function "{func_name}", result type: {type(restype)}, error_check {errcheck}'
-        )
 
         if errcheck:
             symbol.errcheck = errcheck
 
-        setattr(self, func_name, symbol)
-        return symbol
+        func = _synchronization_wrapper(symbol, func_name)
+
+        setattr(self, func_name, func)
+        return func
 
 
 class CANapeError(Exception):
