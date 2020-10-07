@@ -1,7 +1,7 @@
 import math
 import time
 from threading import Thread, Lock
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from .ecu_task import EcuTask, Sample
 from .utils import CANapeError
@@ -10,8 +10,9 @@ from .canape import CANape
 
 
 class FifoReader:
-    def __init__(self, canape_instance: CANape, task: EcuTask):
+    def __init__(self, canape_instance: CANape, task: EcuTask, refresh_rate: float):
         self._task = task
+        self.refresh_rate = refresh_rate
 
         # register callbacks
         self._canape = canape_instance
@@ -25,15 +26,21 @@ class FifoReader:
         self._channels: Dict[str, Sample] = {}
         self._count = 0
 
-        self._thread = Thread(target=self._read_fifo)
+        self._thread: Optional[Thread] = None
         self._lock = Lock()
         self.stopped = True
-        self.refresh_rate = 0.001  # seconds
 
     def add_channel(self, channel_name: str, polling_rate: int, save_to_file: bool):
         self._lock.acquire()
-        self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)
-        self._channels[channel_name] = Sample(math.nan, math.nan)
+        if channel_name not in self._channels:
+            self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)
+            self._channels[channel_name] = Sample(math.nan, math.nan)
+            self._count = len(self._channels)
+        self._lock.release()
+
+    def clear_channels(self):
+        self._lock.acquire()
+        self._channels.clear()
         self._count = len(self._channels)
         self._lock.release()
 
@@ -49,8 +56,17 @@ class FifoReader:
         return self._task
 
     def _start(self):
+        self._stop()
         self.stopped = False
+        self._thread = Thread(target=self._read_fifo)
         self._thread.start()
+
+    def _stop(self):
+        self.stopped = True
+        if self._thread is not None:
+            if self._thread.is_alive():
+                self._thread.join()
+            self._thread = None
 
     def _read_fifo(self):
         self._task.daq_check_overrun(reset_overrun=True)
@@ -67,19 +83,16 @@ class FifoReader:
                         if not math.isnan(samples[j].value):
                             self._channels[channel_name] = samples[j]
 
-                self._lock.release()
-
             except CANapeError as e:
                 if e.error_code == ErrorCodes.AEC_NO_VALUES_SAMPLED:
                     pass
                 else:
                     raise e
 
-            time.sleep(self.refresh_rate)
+            finally:
+                self._lock.release()
 
-    def _stop(self):
-        self.stopped = True
-        self._thread.join()
+            time.sleep(self.refresh_rate)
 
     def get_sample(self, channel_name: str) -> Sample:
         self._lock.acquire()
