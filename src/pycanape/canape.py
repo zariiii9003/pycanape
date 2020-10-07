@@ -1,4 +1,5 @@
 import ctypes
+from threading import Lock
 from typing import NamedTuple, Dict, Callable, Set
 
 from . import RecorderType, MeasurementState
@@ -81,6 +82,7 @@ class CANape:
 
         # register callbacks for every event type
         self._c_event_callback = cnp_class.EVENT_CALLBACK(self._on_event)
+        self._callback_lock = Lock()
         for event_code in EventCode:
             self._callbacks[event_code] = set()
             cnp_prototype.Asap3RegisterCallBack(
@@ -92,14 +94,22 @@ class CANape:
 
     def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int):
         """This function is called by CANape."""
-        for func in self._callbacks[EventCode(private_data)]:
-            func()
+        try:
+            self._callback_lock.acquire()
+            for func in self._callbacks[EventCode(private_data)]:
+                func()
+        finally:
+            self._callback_lock.release()
 
     def register_callback(self, event_code: EventCode, callback_func: Callable):
+        self._callback_lock.acquire()
         self._callbacks[event_code].add(callback_func)
+        self._callback_lock.release()
 
     def unregister_callback(self, event_code: EventCode, callback_func: Callable):
+        self._callback_lock.acquire()
         self._callbacks[event_code].remove(callback_func)
+        self._callback_lock.release()
 
     def get_application_version(self) -> AppVersion:
         """Call this function to get the current version of the server application."""
