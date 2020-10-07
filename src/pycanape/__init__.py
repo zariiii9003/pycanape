@@ -1,4 +1,4 @@
-__version__ = "0.1.0.dev3"
+__version__ = "0.1.0.dev4"
 
 from .cnp_api.cnp_constants import (
     Channels,
