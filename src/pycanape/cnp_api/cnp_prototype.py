@@ -178,6 +178,17 @@ Asap3GetCurrentValues = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3GetDatabaseInfo = CANAPEAPI.map_symbol(
+    func_name="Asap3GetDatabaseInfo",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TModulHdl,                    # > TModulHdl module
+        ctypes.POINTER(cnp_class.DBFileInfo),   # < DBFileInfo *Info
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3GetDBObjectInfo = CANAPEAPI.map_symbol(
     func_name="Asap3GetDBObjectInfo",
     restype=ctypes.c_bool,

@@ -10,7 +10,7 @@ from .cnp_api.cnp_constants import (
     RecorderState,
     ValueType,
 )
-from .module import Module, EcuTask, MeasurementListEntry
+from .module import DBFileInfo, EcuTask, MeasurementListEntry, Module
 from .daq_handling import FifoReader
 from .recorder import Recorder
 from .utils import CANapeError

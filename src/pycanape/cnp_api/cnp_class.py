@@ -160,3 +160,12 @@ class version_t(ctypes.Structure):
         ("osVersion", ctypes.c_char * cnp_constants.MAX_OS_VERSION),
         ("osRelease", ctypes.c_int),
     ]
+
+
+class DBFileInfo(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [
+        ("asap2Fname", ctypes.c_char * wintypes.MAX_PATH),
+        ("asap2Path", ctypes.c_char * wintypes.MAX_PATH),
+        ("type", wintypes.BYTE),
+    ]

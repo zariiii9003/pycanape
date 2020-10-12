@@ -15,6 +15,12 @@ class MeasurementListEntry(NamedTuple):
     object_name: str
 
 
+class DBFileInfo(NamedTuple):
+    file_name: str
+    file_path: str
+    file_type: cnp_constants.DBFileType
+
+
 class Module:
     def __init__(
         self,
@@ -23,6 +29,21 @@ class Module:
     ):
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
+
+    def get_database_info(self) -> DBFileInfo:
+        """Get Info concerning the database file."""
+        cnp_info = cnp_class.DBFileInfo()
+        cnp_prototype.Asap3GetDatabaseInfo(
+            self.asap3_handle,
+            self.module_handle,
+            ctypes.byref(cnp_info),
+        )
+        db_info = DBFileInfo(
+            file_name=cnp_info.asap2Fname.decode(),
+            file_path=cnp_info.asap2Path.decode(),
+            file_type=cnp_constants.DBFileType(cnp_info.type),
+        )
+        return db_info
 
     def is_module_active(self) -> bool:
         """Return the activation state of the module.

@@ -384,3 +384,28 @@ class EventCode(IntEnum):
     et_ON_CLOSEPROJECT = 3
     et_ON_OPENPROJECT = 4
     et_ON_CLOSECANAPE = 5
+
+
+class DBFileType(IntEnum):
+    UNKNOWN = 0
+    ASAP2 = 1
+    DB = 2
+    DBB = 3
+    DBC = 4
+    CANDELA = 5
+    ODF = 6
+    EDS = 7
+    EHR = 8
+    ROB = 9
+    LST = 10
+    LDF = 11
+    CDM = 12
+    MDF = 13
+    XML = 14
+    Update = 15
+    CDP = 16
+    LostVariable = 17
+    PDX = 18
+    AutosarXML = 19
+    System = 20
+    Anonymous = 21
