@@ -1,7 +1,7 @@
 /venv/
 /dist/
-/.coverage
-/htmlcov/
+*.coverage
+*htmlcov/
 /.idea/
 /.tox/
 /src/pycanape.egg-info/
