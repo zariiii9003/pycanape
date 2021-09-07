@@ -343,6 +343,16 @@ class TAsap3DataType(IntEnum):
     TYPE_STRING = 6  # Characteristic Object is type of ASCII string
 
 
+class TAsap3DBOType(IntEnum):
+    """possible database object types"""
+
+    DBTYPE_MEASUREMENT = 1  # Selects measurement objects from the database
+    DBTYPE_CHARACTERISTIC = 2  # Selects characteristic objects from the database
+    DBTYPE_ALL = (
+        3  # Selects both, measurement and characteristic objects from the database
+    )
+
+
 class TAsap3ECUState(IntEnum):
     """possible On-Offline states of the ECU"""
 

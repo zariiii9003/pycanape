@@ -11,7 +11,7 @@ CANAPEAPI = CLibrary(DLL_NAME)
 
 def get_last_error(result, function, arguments):
     if result:
-        return
+        return arguments
 
     error_code = Asap3GetLastError(arguments[0])
     buffer = ctypes.c_char_p()
@@ -29,6 +29,7 @@ def get_last_error(result, function, arguments):
             f"{ptr.contents.value.decode('ascii')}"
         )
         raise CANapeError(error_code, error_msg, function.__name__)
+    return arguments
 
 
 # fmt: off
@@ -197,6 +198,19 @@ Asap3GetDBObjectInfo = CANAPEAPI.map_symbol(
         cnp_class.TModulHdl,                    # > TModulHdl module
         ctypes.c_char_p,                        # > char *ObjectName
         ctypes.POINTER(cnp_class.DBObjectInfo),  # < DBObjectInfo *Info
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetDatabaseObjects = CANAPEAPI.map_symbol(
+    func_name="Asap3GetDatabaseObjects",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TModulHdl,                    # > TModulHdl module
+        ctypes.POINTER(ctypes.c_char),          # > char *DataObjects
+        ctypes.POINTER(wintypes.UINT),          # > UINT *MaxSize
+        cnp_class.enum_type,                    # > TAsap3DBOType DbType
     ],
     errcheck=get_last_error,
 )

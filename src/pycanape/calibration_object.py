@@ -285,9 +285,11 @@ def get_calibration_object(
     name: str,
 ) -> CalibrationObject:
     object_info = cnp_class.DBObjectInfo()
-    cnp_prototype.Asap3GetDBObjectInfo(
+    found = cnp_prototype.Asap3GetDBObjectInfo(
         asap3_handle, module_handle, name.encode("ascii"), ctypes.byref(object_info)
     )
+    if not found:
+        raise KeyError(f"{name} not found.")
 
     cal_obj_map = {
         ValueType.VALUE: ScalarCalibrationObject,

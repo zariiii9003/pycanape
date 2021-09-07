@@ -1,5 +1,6 @@
 import ctypes
-from typing import NamedTuple, Dict
+import fnmatch
+from typing import List, NamedTuple, Dict
 
 from . import DriverType
 from .ecu_task import EcuTask
@@ -30,6 +31,8 @@ class Module:
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 
+        self._objects_cache = None
+
     def get_database_info(self) -> DBFileInfo:
         """Get Info concerning the database file."""
         cnp_info = cnp_class.DBFileInfo()
@@ -59,7 +62,7 @@ class Module:
         )
         return active.value
 
-    def module_activation(self, activate: bool = True):
+    def module_activation(self, activate: bool = True) -> None:
         """Switches the module activation state.
 
         :param activate:
@@ -83,7 +86,7 @@ class Module:
 
         return False
 
-    def switch_ecu_on_offline(self, online: bool, download: bool = True):
+    def switch_ecu_on_offline(self, online: bool, download: bool = True) -> None:
         """Switches an ECU from online to offline and vice versa.
 
         :param online:
@@ -126,6 +129,26 @@ class Module:
         )
         return buffer.value.decode("ascii")
 
+    def get_database_objects(self) -> List[str]:
+        """Get a list of all object names in database.
+
+        :return:
+            List of object names
+        """
+        if self._objects_cache is None:
+            max_size = 20_000_000
+            buffer = ctypes.create_string_buffer(max_size)
+            cnp_prototype.Asap3GetDatabaseObjects(
+                self.asap3_handle,
+                self.module_handle,
+                buffer,
+                ctypes.c_ulong(max_size),
+                cnp_constants.TAsap3DBOType.DBTYPE_ALL,
+            )
+            self._objects_cache = buffer.raw.rstrip(b"\x00").decode().split(";")
+
+        return self._objects_cache
+
     def get_ecu_tasks(self) -> Dict[str, EcuTask]:
         """Get available data acquisition tasks.
 
@@ -144,13 +167,12 @@ class Module:
         )
         cnp_task_info_list = [*task_info_array][: ptr_task_no.contents.value]
 
-        def get_task_instance(task_info: cnp_class.TTaskInfo2):
-            task = EcuTask(
+        def get_task_instance(task_info: cnp_class.TTaskInfo2) -> EcuTask:
+            return EcuTask(
                 asap3_handle=self.asap3_handle,
                 module_handle=self.module_handle,
                 task_info=task_info,
             )
-            return task
 
         ecu_task_list = [get_task_instance(ti) for ti in cnp_task_info_list]
         return {et.description: et for et in ecu_task_list}
@@ -181,6 +203,12 @@ class Module:
         return DriverType(c_driver_type.value)
 
     def get_calibration_object(self, name: str) -> CalibrationObject:
+        """Get calibration object by name or wildcard pattern (e.g. '*InitReset')."""
+        if "*" in name:
+            filtered = fnmatch.filter(names=self.get_database_objects(), pat=name)
+            if len(filtered) == 1:
+                name = filtered[0]
+
         return get_calibration_object(self.asap3_handle, self.module_handle, name)
 
     def has_resume_mode(self) -> bool:
@@ -226,7 +254,7 @@ class Module:
             res[mle.object_name] = mle
         return res
 
-    def reset_data_acquisition_channels_by_module(self):
+    def reset_data_acquisition_channels_by_module(self) -> None:
         """Clears the data acquisition channel list of a specific module.
 
         .. note::
@@ -238,7 +266,7 @@ class Module:
             self.module_handle,
         )
 
-    def release_module(self):
+    def release_module(self) -> None:
         cnp_prototype.Asap3ReleaseModule(
             self.asap3_handle,
             self.module_handle,
