@@ -7,7 +7,6 @@ from can.interfaces.vector import VectorBus, xldefine
 
 import pycanape
 
-
 XCPSIM_PATH = os.path.join(
     pycanape.utils.get_canape_datapath(),
     "Examples",
@@ -77,62 +76,65 @@ def empty_canape():
     sim_process.kill()
 
 
-class TestCanape:
-    def test_create_module(self, empty_canape):
-        canape = empty_canape
+def test_create_module(empty_canape):
+    canape = empty_canape
 
-        assert canape.get_module_count() == 0
+    assert canape.get_module_count() == 0
 
-        created_module = canape.create_module(
-            module_name="XCPsim",
-            database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
-            driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
-            channel=pycanape.Channels.DEV_CAN1,
-            go_online=True,
-            enable_cache=-1,
-        )
-        assert canape.get_module_count() == 1
-        assert isinstance(created_module, pycanape.Module)
+    created_module = canape.create_module(
+        module_name="XCPsim",
+        database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
+        driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
+        channel=pycanape.Channels.DEV_CAN1,
+        go_online=True,
+        enable_cache=-1,
+    )
+    assert canape.get_module_count() == 1
+    assert isinstance(created_module, pycanape.Module)
 
-    def test_remove_module(self, empty_canape):
-        canape = empty_canape
-        assert canape.get_module_count() == 0
 
-        canape.create_module(
-            module_name="XCPsim",
-            database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
-            driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
-            channel=pycanape.Channels.DEV_CAN1,
-            go_online=True,
-            enable_cache=-1,
-        )
-        assert canape.get_module_count() == 1
+def test_remove_module(empty_canape):
+    canape = empty_canape
+    assert canape.get_module_count() == 0
 
-        for idx in range(0, canape.get_module_count()):
-            module = canape.get_module_by_index(idx)
-            module.release_module()
+    canape.create_module(
+        module_name="XCPsim",
+        database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
+        driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
+        channel=pycanape.Channels.DEV_CAN1,
+        go_online=True,
+        enable_cache=-1,
+    )
+    assert canape.get_module_count() == 1
 
-        assert canape.get_module_count() == 0
+    for idx in range(0, canape.get_module_count()):
+        module = canape.get_module_by_index(idx)
+        module.module_activation(activate=False)
+        module.release_module()
 
-    def test_get_module(self, empty_canape):
-        canape = empty_canape
+    with pytest.raises(pycanape.CANapeError):
+        canape.get_module_by_index(0)
 
-        created_module = canape.create_module(
-            module_name="XCPsim",
-            database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
-            driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
-            channel=pycanape.Channels.DEV_CAN1,
-            go_online=True,
-            enable_cache=-1,
-        )
 
-        module = canape.get_module_by_name("XCPsim")
-        assert isinstance(module, pycanape.Module)
-        assert module.module_handle == created_module.module_handle
+def test_get_module(empty_canape):
+    canape = empty_canape
 
-        module = canape.get_module_by_index(created_module.module_handle.value)
-        assert isinstance(module, pycanape.Module)
-        assert module.module_handle == created_module.module_handle
+    created_module = canape.create_module(
+        module_name="XCPsim",
+        database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
+        driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
+        channel=pycanape.Channels.DEV_CAN1,
+        go_online=True,
+        enable_cache=-1,
+    )
 
-        with pytest.raises(pycanape.CANapeError):
-            module = canape.get_module_by_name("NonExistingModule")
+    module = canape.get_module_by_name("XCPsim")
+    assert isinstance(module, pycanape.Module)
+    assert module.module_handle == created_module.module_handle
+
+    module = canape.get_module_by_index(created_module.module_handle.value)
+    assert isinstance(module, pycanape.Module)
+    assert module.module_handle == created_module.module_handle
+
+    with pytest.raises(pycanape.CANapeError):
+        _ = canape.get_module_by_name("NonExistingModule")
