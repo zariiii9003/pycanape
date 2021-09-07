@@ -1,19 +1,25 @@
 [tool.poetry]
 name = "pyCANape"
-version = "0.1.0.dev4"
+version = "0.2.0.dev0"
 description = "Pythonic wrapper for the CANapeAPI"
 license = "LGPL-3.0-or-later"
 authors = ["Artur Drogunow"]
 
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+
 [tool.poetry.dependencies]
 python = "^3.6"
+psutil = "*"
+importlib-metadata = {version = "", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"
 coverage = "^4"
 pytest-cov = "*"
 pytest-timeout = "*"
-psutil = "*"
 python-can = { git = "https://github.com/hardbyte/python-can.git", branch = "develop" }
 
 [tool.pytest.ini_options]
@@ -23,6 +29,16 @@ testpaths = [
     "tests",
 ]
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+[tool.black]
+exclude = '''
+/(
+  | .venv
+  | venv
+  | .tox
+  | build
+  | dist
+  | .mypy_cache
+  | .pytest_cache
+)/
+
+'''
