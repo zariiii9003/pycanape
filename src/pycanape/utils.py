@@ -4,6 +4,8 @@ from ctypes.util import find_library
 import logging
 from threading import Lock
 
+import psutil
+
 LOG = logging.getLogger(__name__)
 LOCK = Lock()
 
@@ -83,6 +85,18 @@ class CANapeError(Exception):
 
     def __reduce__(self):
         return CANapeError, self._args, {}
+
+
+def _kill_canape_processes() -> None:
+    # search for open CANape processes and kill them
+    for proc in psutil.process_iter():
+        try:
+            proc_name = proc.name()
+        except psutil.AccessDenied:
+            pass
+        else:
+            if proc_name.lower() in ("canape.exe", "canape64.exe"):
+                proc.kill()
 
 
 def get_canape_path() -> str:

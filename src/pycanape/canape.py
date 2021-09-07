@@ -5,6 +5,7 @@ from typing import NamedTuple, Dict, Callable, Set
 from . import RecorderType, MeasurementState
 from .recorder import Recorder
 from .module import Module
+from .utils import CANapeError, _kill_canape_processes
 from .cnp_api import cnp_class, cnp_constants, cnp_prototype
 from .cnp_api.cnp_constants import EventCode
 
@@ -58,6 +59,8 @@ class CANape:
             modal_mode = True -> non-modal (Python Client and CANape)
             modal_mode = False -> modal (only Python Client)
         """
+        _kill_canape_processes()
+
         asap3_handle = cnp_class.TAsap3Hdl()
         ptr = ctypes.pointer(asap3_handle)
 
@@ -265,11 +268,27 @@ class CANape:
         """
         module_handle = cnp_class.TModulHdl(module_index)
 
-        if module_handle.value not in self._modules.keys():
-            self._modules[module_handle.value] = Module(
-                self.asap3_handle, module_handle
-            )
+        # check if Module instance exists
+        if module_handle.value in self._modules.keys():
+            module = self._modules[module_handle.value]
+        # create new Module instance
+        else:
+            module = Module(self.asap3_handle, module_handle)
 
+        # check validity
+        try:
+            module.get_module_name()
+        except CANapeError:
+            if module_handle.value in self._modules.keys():
+                self._modules.pop(module_handle.value)
+
+            raise CANapeError(
+                cnp_constants.ErrorCodes.AEC_INVALID_MODULE_HDL.value,
+                cnp_constants.ErrorCodes.AEC_INVALID_MODULE_HDL.name,
+                f"{self.__class__.__name__}.get_module_by_index",
+            ) from None
+
+        self._modules[module_handle.value] = module
         return self._modules[module_handle.value]
 
     def set_interactive_mode(self, mode: bool):
