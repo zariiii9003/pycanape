@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyCANape"
-version = "0.2.0.dev0"
+version = "0.2.0"
 description = "Pythonic wrapper for the CANapeAPI"
 license = "LGPL-3.0-or-later"
 authors = ["Artur Drogunow"]
