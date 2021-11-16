@@ -13,7 +13,7 @@ build-backend = "poetry.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.6"
 psutil = "*"
-backports.cached-property = {version = "", python = "<3.8"}
+"backports.cached-property" = {version = "", python = "<3.8"}
 importlib-metadata = {version = "", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
