@@ -400,7 +400,7 @@ class CANape:
         return MeasurementState(c_state.value)
 
     def has_mcd3_license(self) -> bool:
-        """"Check if the MCD option is enabled."""
+        """Check if the MCD option is enabled."""
         c_bln = ctypes.c_bool()
         cnp_prototype.Asap3HasMCD3License(
             self.asap3_handle,
