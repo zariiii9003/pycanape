@@ -117,7 +117,7 @@ class AxisCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @axis.setter
-    def axis(self, new_axis: typing.Sequence[float]):
+    def axis(self, new_axis: typing.Sequence[float]) -> None:
         axis = (ctypes.c_double * len(new_axis))(*new_axis)
         cov = self._read_calibration_object_value()
         cov.axis.axis = ctypes.cast(axis, ctypes.POINTER(ctypes.c_double))
@@ -141,7 +141,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @axis.setter
-    def axis(self, new_axis: typing.Sequence[float]):
+    def axis(self, new_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         axis = (ctypes.c_double * cov.curve.dimension)(*new_axis)
         cov.curve.axis = ctypes.cast(axis, ctypes.POINTER(ctypes.c_double))
@@ -156,7 +156,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @values.setter
-    def values(self, values: typing.Sequence[float]):
+    def values(self, values: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * cov.curve.dimension)(*values)
         cov.curve.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
@@ -185,7 +185,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @x_axis.setter
-    def x_axis(self, new_x_axis: typing.Sequence[float]):
+    def x_axis(self, new_x_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * cov.map.xDimension)(*new_x_axis)
         cov.map.xAxis = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
@@ -200,14 +200,14 @@ class MapCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @y_axis.setter
-    def y_axis(self, new_y_axis: typing.Sequence[float]):
+    def y_axis(self, new_y_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * cov.map.yDimension)(*new_y_axis)
         cov.map.yAxis = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
         self._write_calibration_object_value(cov)
 
     @property
-    def values(self):
+    def values(self) -> typing.Sequence[float]:
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.map.values,
@@ -216,7 +216,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @values.setter
-    def values(self, new_values: typing.Sequence[float]):
+    def values(self, new_values: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
             *new_values
@@ -232,12 +232,12 @@ class AsciiCalibrationObject(BaseCalibrationObject):
         return cov.ascii.len
 
     @property
-    def ascii(self):
+    def ascii(self) -> str:
         cov = self._read_calibration_object_value()
         return cov.ascii.ascii.decode("ascii")
 
     @ascii.setter
-    def ascii(self, new_ascii: str):
+    def ascii(self, new_ascii: str) -> None:
         cov = self._read_calibration_object_value()
         cov.ascii.ascii = new_ascii.encode("ascii")
         self._write_calibration_object_value(cov)
@@ -255,7 +255,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return cov.valblk.yDimension
 
     @property
-    def values(self):
+    def values(self) -> typing.Sequence[float]:
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.valblk.values,
@@ -266,7 +266,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return tuple(ptr.contents)
 
     @values.setter
-    def values(self, new_values: typing.Sequence[float]):
+    def values(self, new_values: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension))(
             *new_values
