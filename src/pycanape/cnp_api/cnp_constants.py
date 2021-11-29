@@ -192,6 +192,9 @@ class ErrorCodes(IntEnum):
     AEC_PATCHSECTION_NOT_FOUND = 132  # Patch entry not found
     AEC_SEC_MANAGER_ERROR = 133  # Security manager access error
     ACE_CHANNEL_OPTIMIZED = 134  # Measurement channel is optimized because it's parent will already be measured
+    ACE_ERR_PROFILE_ID = 135  # Profile not registered
+    ACE_ERR_UNSUPPORTED_TYPE = 136  # Unsupported data type for measurement
+    ACE_ERR_DATA_SIZE = 137  # Datasize of object too large
 
 
 class TApplicationType(IntEnum):
@@ -303,6 +306,8 @@ class DriverType(IntEnum):
     ASAP3_DRIVER_SYSTEM = 140  # System driver
     ASAP3_DRIVER_ETH = 150  # Ethernet driver
     ASAP3_DAIO_SYSTEM = 160  # DAIO_SYSTEM driver
+    ASAP3_DRIVER_SOME_IP = 170  # SOME-IP driver
+    ASAP3_DRIVER_DLT = 180  # DLT driver
 
 
 class TFormat(IntEnum):
@@ -341,6 +346,14 @@ class TAsap3DataType(IntEnum):
     TYPE_SIGNED = 4  # Characteristic Object is type of signed
     TYPE_UNSIGNED = 5  # Characteristic Object is type of unsigned
     TYPE_STRING = 6  # Characteristic Object is type of ASCII string
+    TYPE_INT64 = 7  # Characteristic Object is type of 64bit integer
+    TYPE_UINT64 = 8  # Characteristic Object is type of 64bit integer
+    TYPE_UWORD = 9  # Characteristic Object is type of unsigned word
+    TYPE_WORD = 10  # Characteristic Object is type of signed word
+    TYPE_UINT = 11  # Characteristic Object is type of unsigned int
+    TYPE_UBYTE = 12  # Characteristic Object is type of BYTE
+    TYPE_SBYTE = 13  # Characteristic Object is type of character
+    TYPE_FLOAT16 = 14  # Characteristic Object is type of 16bit float
 
 
 class TAsap3DBOType(IntEnum):
