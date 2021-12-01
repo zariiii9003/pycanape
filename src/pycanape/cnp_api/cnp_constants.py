@@ -16,6 +16,7 @@ TDBE_VALUE_MAP = 0x00000004  # definition for map object selection
 TDBE_VALUE_AXIS = 0x00000008  # definition for axis object selection
 TDBE_VALUE_ASCII = 0x00000010  # definition for ASCII object selection
 TDBE_VALUE_VALBLK = 0x00000020  # definition for Value Block object selection
+TDBE_VALUE_TEMPLATE = 0x00000040  # definition for Includeing templates
 TDBE_VALUE_ALL = (
     TDBE_VALUE_SCALAR
     | TDBE_VALUE_CURVE
@@ -23,7 +24,16 @@ TDBE_VALUE_ALL = (
     | TDBE_VALUE_AXIS
     | TDBE_VALUE_ASCII
     | TDBE_VALUE_VALBLK
-)
+)  # definition for all object types without templates
+TDBE_VALUE_INCLUDING_TEMPLATES = (
+    TDBE_VALUE_SCALAR
+    | TDBE_VALUE_CURVE
+    | TDBE_VALUE_MAP
+    | TDBE_VALUE_AXIS
+    | TDBE_VALUE_ASCII
+    | TDBE_VALUE_VALBLK
+    | TDBE_VALUE_TEMPLATE
+)  # definition for all object types including templates
 
 
 class ErrorCodes(IntEnum):
@@ -195,6 +205,7 @@ class ErrorCodes(IntEnum):
     ACE_ERR_PROFILE_ID = 135  # Profile not registered
     ACE_ERR_UNSUPPORTED_TYPE = 136  # Unsupported data type for measurement
     ACE_ERR_DATA_SIZE = 137  # Datasize of object too large
+    AEC_CALOBJ_INVALID_VALUE = 138  # Invalid value - object can't be read
 
 
 class TApplicationType(IntEnum):

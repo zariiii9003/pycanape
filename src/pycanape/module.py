@@ -136,13 +136,23 @@ class Module:
             List of object names
         """
         if self._objects_cache is None:
-            max_size = 20_000_000
-            buffer = ctypes.create_string_buffer(max_size)
+            # call function first time to determine max_size
+            max_size = ctypes.c_ulong(0)
+            cnp_prototype.Asap3GetDatabaseObjects(
+                self.asap3_handle,
+                self.module_handle,
+                None,
+                ctypes.byref(max_size),
+                cnp_constants.TAsap3DBOType.DBTYPE_ALL,
+            )
+
+            # call function again to retrieve data
+            buffer = ctypes.create_string_buffer(max_size.value)
             cnp_prototype.Asap3GetDatabaseObjects(
                 self.asap3_handle,
                 self.module_handle,
                 buffer,
-                ctypes.c_ulong(max_size),
+                ctypes.byref(max_size),
                 cnp_constants.TAsap3DBOType.DBTYPE_ALL,
             )
             self._objects_cache = buffer.raw.rstrip(b"\x00").decode().split(";")

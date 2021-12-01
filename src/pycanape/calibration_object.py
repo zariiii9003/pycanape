@@ -32,7 +32,7 @@ class BaseCalibrationObject:
             self._module_handle,
             self.name.encode("ascii"),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
-            False,
+            True,
             ctypes.byref(cov),
         )
         return cov
