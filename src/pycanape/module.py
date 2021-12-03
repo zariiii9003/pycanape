@@ -1,5 +1,6 @@
 import ctypes
 import fnmatch
+import os.path
 from typing import List, NamedTuple, Dict
 
 from . import DriverType
@@ -57,6 +58,11 @@ class Module:
             file_type=cnp_constants.DBFileType(cnp_info.type),
         )
         return db_info
+
+    def get_database_path(self) -> str:
+        """Get path to database file."""
+        db_info = self.get_database_info()
+        return os.path.join(db_info.file_path, db_info.file_name)
 
     def is_module_active(self) -> bool:
         """Return the activation state of the module.
