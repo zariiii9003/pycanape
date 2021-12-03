@@ -165,7 +165,7 @@ class Module:
                 ctypes.byref(max_size),
                 cnp_constants.TAsap3DBOType.DBTYPE_ALL,
             )
-            self._objects_cache = buffer.raw.rstrip(b"\x00").decode().split(";")
+            self._objects_cache = buffer.value.strip(b";").decode().split(";")
 
         return self._objects_cache
 
