@@ -5,7 +5,12 @@ from typing import List, NamedTuple, Dict
 from . import DriverType
 from .ecu_task import EcuTask
 from .calibration_object import get_calibration_object, CalibrationObject
-from .cnp_api import cnp_class, cnp_prototype, cnp_constants
+from .cnp_api import cnp_class, cnp_constants
+
+try:
+    from .cnp_api import cnp_prototype
+except FileNotFoundError:
+    cnp_prototype = None
 
 
 class MeasurementListEntry(NamedTuple):
@@ -28,6 +33,11 @@ class Module:
         asap3_handle: cnp_class.TAsap3Hdl,
         module_handle: cnp_class.TModulHdl,
     ):
+        if cnp_prototype is None:
+            raise FileNotFoundError(
+                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            )
+
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 

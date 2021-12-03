@@ -9,7 +9,12 @@ else:
     from backports.cached_property import cached_property
 
 from . import ObjectType, ValueType
-from .cnp_api import cnp_class, cnp_prototype, cnp_constants
+from .cnp_api import cnp_class, cnp_constants
+
+try:
+    from .cnp_api import cnp_prototype
+except FileNotFoundError:
+    cnp_prototype = None
 
 
 class BaseCalibrationObject:
@@ -20,6 +25,11 @@ class BaseCalibrationObject:
         name: str,
         object_info: cnp_class.DBObjectInfo,
     ):
+        if cnp_prototype is None:
+            raise FileNotFoundError(
+                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            )
+
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle
         self._name = name

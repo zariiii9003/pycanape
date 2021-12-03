@@ -2,7 +2,12 @@ import ctypes
 import typing
 from typing import List
 
-from .cnp_api import cnp_class, cnp_constants, cnp_prototype
+from .cnp_api import cnp_class, cnp_constants
+
+try:
+    from .cnp_api import cnp_prototype
+except FileNotFoundError:
+    cnp_prototype = None
 
 
 class Sample(typing.NamedTuple):
@@ -17,6 +22,11 @@ class EcuTask:
         module_handle: cnp_class.TModulHdl,
         task_info: cnp_class.TTaskInfo2,
     ):
+        if cnp_prototype is None:
+            raise FileNotFoundError(
+                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            )
+
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle
         self._task_info = task_info

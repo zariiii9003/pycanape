@@ -6,8 +6,13 @@ from . import RecorderType, MeasurementState
 from .recorder import Recorder
 from .module import Module
 from .utils import CANapeError, _kill_canape_processes
-from .cnp_api import cnp_class, cnp_constants, cnp_prototype
+from .cnp_api import cnp_class, cnp_constants
 from .cnp_api.cnp_constants import EventCode
+
+try:
+    from .cnp_api import cnp_prototype
+except FileNotFoundError:
+    cnp_prototype = None
 
 
 class AppVersion(NamedTuple):
@@ -59,6 +64,11 @@ class CANape:
             modal_mode = True -> non-modal (Python Client and CANape)
             modal_mode = False -> modal (only Python Client)
         """
+        if cnp_prototype is None:
+            raise FileNotFoundError(
+                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            )
+
         _kill_canape_processes()
 
         asap3_handle = cnp_class.TAsap3Hdl()

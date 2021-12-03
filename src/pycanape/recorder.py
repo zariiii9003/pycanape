@@ -2,14 +2,23 @@ import ctypes
 from ctypes import wintypes
 
 from . import RecorderState
-from .cnp_api import cnp_prototype
 from .cnp_api import cnp_class
+
+try:
+    from .cnp_api import cnp_prototype
+except FileNotFoundError:
+    cnp_prototype = None
 
 
 class Recorder:
     def __init__(
         self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID
     ):
+        if cnp_prototype is None:
+            raise FileNotFoundError(
+                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            )
+
         self._asap3_handle = asap3_handle
         self._recorder_id = recorder_id
 

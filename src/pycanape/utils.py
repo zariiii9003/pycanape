@@ -20,10 +20,8 @@ def _synchronization_wrapper(func, func_name: str):
         return func
 
     def wrapper(*args, **kwargs):
-        LOCK.acquire()
-        res = func(*args, **kwargs)
-        LOCK.release()
-        return res
+        with LOCK:
+            return func(*args, **kwargs)
 
     return wrapper
 
@@ -32,7 +30,13 @@ class CLibrary(ctypes.WinDLL):
     """Based on https://github.com/hardbyte/python-can/blob/develop/can/ctypesutil.py"""
 
     def __init__(self, library_or_path: str):
-        super().__init__(find_library(library_or_path))
+        library_path = find_library(library_or_path)
+        if library_path is None:
+            log_msg = "CANape API not found. Add CANape API location to environment variable `PATH`."
+            LOG.warning(log_msg)
+            raise FileNotFoundError(log_msg)
+
+        super().__init__(library_path)
 
     @property
     def function_type(self):
