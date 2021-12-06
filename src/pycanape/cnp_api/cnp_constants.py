@@ -1,4 +1,11 @@
 from enum import IntEnum
+import typing
+
+import numpy as np
+
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
+
 
 CANAPE_API_MAIN_VESION = 2
 CANAPE_API_SUB_VESION = 3
@@ -365,6 +372,26 @@ class TAsap3DataType(IntEnum):
     TYPE_UBYTE = 12  # Characteristic Object is type of BYTE
     TYPE_SBYTE = 13  # Characteristic Object is type of character
     TYPE_FLOAT16 = 14  # Characteristic Object is type of 16bit float
+
+    @property
+    def dtype(self) -> "npt.DTypeLike":
+        datatype_map: typing.Dict[TAsap3DataType, "npt.DTypeLike"] = {
+            TAsap3DataType.TYPE_INT: np.int32,
+            TAsap3DataType.TYPE_FLOAT: np.float32,
+            TAsap3DataType.TYPE_DOUBLE: np.float64,
+            # TAsap3DataType.TYPE_SIGNED: np.int16,  # TODO: check with CANape 17
+            # TAsap3DataType.TYPE_UNSIGNED: np.uint16,  # TODO: check with CANape 17
+            TAsap3DataType.TYPE_STRING: np.uint8,
+            TAsap3DataType.TYPE_INT64: np.int64,
+            TAsap3DataType.TYPE_UINT64: np.uint64,
+            TAsap3DataType.TYPE_UWORD: np.uint16,
+            TAsap3DataType.TYPE_WORD: np.int16,
+            TAsap3DataType.TYPE_UINT: np.uint32,
+            TAsap3DataType.TYPE_UBYTE: np.uint8,
+            TAsap3DataType.TYPE_SBYTE: np.int8,
+            TAsap3DataType.TYPE_FLOAT16: np.float16,
+        }
+        return datatype_map[self]
 
 
 class TAsap3DBOType(IntEnum):

@@ -8,6 +8,8 @@ if sys.version_info >= (3, 8):
 else:
     from backports.cached_property import cached_property
 
+import numpy as np
+
 from . import ObjectType, ValueType
 from .cnp_api import cnp_class, cnp_constants
 
@@ -15,6 +17,9 @@ try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
     cnp_prototype = None
+
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
 
 
 class BaseCalibrationObject:
@@ -34,13 +39,33 @@ class BaseCalibrationObject:
         self._module_handle = module_handle
         self._name = name
         self._object_info = object_info
+        self._datatype = self._read_datatype()
+
+    def _read_datatype(self) -> cnp_constants.TAsap3DataType:
+        _dtype = cnp_class.enum_type(0)
+        _address = ctypes.c_ulong(0)
+        _min = ctypes.c_double(0)
+        _max = ctypes.c_double(0)
+        _increment = ctypes.c_double(0)
+        cnp_prototype.Asap3ReadObjectParameter(
+            self._asap3_handle,
+            self._module_handle,
+            self._name.encode("ascii"),
+            cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
+            ctypes.byref(_dtype),
+            ctypes.byref(_address),
+            ctypes.byref(_min),
+            ctypes.byref(_max),
+            ctypes.byref(_increment),
+        )
+        return cnp_constants.TAsap3DataType(_dtype.value)
 
     def _read_calibration_object_value(self) -> cnp_class.TCalibrationObjectValue:
         cov = cnp_class.TCalibrationObjectValue()
         cnp_prototype.Asap3ReadCalibrationObject2(
             self._asap3_handle,
             self._module_handle,
-            self.name.encode("ascii"),
+            self._name.encode("ascii"),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             True,
             ctypes.byref(cov),
@@ -53,7 +78,7 @@ class BaseCalibrationObject:
         cnp_prototype.Asap3WriteCalibrationObject(
             self._asap3_handle,
             self._module_handle,
-            self.name.encode("ascii"),
+            self._name.encode("ascii"),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             ctypes.byref(cov),
         )
@@ -99,9 +124,14 @@ class ScalarCalibrationObject(BaseCalibrationObject):
     """0D calibration object"""
 
     @property
-    def value(self) -> float:
+    def value(self) -> typing.Union[float, np.number]:
         cov = self._read_calibration_object_value()
-        return cov.value.value
+
+        try:
+            np_dtype = self._datatype.dtype
+        except KeyError:
+            return cov.value.value
+        return np_dtype(cov.value.value)
 
     @value.setter
     def value(self, new_value: float):
@@ -119,12 +149,17 @@ class AxisCalibrationObject(BaseCalibrationObject):
         return cov.axis.dimension
 
     @property
-    def axis(self) -> typing.Sequence[float]:
+    def axis(self) -> "npt.NDArray":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.axis.axis, ctypes.POINTER(ctypes.c_double * cov.axis.dimension)
         )
-        return tuple(ptr.contents)
+        try:
+            np_dtype = self._datatype.dtype
+        except KeyError:
+            return np.array(ptr.contents, dtype=float)
+
+        return np.array(ptr.contents, dtype=np_dtype)
 
     @axis.setter
     def axis(self, new_axis: typing.Sequence[float]) -> None:
@@ -143,12 +178,12 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return cov.curve.dimension
 
     @property
-    def axis(self) -> typing.Sequence[float]:
+    def axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.curve.axis, ctypes.POINTER(ctypes.c_double * cov.curve.dimension)
         )
-        return tuple(ptr.contents)
+        return np.array(ptr.contents, dtype=float)
 
     @axis.setter
     def axis(self, new_axis: typing.Sequence[float]) -> None:
@@ -158,12 +193,17 @@ class CurveCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def values(self) -> typing.Sequence[float]:
+    def values(self) -> "npt.NDArray":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.curve.values, ctypes.POINTER(ctypes.c_double * cov.curve.dimension)
         )
-        return tuple(ptr.contents)
+        try:
+            np_dtype = self._datatype.dtype
+        except KeyError:
+            return np.array(ptr.contents, dtype=float)
+
+        return np.array(ptr.contents, dtype=np_dtype)
 
     @values.setter
     def values(self, values: typing.Sequence[float]) -> None:
@@ -187,12 +227,12 @@ class MapCalibrationObject(BaseCalibrationObject):
         return cov.map.yDimension
 
     @property
-    def x_axis(self) -> typing.Sequence[float]:
+    def x_axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.map.xAxis, ctypes.POINTER(ctypes.c_double * cov.map.xDimension)
         )
-        return tuple(ptr.contents)
+        return np.array(ptr.contents, dtype=float)
 
     @x_axis.setter
     def x_axis(self, new_x_axis: typing.Sequence[float]) -> None:
@@ -202,12 +242,12 @@ class MapCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def y_axis(self) -> typing.Sequence[float]:
+    def y_axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.map.yAxis, ctypes.POINTER(ctypes.c_double * cov.map.yDimension)
         )
-        return tuple(ptr.contents)
+        return np.array(ptr.contents, dtype=float)
 
     @y_axis.setter
     def y_axis(self, new_y_axis: typing.Sequence[float]) -> None:
@@ -217,13 +257,20 @@ class MapCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def values(self) -> typing.Sequence[float]:
+    def values(self) -> "npt.NDArray":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.map.values,
             ctypes.POINTER(ctypes.c_double * (cov.map.xDimension * cov.map.yDimension)),
         )
-        return tuple(ptr.contents)
+        try:
+            np_dtype = self._datatype.dtype
+        except KeyError:
+            np_array = np.array(ptr.contents, dtype=float)
+        else:
+            np_array = np.array(ptr.contents, dtype=np_dtype)
+
+        return np_array.reshape((cov.map.xDimension, cov.map.yDimension))
 
     @values.setter
     def values(self, new_values: typing.Sequence[float]) -> None:
@@ -265,7 +312,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return cov.valblk.yDimension
 
     @property
-    def values(self) -> typing.Sequence[float]:
+    def values(self) -> "npt.NDArray":
         cov = self._read_calibration_object_value()
         ptr = ctypes.cast(
             cov.valblk.values,
@@ -273,7 +320,14 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
                 ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension)
             ),
         )
-        return tuple(ptr.contents)
+        try:
+            np_dtype = self._datatype.dtype
+        except KeyError:
+            np_array = np.array(ptr.contents, dtype=float)
+        else:
+            np_array = np.array(ptr.contents, dtype=np_dtype)
+
+        return np_array.reshape((cov.valblk.xDimension, cov.valblk.yDimension))
 
     @values.setter
     def values(self, new_values: typing.Sequence[float]) -> None:
