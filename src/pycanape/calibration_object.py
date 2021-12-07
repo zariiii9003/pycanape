@@ -249,7 +249,9 @@ class MapCalibrationObject(BaseCalibrationObject):
             ctypes.POINTER(ctypes.c_double * (cov.map.xDimension * cov.map.yDimension)),
         )
         np_array = np.array(ptr.contents, dtype=float)
-        return np_array.reshape((cov.map.xDimension, cov.map.yDimension))
+        if cov.map.yDimension > 1:
+            return np_array.reshape((cov.map.xDimension, cov.map.yDimension))
+        return np_array
 
     @values.setter
     def values(self, new_values: typing.Sequence[float]) -> None:
@@ -300,7 +302,9 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
             ),
         )
         np_array = np.array(ptr.contents, dtype=float)
-        return np_array.reshape((cov.valblk.xDimension, cov.valblk.yDimension))
+        if cov.valblk.yDimension > 1:
+            return np_array.reshape((cov.valblk.xDimension, cov.valblk.yDimension))
+        return np_array
 
     @values.setter
     def values(self, new_values: typing.Sequence[float]) -> None:
