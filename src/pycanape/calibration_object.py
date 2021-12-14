@@ -146,16 +146,14 @@ class AxisCalibrationObject(BaseCalibrationObject):
     @property
     def axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.axis.axis, ctypes.POINTER(ctypes.c_double * cov.axis.dimension)
-        )
-        return np.array(ptr.contents, dtype=float)
+        np_array = np.ctypeslib.as_array(cov.axis.axis, shape=(cov.axis.dimension,))
+        return np_array.astype(dtype=float, copy=True)
 
     @axis.setter
     def axis(self, new_axis: typing.Sequence[float]) -> None:
-        axis = (ctypes.c_double * len(new_axis))(*new_axis)
         cov = self._read_calibration_object_value()
-        cov.axis.axis = ctypes.cast(axis, ctypes.POINTER(ctypes.c_double))
+        axis = (ctypes.c_double * len(new_axis))(*new_axis)
+        cov.axis.axis = axis
         self._write_calibration_object_value(cov)
 
 
@@ -170,31 +168,27 @@ class CurveCalibrationObject(BaseCalibrationObject):
     @property
     def axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.curve.axis, ctypes.POINTER(ctypes.c_double * cov.curve.dimension)
-        )
-        return np.array(ptr.contents, dtype=float)
+        np_array = np.ctypeslib.as_array(cov.curve.axis, shape=(cov.curve.dimension,))
+        return np_array.astype(dtype=float, copy=True)
 
     @axis.setter
     def axis(self, new_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         axis = (ctypes.c_double * cov.curve.dimension)(*new_axis)
-        cov.curve.axis = ctypes.cast(axis, ctypes.POINTER(ctypes.c_double))
+        cov.curve.axis = axis
         self._write_calibration_object_value(cov)
 
     @property
     def values(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.curve.values, ctypes.POINTER(ctypes.c_double * cov.curve.dimension)
-        )
-        return np.array(ptr.contents, dtype=float)
+        np_array = np.ctypeslib.as_array(cov.curve.values, shape=(cov.curve.dimension,))
+        return np_array.astype(dtype=float, copy=True)
 
     @values.setter
     def values(self, values: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
-        array = (ctypes.c_double * cov.curve.dimension)(*values)
-        cov.curve.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
+        c_array = (ctypes.c_double * cov.curve.dimension)(*values)
+        cov.curve.values = c_array
         self._write_calibration_object_value(cov)
 
 
@@ -214,52 +208,44 @@ class MapCalibrationObject(BaseCalibrationObject):
     @property
     def x_axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.map.xAxis, ctypes.POINTER(ctypes.c_double * cov.map.xDimension)
-        )
-        return np.array(ptr.contents, dtype=float)
+        np_array = np.ctypeslib.as_array(cov.map.xAxis, shape=(cov.map.xDimension,))
+        return np_array.astype(dtype=float, copy=True)
 
     @x_axis.setter
     def x_axis(self, new_x_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
-        array = (ctypes.c_double * cov.map.xDimension)(*new_x_axis)
-        cov.map.xAxis = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
+        c_array = (ctypes.c_double * cov.map.xDimension)(*new_x_axis)
+        cov.map.xAxis = c_array
         self._write_calibration_object_value(cov)
 
     @property
     def y_axis(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.map.yAxis, ctypes.POINTER(ctypes.c_double * cov.map.yDimension)
-        )
-        return np.array(ptr.contents, dtype=float)
+        np_array = np.ctypeslib.as_array(cov.map.yAxis, shape=(cov.map.yDimension,))
+        return np_array.astype(dtype=float, copy=True)
 
     @y_axis.setter
     def y_axis(self, new_y_axis: typing.Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
-        array = (ctypes.c_double * cov.map.yDimension)(*new_y_axis)
-        cov.map.yAxis = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
+        c_array = (ctypes.c_double * cov.map.yDimension)(*new_y_axis)
+        cov.map.yAxis = c_array
         self._write_calibration_object_value(cov)
 
     @property
     def values(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.map.values,
-            ctypes.POINTER(ctypes.c_double * (cov.map.xDimension * cov.map.yDimension)),
+        np_array = np.ctypeslib.as_array(
+            cov.map.values, shape=(cov.map.xDimension, cov.map.yDimension)
         )
-        np_array = np.array(ptr.contents, dtype=float)
-        if cov.map.yDimension > 1:
-            return np_array.reshape((cov.map.xDimension, cov.map.yDimension))
-        return np_array
+        return np_array.astype(dtype=float, copy=True)
 
     @values.setter
     def values(self, new_values: "npt.NDArray[float]") -> None:
         cov = self._read_calibration_object_value()
-        array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
+        c_array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
             *new_values.flatten()
         )
-        cov.map.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
+        cov.map.values = c_array
         self._write_calibration_object_value(cov)
 
 
@@ -295,24 +281,18 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
     @property
     def values(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        ptr = ctypes.cast(
-            cov.valblk.values,
-            ctypes.POINTER(
-                ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension)
-            ),
+        np_array = np.ctypeslib.as_array(
+            cov.valblk.values, shape=(cov.valblk.xDimension, cov.valblk.yDimension)
         )
-        np_array = np.array(ptr.contents, dtype=float)
-        if cov.valblk.yDimension > 1:
-            return np_array.reshape((cov.valblk.xDimension, cov.valblk.yDimension))
-        return np_array
+        return np_array.astype(dtype=float, copy=True)
 
     @values.setter
     def values(self, new_values: "npt.NDArray[float]") -> None:
         cov = self._read_calibration_object_value()
-        array = (ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension))(
+        c_array = (ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension))(
             *new_values.flatten()
         )
-        cov.valblk.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
+        cov.valblk.values = c_array
         self._write_calibration_object_value(cov)
 
 
