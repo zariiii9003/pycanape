@@ -254,10 +254,10 @@ class MapCalibrationObject(BaseCalibrationObject):
         return np_array
 
     @values.setter
-    def values(self, new_values: typing.Sequence[float]) -> None:
+    def values(self, new_values: "npt.NDArray[float]") -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
-            *new_values
+            *new_values.flatten()
         )
         cov.map.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
         self._write_calibration_object_value(cov)
@@ -307,10 +307,10 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return np_array
 
     @values.setter
-    def values(self, new_values: typing.Sequence[float]) -> None:
+    def values(self, new_values: "npt.NDArray[float]") -> None:
         cov = self._read_calibration_object_value()
         array = (ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension))(
-            *new_values
+            *new_values.flatten()
         )
         cov.valblk.values = ctypes.cast(array, ctypes.POINTER(ctypes.c_double))
         self._write_calibration_object_value(cov)
