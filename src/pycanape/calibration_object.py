@@ -234,18 +234,33 @@ class MapCalibrationObject(BaseCalibrationObject):
     @property
     def values(self) -> "npt.NDArray[float]":
         cov = self._read_calibration_object_value()
-        np_array = np.ctypeslib.as_array(
-            cov.map.values, shape=(cov.map.xDimension, cov.map.yDimension)
-        )
+        if cov.type == ValueType.MAP:
+            np_array = np.ctypeslib.as_array(
+                cov.map.values, shape=(cov.map.xDimension, cov.map.yDimension)
+            )
+        elif cov.type == ValueType.VAL_BLK:
+            np_array = np.ctypeslib.as_array(
+                cov.valblk.values, shape=(cov.valblk.xDimension, cov.valblk.yDimension)
+            )
+        else:
+            raise ValueError
         return np_array.astype(dtype=float, copy=True)
 
     @values.setter
     def values(self, new_values: "npt.NDArray[float]") -> None:
         cov = self._read_calibration_object_value()
-        c_array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
-            *new_values.flatten()
-        )
-        cov.map.values = c_array
+        if cov.type == ValueType.MAP:
+            c_array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
+                *new_values.flatten()
+            )
+            cov.map.values = c_array
+        elif cov.type == ValueType.VAL_BLK:
+            c_array = (
+                ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension)
+            )(*new_values.flatten())
+            cov.valblk.values = c_array
+        else:
+            raise ValueError
         self._write_calibration_object_value(cov)
 
 
@@ -284,6 +299,8 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         np_array = np.ctypeslib.as_array(
             cov.valblk.values, shape=(cov.valblk.xDimension, cov.valblk.yDimension)
         )
+        if cov.valblk.yDimension < 2:
+            np_array = np_array.flatten()
         return np_array.astype(dtype=float, copy=True)
 
     @values.setter
