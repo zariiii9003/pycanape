@@ -11,7 +11,7 @@ build-backend = "poetry.masonry.api"
 
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 psutil = "*"
 numpy = "*"
 "backports.cached-property" = {version = "", python = "<3.8"}
@@ -22,6 +22,7 @@ pytest = "^6.0"
 coverage = "^4"
 pytest-cov = "*"
 pytest-timeout = "*"
+black = "*"
 python-can = { git = "https://github.com/hardbyte/python-can.git", branch = "develop" }
 
 [tool.pytest.ini_options]
