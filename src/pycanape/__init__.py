@@ -1,6 +1,6 @@
 import sys
 
-# compatibility fix for python 3.6 and 3.7
+# compatibility fix for python 3.7
 if sys.version_info >= (3, 8):
     import importlib.metadata as importlib_metadata
 else:
@@ -8,6 +8,7 @@ else:
 
 __version__ = importlib_metadata.metadata("pycanape")["Version"]
 
+from .utils import CANapeError
 from .cnp_api.cnp_constants import (
     Channels,
     DriverType,
@@ -21,7 +22,6 @@ from .cnp_api.cnp_constants import (
 from .module import DBFileInfo, EcuTask, MeasurementListEntry, Module
 from .daq_handling import FifoReader
 from .recorder import Recorder
-from .utils import CANapeError
 from .calibration_object import (
     ScalarCalibrationObject,
     AxisCalibrationObject,

@@ -10,7 +10,7 @@ else:
 
 import numpy as np
 
-from . import ObjectType, ValueType
+from . import ObjectType, ValueType, CANapeError
 from .cnp_api import cnp_class, cnp_constants
 
 try:
@@ -39,7 +39,10 @@ class BaseCalibrationObject:
         self._module_handle = module_handle
         self._name = name
         self._object_info = object_info
-        self._datatype = self._read_datatype()
+        try:
+            self._datatype = self._read_datatype()
+        except CANapeError:
+            self._datatype = None
 
     def _read_datatype(self) -> cnp_constants.TAsap3DataType:
         _dtype = cnp_class.enum_type(0)
