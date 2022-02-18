@@ -122,6 +122,18 @@ class BaseCalibrationObject:
     def unit(self) -> str:
         return self._object_info.unit.decode("ascii")
 
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self._name})"
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"asap3_handle={repr(self._asap3_handle)}, "
+            f"module_handle={repr(self._module_handle)}, "
+            f"name={repr(self._name)}, "
+            f"object_info)"
+        )
+
 
 class ScalarCalibrationObject(BaseCalibrationObject):
     """0D calibration object"""
