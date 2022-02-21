@@ -3,7 +3,7 @@ import fnmatch
 import os.path
 from typing import List, NamedTuple, Dict
 
-from . import DriverType
+from . import DriverType, RC
 from .ecu_task import EcuTask
 from .calibration_object import get_calibration_object, CalibrationObject
 from .cnp_api import cnp_class, cnp_constants
@@ -133,7 +133,7 @@ class Module:
             self.module_handle,
             ptr,
         )
-        return buffer.value.decode("ascii")
+        return buffer.value.decode(RC["ENCODING"])
 
     def get_communication_type(self) -> str:
         """Get current communication type (e.g. "CAN")."""
@@ -143,7 +143,7 @@ class Module:
             self.module_handle,
             ctypes.pointer(buffer),
         )
-        return buffer.value.decode("ascii")
+        return buffer.value.decode(RC["ENCODING"])
 
     def get_database_objects(self) -> List[str]:
         """Get a list of all object names in database.
@@ -212,7 +212,7 @@ class Module:
             ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
             ctypes.byref(ctypes.c_uint()),
         )
-        return c_name.value.decode("ascii")
+        return c_name.value.decode(RC["ENCODING"])
 
     def get_ecu_driver_type(self) -> DriverType:
         """Retrieves the drivertype of an ECU.
@@ -275,7 +275,7 @@ class Module:
                 rate=c_entry.rate,
                 save_flag=c_entry.SaveFlag,
                 disabled=c_entry.Disabled,
-                object_name=c_entry.ObjectName.decode("ascii"),
+                object_name=c_entry.ObjectName.decode(RC["ENCODING"]),
             )
             res[mle.object_name] = mle
         return res

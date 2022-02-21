@@ -2,7 +2,7 @@ import ctypes
 import sys
 import typing
 
-# compatibility fix for python 3.6 and 3.7
+# compatibility fix for python 3.7
 if sys.version_info >= (3, 8):
     from functools import cached_property
 else:
@@ -10,7 +10,7 @@ else:
 
 import numpy as np
 
-from . import ObjectType, ValueType, CANapeError
+from . import ObjectType, ValueType, CANapeError, RC
 from .cnp_api import cnp_class, cnp_constants
 
 try:
@@ -53,7 +53,7 @@ class BaseCalibrationObject:
         cnp_prototype.Asap3ReadObjectParameter(
             self._asap3_handle,
             self._module_handle,
-            self._name.encode("ascii"),
+            self._name.encode(RC["ENCODING"]),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             ctypes.byref(_dtype),
             ctypes.byref(_address),
@@ -68,7 +68,7 @@ class BaseCalibrationObject:
         cnp_prototype.Asap3ReadCalibrationObject2(
             self._asap3_handle,
             self._module_handle,
-            self._name.encode("ascii"),
+            self._name.encode(RC["ENCODING"]),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             True,
             ctypes.byref(cov),
@@ -81,7 +81,7 @@ class BaseCalibrationObject:
         cnp_prototype.Asap3WriteCalibrationObject(
             self._asap3_handle,
             self._module_handle,
-            self._name.encode("ascii"),
+            self._name.encode(RC["ENCODING"]),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             ctypes.byref(cov),
         )
@@ -120,7 +120,7 @@ class BaseCalibrationObject:
 
     @property
     def unit(self) -> str:
-        return self._object_info.unit.decode("ascii")
+        return self._object_info.unit.decode(RC["ENCODING"])
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self._name})"
@@ -288,12 +288,12 @@ class AsciiCalibrationObject(BaseCalibrationObject):
     @property
     def ascii(self) -> str:
         cov = self._read_calibration_object_value()
-        return cov.ascii.ascii.decode("ascii")
+        return cov.ascii.ascii.decode(RC["ENCODING"])
 
     @ascii.setter
     def ascii(self, new_ascii: str) -> None:
         cov = self._read_calibration_object_value()
-        cov.ascii.ascii = new_ascii.encode("ascii")
+        cov.ascii.ascii = new_ascii.encode(RC["ENCODING"])
         self._write_calibration_object_value(cov)
 
 
@@ -345,7 +345,10 @@ def get_calibration_object(
 ) -> CalibrationObject:
     object_info = cnp_class.DBObjectInfo()
     found = cnp_prototype.Asap3GetDBObjectInfo(
-        asap3_handle, module_handle, name.encode("ascii"), ctypes.byref(object_info)
+        asap3_handle,
+        module_handle,
+        name.encode(RC["ENCODING"]),
+        ctypes.byref(object_info),
     )
     if not found:
         raise KeyError(f"{name} not found.")

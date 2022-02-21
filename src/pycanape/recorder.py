@@ -1,7 +1,7 @@
 import ctypes
 from ctypes import wintypes
 
-from . import RecorderState
+from . import RecorderState, RC
 from .cnp_api import cnp_class
 
 try:
@@ -32,7 +32,7 @@ class Recorder:
             ctypes.cast(c_name, ctypes.c_char_p),
             ctypes.byref(length),
         )
-        return c_name.value.decode("ascii")
+        return c_name.value.decode(RC["ENCODING"])
 
     def get_state(self) -> RecorderState:
         """Return the state of a Recorder"""
@@ -84,7 +84,7 @@ class Recorder:
             ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
             ctypes.byref(length),
         )
-        return c_name.value.decode("ascii")
+        return c_name.value.decode(RC["ENCODING"])
 
     def set_mdf_filename(self, filename: str):
         """Set the MDF Filename for a Recorder.
@@ -95,7 +95,7 @@ class Recorder:
         cnp_prototype.Asap3SetRecorderMdfFileName(
             self._asap3_handle,
             self._recorder_id,
-            filename.encode("ascii"),
+            filename.encode(RC["ENCODING"]),
         )
 
     def start(self):

@@ -2,7 +2,7 @@ import ctypes
 from threading import Lock
 from typing import NamedTuple, Dict, Callable, Set
 
-from . import RecorderType, MeasurementState
+from . import RecorderType, MeasurementState, RC
 from .recorder import Recorder
 from .module import Module
 from .utils import CANapeError, _kill_canape_processes
@@ -135,7 +135,7 @@ class CANape:
             main_version=c_app_version.MainVersion,
             sub_version=c_app_version.SubVersion,
             service_pack=c_app_version.ServicePack,
-            app_name=c_app_version.Application.decode("ascii"),
+            app_name=c_app_version.Application.decode(RC["ENCODING"]),
         )
         return app_version
 
@@ -148,7 +148,7 @@ class CANape:
             dll_main_version=version_t.dllMainVersion,
             dll_sub_version=version_t.dllSubVersion,
             dll_release=version_t.dllRelease,
-            os_version=version_t.osVersion.decode("ascii"),
+            os_version=version_t.osVersion.decode(RC["ENCODING"]),
             os_release=version_t.osRelease,
         )
         return version
@@ -162,7 +162,7 @@ class CANape:
             ctypes.cast(c_buffer, ctypes.c_char_p),
             ctypes.byref(c_length),
         )
-        return c_buffer.value.decode("ascii")
+        return c_buffer.value.decode(RC["ENCODING"])
 
     def create_module(
         self,
@@ -257,7 +257,7 @@ class CANape:
 
         cnp_prototype.Asap3GetModuleHandle(
             self.asap3_handle,  # TAsap3Hdl hdl
-            module_name.encode("ascii"),  # const char *moduleName
+            module_name.encode(RC["ENCODING"]),  # const char *moduleName
             ctypes.byref(module_handle),  # TModulHdl * module
         )
 
@@ -327,7 +327,7 @@ class CANape:
         """
         bln = ctypes.c_bool()
         cnp_prototype.Asap3IsNetworkActivated(
-            self.asap3_handle, network_name.encode("ascii"), ctypes.byref(bln)
+            self.asap3_handle, network_name.encode(RC["ENCODING"]), ctypes.byref(bln)
         )
         return bln.value
 
@@ -374,7 +374,7 @@ class CANape:
         ptr = ctypes.pointer(c_recorder_id)
         cnp_prototype.Asap3DefineRecorder(
             self.asap3_handle,
-            recorder_name.encode("ascii"),
+            recorder_name.encode(RC["ENCODING"]),
             ptr,
             recorder_type,
         )

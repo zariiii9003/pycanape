@@ -2,6 +2,7 @@ import ctypes
 import typing
 from typing import List
 
+from . import RC
 from .cnp_api import cnp_class, cnp_constants
 
 try:
@@ -40,7 +41,7 @@ class EcuTask:
     @property
     def description(self) -> str:
         """Description text"""
-        return self._task_info.description.decode("ascii")
+        return self._task_info.description.decode(RC["ENCODING"])
 
     @property
     def task_id(self) -> int:
@@ -83,7 +84,7 @@ class EcuTask:
         cnp_prototype.Asap3SetupDataAcquisitionChnl(
             self._asap3_handle,
             self._module_handle,
-            measurement_object_name.encode("ascii"),
+            measurement_object_name.encode(RC["ENCODING"]),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
             self.task_id,
             polling_rate,

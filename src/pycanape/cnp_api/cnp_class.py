@@ -2,6 +2,7 @@ import ctypes
 from ctypes import wintypes
 
 from . import cnp_constants
+from .. import RC
 
 enum_type = ctypes.c_uint
 
@@ -59,7 +60,7 @@ class s_ascii(ctypes.Structure):
     _fields_ = [
         ("type", enum_type),
         ("len", ctypes.c_short),
-        ("ascii", ctypes.c_char_p),
+        (RC["ENCODING"], ctypes.c_char_p),
     ]
 
 
@@ -101,7 +102,7 @@ class TCalibrationObjectValue(ctypes.Union):
         ("type", enum_type),
         ("value", s_value),
         ("axis", s_axis),
-        ("ascii", s_ascii),
+        (RC["ENCODING"], s_ascii),
         ("curve", s_curve),
         ("map", s_map),
         ("valblk", s_valblk),
