@@ -39,6 +39,7 @@ class BaseCalibrationObject:
         self._module_handle = module_handle
         self._name = name
         self._object_info = object_info
+        self._force_upload = True
         try:
             self._datatype = self._read_datatype()
         except CANapeError:
@@ -70,7 +71,7 @@ class BaseCalibrationObject:
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
             cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
-            True,
+            self._force_upload,
             ctypes.byref(cov),
         )
         return cov
@@ -121,6 +122,16 @@ class BaseCalibrationObject:
     @property
     def unit(self) -> str:
         return self._object_info.unit.decode(RC["ENCODING"])
+
+    @property
+    def force_upload(self) -> bool:
+        return self._force_upload
+
+    @force_upload.setter
+    def force_upload(self, value: bool) -> None:
+        if not isinstance(value, bool):
+            raise TypeError(f"value must be {bool}, but is {type(value)}")
+        self._force_upload = value
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self._name})"
