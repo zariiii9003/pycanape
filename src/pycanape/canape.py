@@ -418,6 +418,31 @@ class CANape:
         )
         return c_bln.value
 
+    def get_cna_filename(self) -> str:
+        """Call this function to get the current name of the used CNA file.
+        This name is only available if CANape run in the nonmodal ASAP3 mode.
+
+        :return:
+            Path to .cna file
+        """
+        # call function first time to determine max_size
+        size = ctypes.c_ulong(0)
+        cnp_prototype.Asap3GetCNAFilename(
+            self.asap3_handle,
+            None,
+            ctypes.byref(size),
+        )
+
+        # call function again to retrieve data
+        buffer = ctypes.create_string_buffer(size.value)
+        cnp_prototype.Asap3GetCNAFilename(
+            self.asap3_handle,
+            buffer,
+            ctypes.byref(size),
+        )
+
+        return buffer.value.decode(RC["ENCODING"])
+
     def exit(self, close_canape: bool = True):
         """Shut down ASAP3 connection to CANape with optional termination of CANape.
 

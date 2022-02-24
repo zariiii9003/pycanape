@@ -154,6 +154,17 @@ Asap3GetApplicationVersion = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3GetCNAFilename = CANAPEAPI.map_symbol(
+    func_name="Asap3GetCNAFilename",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.POINTER(ctypes.c_char),          # > char *FileName
+        ctypes.POINTER(wintypes.UINT),          # > unsigned int *Size
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3GetCommunicationType = CANAPEAPI.map_symbol(
     func_name="Asap3GetCommunicationType",
     restype=ctypes.c_bool,
