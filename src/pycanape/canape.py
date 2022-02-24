@@ -427,11 +427,17 @@ class CANape:
         """
         # call function first time to determine max_size
         size = ctypes.c_ulong(0)
-        cnp_prototype.Asap3GetCNAFilename(
-            self.asap3_handle,
-            None,
-            ctypes.byref(size),
-        )
+        try:
+            cnp_prototype.Asap3GetCNAFilename(
+                self.asap3_handle,
+                None,
+                ctypes.byref(size),
+            )
+        except CANapeError:
+            if size.value > 0:
+                pass
+            else:
+                raise
 
         # call function again to retrieve data
         buffer = ctypes.create_string_buffer(size.value)
@@ -442,6 +448,12 @@ class CANape:
         )
 
         return buffer.value.decode(RC["ENCODING"])
+
+    def load_cna_file(self, cna_file: str) -> None:
+        """Call this function to to load a configuration file (CNA)."""
+        cnp_prototype.Asap3LoadCNAFile(
+            self.asap3_handle, cna_file.encode(RC["ENCODING"])
+        )
 
     def exit(self, close_canape: bool = True):
         """Shut down ASAP3 connection to CANape with optional termination of CANape.

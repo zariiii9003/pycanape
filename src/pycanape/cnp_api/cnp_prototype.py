@@ -523,6 +523,16 @@ Asap3IsRecorderEnabled = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3LoadCNAFile = CANAPEAPI.map_symbol(
+    func_name="Asap3LoadCNAFile",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_char_p,                        # > char* configFileName
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3ModuleActivation = CANAPEAPI.map_symbol(
     func_name="Asap3ModuleActivation",
     restype=ctypes.c_bool,
