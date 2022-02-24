@@ -53,8 +53,8 @@ class Module:
             ctypes.byref(cnp_info),
         )
         db_info = DBFileInfo(
-            file_name=cnp_info.asap2Fname.decode(),
-            file_path=cnp_info.asap2Path.decode(),
+            file_name=cnp_info.asap2Fname.decode(RC["ENCODING"]),
+            file_path=cnp_info.asap2Path.decode(RC["ENCODING"]),
             file_type=cnp_constants.DBFileType(cnp_info.type),
         )
         return db_info
@@ -171,7 +171,9 @@ class Module:
                 ctypes.byref(max_size),
                 cnp_constants.TAsap3DBOType.DBTYPE_ALL,
             )
-            self._objects_cache = buffer.value.strip(b";").decode().split(";")
+            self._objects_cache = (
+                buffer.value.strip(b";").decode(RC["ENCODING"]).split(";")
+            )
 
         return self._objects_cache
 
