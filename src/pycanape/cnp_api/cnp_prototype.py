@@ -246,7 +246,8 @@ Asap3GetEcuTasks = CANAPEAPI.map_symbol(
         ctypes.POINTER(cnp_class.TTaskInfo),    # < TTaskInfo * taskInfo
         ctypes.POINTER(ctypes.c_ushort),        # < unsigned short *noTasks
         ctypes.c_short,                         # > unsigned short maxTaskInfo
-    ]
+    ],
+    errcheck=get_last_error,
 )
 
 Asap3GetEcuTasks2 = CANAPEAPI.map_symbol(
@@ -270,6 +271,7 @@ Asap3GetFifoLevel = CANAPEAPI.map_symbol(
         cnp_class.TModulHdl,                    # > TModulHdl module
         ctypes.c_ushort,                        # > unsigned short taskId
     ],
+    errcheck=get_last_error,
 )
 
 Asap3GetLastError = CANAPEAPI.map_symbol(
@@ -477,6 +479,7 @@ Asap3Init5 = CANAPEAPI.map_symbol(
         ctypes.c_bool,                          # > bool bHexmode,
         ctypes.c_bool,                          # > bool bModalMode
     ],
+    errcheck=get_last_error,
 )
 
 Asap3IsECUOnline = CANAPEAPI.map_symbol(
