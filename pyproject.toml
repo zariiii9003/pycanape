@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyCANape"
-version = "0.4.0"
+version = "0.4.1"
 description = "Pythonic wrapper for the CANapeAPI"
 license = "LGPL-3.0-or-later"
 authors = ["Artur Drogunow"]
@@ -23,7 +23,7 @@ coverage = "^4"
 pytest-cov = "*"
 pytest-timeout = "*"
 black = "*"
-python-can = { git = "https://github.com/hardbyte/python-can.git", branch = "develop" }
+python-can = "^4.0"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
