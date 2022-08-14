@@ -100,11 +100,9 @@ class Recorder:
 
     def start(self):
         """Starts the recording into the mdf file."""
-        print(
-            cnp_prototype.Asap3StartRecorder(
-                self._asap3_handle,
-                self._recorder_id,
-            )
+        cnp_prototype.Asap3StartRecorder(
+            self._asap3_handle,
+            self._recorder_id,
         )
 
     def stop(self, save_to_mdf: bool = True):
