@@ -23,16 +23,15 @@ classifiers = [
 ]
 dependencies = [
     "psutil",
-    "numpy",
+    "numpy>=1.21",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
     "black==22.8.*",
-    "sphinx==5.2.*",
-    "build",
-    "twine",
+    "mypy==0.981",
+    "types-backports;python_version<'3.8'"
 ]
 doc = [
     "furo",
@@ -60,3 +59,25 @@ exclude = '''
   | .pytest_cache
 )/
 '''
+
+[tool.mypy]
+show_error_codes = true
+ignore_missing_imports = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+warn_unused_ignores = false
+warn_redundant_casts = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+exclude = [
+    "^docs/.*",
+    '^.*venv/.*',
+]
+
+
+[[tool.mypy.overrides]]
+module = [
+    "psutil",
+]
+ignore_missing_imports = true

@@ -11,12 +11,12 @@ from .cnp_api import cnp_class
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
-    cnp_prototype = None
+    cnp_prototype = None  # type: ignore[assignment]
 
 
 class Recorder:
     def __init__(
-        self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID
+        self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID  # type: ignore[valid-type]
     ) -> None:
         """The :class:`~pycanape.recorder.Recorder` class is not meant to be instantiated
         by the user. :class:`~pycanape.recorder.Recorder` instances are returned by

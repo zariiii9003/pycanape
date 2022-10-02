@@ -1,0 +1,47 @@
+name: Build & Release
+
+on: [push, pull_request]
+
+env:
+  PY_COLORS: "1"
+
+
+jobs:
+  build:
+    name: Build artifacts
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build wheel and sdist
+        run: pipx run build
+
+      - name: Check artifacts
+        run: pipx run twine check dist/*
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*
+
+  upload_pypi:
+    name: Create release
+    needs: [ build ]
+    runs-on: windows-latest
+
+    # create a new release for tagged commits
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@v1.4.2
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*

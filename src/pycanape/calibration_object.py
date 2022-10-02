@@ -20,7 +20,7 @@ from .cnp_api import cnp_class, cnp_constants
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
-    cnp_prototype = None
+    cnp_prototype = None  # type: ignore[assignment]
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
@@ -29,7 +29,7 @@ if typing.TYPE_CHECKING:
 class BaseCalibrationObject:
     def __init__(
         self,
-        asap3_handle: cnp_class.TAsap3Hdl,
+        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: typing.Union[cnp_class.TModulHdl, int],
         name: str,
         object_info: cnp_class.DBObjectInfo,
@@ -45,7 +45,9 @@ class BaseCalibrationObject:
         self._object_info = object_info
         self._force_upload = True
         try:
-            self._datatype = self._read_datatype()
+            self._datatype: typing.Optional[
+                cnp_constants.TAsap3DataType
+            ] = self._read_datatype()
         except CANapeError:
             self._datatype = None
 
@@ -176,7 +178,7 @@ class AxisCalibrationObject(BaseCalibrationObject):
         return cov.axis.dimension
 
     @property
-    def axis(self) -> "npt.NDArray[float]":
+    def axis(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(cov.axis.axis, shape=(cov.axis.dimension,))
         return np_array.astype(dtype=float, copy=True)
@@ -198,7 +200,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return cov.curve.dimension
 
     @property
-    def axis(self) -> "npt.NDArray[float]":
+    def axis(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(cov.curve.axis, shape=(cov.curve.dimension,))
         return np_array.astype(dtype=float, copy=True)
@@ -211,7 +213,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def values(self) -> "npt.NDArray[float]":
+    def values(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(cov.curve.values, shape=(cov.curve.dimension,))
         return np_array.astype(dtype=float, copy=True)
@@ -238,7 +240,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return cov.map.yDimension
 
     @property
-    def x_axis(self) -> "npt.NDArray[float]":
+    def x_axis(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(cov.map.xAxis, shape=(cov.map.xDimension,))
         return np_array.astype(dtype=float, copy=True)
@@ -251,7 +253,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def y_axis(self) -> "npt.NDArray[float]":
+    def y_axis(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(cov.map.yAxis, shape=(cov.map.yDimension,))
         return np_array.astype(dtype=float, copy=True)
@@ -264,7 +266,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
     @property
-    def values(self) -> "npt.NDArray[float]":
+    def values(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         if cov.type == ValueType.MAP:
             np_array = np.ctypeslib.as_array(
@@ -279,7 +281,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @values.setter
-    def values(self, new_values: "npt.NDArray[float]") -> None:
+    def values(self, new_values: "npt.NDArray[np.float64]") -> None:
         cov = self._read_calibration_object_value()
         if cov.type == ValueType.MAP:
             c_array = (ctypes.c_double * (cov.map.xDimension * cov.map.yDimension))(
@@ -326,7 +328,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return cov.valblk.yDimension
 
     @property
-    def values(self) -> "npt.NDArray[float]":
+    def values(self) -> "npt.NDArray[np.float64]":
         cov = self._read_calibration_object_value()
         np_array = np.ctypeslib.as_array(
             cov.valblk.values, shape=(cov.valblk.xDimension, cov.valblk.yDimension)
@@ -336,7 +338,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @values.setter
-    def values(self, new_values: "npt.NDArray[float]") -> None:
+    def values(self, new_values: "npt.NDArray[np.float64]") -> None:
         cov = self._read_calibration_object_value()
         c_array = (ctypes.c_double * (cov.valblk.xDimension * cov.valblk.yDimension))(
             *new_values.flatten()
@@ -356,7 +358,7 @@ CalibrationObject = typing.Union[
 
 
 def get_calibration_object(
-    asap3_handle: cnp_class.TAsap3Hdl,
+    asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
     module_handle: typing.Union[cnp_class.TModulHdl, int],
     name: str,
 ) -> CalibrationObject:
@@ -370,7 +372,7 @@ def get_calibration_object(
     if not found:
         raise KeyError(f"{name} not found.")
 
-    cal_obj_map = {
+    cal_obj_map: typing.Dict[ValueType, typing.Type[CalibrationObject]] = {
         ValueType.VALUE: ScalarCalibrationObject,
         ValueType.CURVE: CurveCalibrationObject,
         ValueType.MAP: MapCalibrationObject,

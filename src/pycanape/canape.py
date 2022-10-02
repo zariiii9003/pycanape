@@ -4,7 +4,7 @@
 
 import ctypes
 from threading import Lock
-from typing import NamedTuple, Dict, Callable, Set
+from typing import NamedTuple, Dict, Callable, Set, Any
 
 from . import RecorderType, MeasurementState, RC
 from .recorder import Recorder
@@ -16,7 +16,7 @@ from .cnp_api.cnp_constants import EventCode
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
-    cnp_prototype = None
+    cnp_prototype = None  # type: ignore[assignment]
 
 
 class AppVersion(NamedTuple):
@@ -99,7 +99,7 @@ class CANape:
         self.asap3_handle = ptr.contents
 
         self._modules: Dict[int, Module] = {}
-        self._callbacks: Dict[EventCode, Set[Callable]] = {}
+        self._callbacks: Dict[EventCode, Set[Callable[[], Any]]] = {}
 
         # register callbacks for every event type
         self._c_event_callback = cnp_class.EVENT_CALLBACK(self._on_event)
@@ -113,7 +113,7 @@ class CANape:
                 event_code,
             )
 
-    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int) -> None:
+    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int) -> None:  # type: ignore[valid-type]
         """This function is called by CANape."""
         try:
             self._callback_lock.acquire()
@@ -122,13 +122,15 @@ class CANape:
         finally:
             self._callback_lock.release()
 
-    def register_callback(self, event_code: EventCode, callback_func: Callable) -> None:
+    def register_callback(
+        self, event_code: EventCode, callback_func: Callable[[], Any]
+    ) -> None:
         self._callback_lock.acquire()
         self._callbacks[event_code].add(callback_func)
         self._callback_lock.release()
 
     def unregister_callback(
-        self, event_code: EventCode, callback_func: Callable
+        self, event_code: EventCode, callback_func: Callable[[], Any]
     ) -> None:
         self._callback_lock.acquire()
         self._callbacks[event_code].remove(callback_func)

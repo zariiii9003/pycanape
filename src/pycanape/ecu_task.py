@@ -12,7 +12,7 @@ from .cnp_api import cnp_class, cnp_constants
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
-    cnp_prototype = None
+    cnp_prototype = None  # type: ignore[assignment]
 
 
 class Sample(typing.NamedTuple):
@@ -23,7 +23,7 @@ class Sample(typing.NamedTuple):
 class EcuTask:
     def __init__(
         self,
-        asap3_handle: cnp_class.TAsap3Hdl,
+        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: cnp_class.TModulHdl,
         task_info: cnp_class.TTaskInfo2,
     ) -> None:

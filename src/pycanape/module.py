@@ -5,7 +5,7 @@
 import ctypes
 import fnmatch
 import os.path
-from typing import List, NamedTuple, Dict
+from typing import List, NamedTuple, Dict, Optional
 
 from . import DriverType, RC
 from .ecu_task import EcuTask
@@ -15,7 +15,7 @@ from .cnp_api import cnp_class, cnp_constants
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
-    cnp_prototype = None
+    cnp_prototype = None  # type: ignore[assignment]
 
 
 class MeasurementListEntry(NamedTuple):
@@ -35,7 +35,7 @@ class DBFileInfo(NamedTuple):
 class Module:
     def __init__(
         self,
-        asap3_handle: cnp_class.TAsap3Hdl,
+        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: cnp_class.TModulHdl,
     ) -> None:
         """The :class:`~pycanape.module.Module` class is not meant to be instantiated
@@ -55,7 +55,7 @@ class Module:
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 
-        self._objects_cache = None
+        self._objects_cache: Optional[List[str]] = None
 
     def get_database_info(self) -> DBFileInfo:
         """Get Info concerning the database file."""
@@ -146,7 +146,7 @@ class Module:
             self.module_handle,
             ptr,
         )
-        return buffer.value.decode(RC["ENCODING"])
+        return buffer.value.decode(RC["ENCODING"])  # type: ignore[union-attr]
 
     def get_communication_type(self) -> str:
         """Get current communication type (e.g. "CAN")."""
@@ -156,7 +156,7 @@ class Module:
             self.module_handle,
             ctypes.pointer(buffer),
         )
-        return buffer.value.decode(RC["ENCODING"])
+        return buffer.value.decode(RC["ENCODING"])  # type: ignore[union-attr]
 
     def get_database_objects(self) -> List[str]:
         """Get a list of all object names in database.
