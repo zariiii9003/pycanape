@@ -76,7 +76,9 @@ class BaseCalibrationObject:
         )
         return cov
 
-    def _write_calibration_object_value(self, cov: cnp_class.TCalibrationObjectValue) -> None:
+    def _write_calibration_object_value(
+        self, cov: cnp_class.TCalibrationObjectValue
+    ) -> None:
         if self.object_type != ObjectType.OTT_CALIBRATE:
             raise TypeError("Cannot set value to a Measurement Object.")
         cnp_prototype.Asap3WriteCalibrationObject(

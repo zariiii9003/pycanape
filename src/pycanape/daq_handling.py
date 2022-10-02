@@ -10,7 +10,9 @@ from .canape import CANape
 
 
 class FifoReader:
-    def __init__(self, canape_instance: CANape, task: EcuTask, refresh_rate: float) -> None:
+    def __init__(
+        self, canape_instance: CANape, task: EcuTask, refresh_rate: float
+    ) -> None:
         self._task = task
         self.refresh_rate = refresh_rate
 
@@ -30,7 +32,9 @@ class FifoReader:
         self._lock = Lock()
         self.stopped = True
 
-    def add_channel(self, channel_name: str, polling_rate: int, save_to_file: bool) -> None:
+    def add_channel(
+        self, channel_name: str, polling_rate: int, save_to_file: bool
+    ) -> None:
         self._lock.acquire()
         if channel_name not in self._channels:
             self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)

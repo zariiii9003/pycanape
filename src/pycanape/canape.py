@@ -123,7 +123,9 @@ class CANape:
         self._callbacks[event_code].add(callback_func)
         self._callback_lock.release()
 
-    def unregister_callback(self, event_code: EventCode, callback_func: Callable) -> None:
+    def unregister_callback(
+        self, event_code: EventCode, callback_func: Callable
+    ) -> None:
         self._callback_lock.acquire()
         self._callbacks[event_code].remove(callback_func)
         self._callback_lock.release()
