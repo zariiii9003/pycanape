@@ -450,7 +450,7 @@ class CANape:
         return buffer.value.decode(RC["ENCODING"])
 
     def load_cna_file(self, cna_file: str) -> None:
-        """Call this function to to load a configuration file (CNA)."""
+        """Call this function to load a configuration file (CNA)."""
         cnp_prototype.Asap3LoadCNAFile(
             self.asap3_handle, cna_file.encode(RC["ENCODING"])
         )
