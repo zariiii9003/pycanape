@@ -1,6 +1,11 @@
 # pyCANape
 
+[![PyPI - Version](https://img.shields.io/pypi/v/pycanape.svg)](https://pypi.org/project/pycanape)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pycanape.svg)](https://pypi.org/project/pycanape)
+[![Documentation Status](https://readthedocs.org/projects/pycanape/badge/?version=latest)](https://pycanape.readthedocs.io/en/latest/?badge=latest)
+
 This is a pythonic wrapper around the VECTOR CANape API.
+The documentation is available [here](https://pycanape.readthedocs.io/en/latest).
 
 ## Example usage
 
