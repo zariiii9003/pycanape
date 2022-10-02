@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022-present Artur Drogunow <artur.drogunow@zf.com>
+#
+# SPDX-License-Identifier: MIT
+
 __version__ = "0.5.0.dev0"
 
 from typing import Dict, Any
