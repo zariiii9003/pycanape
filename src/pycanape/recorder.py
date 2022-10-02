@@ -14,6 +14,15 @@ class Recorder:
     def __init__(
         self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID
     ) -> None:
+        """The :class:`~pycanape.recorder.Recorder` class is not meant to be instantiated
+        by the user. :class:`~pycanape.recorder.Recorder` instances are returned by
+        :meth:`~pycanape.canape.CANape.define_recorder`,
+        :meth:`~pycanape.canape.CANape.get_recorder_by_index` and
+        :meth:`~pycanape.canape.CANape.get_selected_recorder`.
+
+        :param asap3_handle:
+        :param recorder_id:
+        """
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
@@ -107,6 +116,7 @@ class Recorder:
 
     def stop(self, save_to_mdf: bool = True) -> None:
         """Stops the recording and writes an MDF File.
+
         :param save_to_mdf:
             save recorded data to a file if True
         """

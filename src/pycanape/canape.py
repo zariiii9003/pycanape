@@ -59,7 +59,7 @@ class CANape:
         :param clear_device_list:
             clear_device_list = True -> all devices are cleared
             clear_device_list = False -> all devices are added,
-                which are described in the CANape.ini
+            which are described in the CANape.ini
         :param modal_mode:
             Sets the start mode of CANape Value:
             modal_mode = True -> non-modal (Python Client and CANape)
@@ -369,6 +369,7 @@ class CANape:
         recorder_type: RecorderType = RecorderType.eTRecorderTypeMDF,
     ) -> Recorder:
         """Creates a new Recorder.
+
         :param recorder_name:
             the name of the new Recorder
         :param recorder_type:

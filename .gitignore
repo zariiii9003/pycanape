@@ -5,3 +5,4 @@
 /.idea/
 /.tox/
 /src/pycanape.egg-info/
+docs/_*

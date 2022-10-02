@@ -13,6 +13,12 @@ class FifoReader:
     def __init__(
         self, canape_instance: CANape, task: EcuTask, refresh_rate: float
     ) -> None:
+        """
+
+        :param canape_instance:
+        :param task:
+        :param refresh_rate:
+        """
         self._task = task
         self.refresh_rate = refresh_rate
 

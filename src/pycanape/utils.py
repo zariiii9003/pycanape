@@ -81,6 +81,7 @@ class CLibrary(ctypes.WinDLL):
 
 class CANapeError(Exception):
     def __init__(self, error_code, error_string, function) -> None:
+        #: The error code according to :class:`~pycanape.cnp_api.cnp_constants.ErrorCodes`
         self.error_code = error_code
         super().__init__(f"{function} failed ({error_string})")
 

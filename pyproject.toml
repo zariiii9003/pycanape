@@ -3,11 +3,11 @@ build-backend = 'setuptools.build_meta'
 requires = ["setuptools >= 62.0"]
 
 [project]
-name = "pyCanape"
+name = "pyCANape"
 description = 'Pythonic wrapper around the VECTOR CANape API'
 readme = "README.md"
 requires-python = ">=3.7"
-license = { file = "LICENSE.md" }
+license = { text = "MIT" }
 keywords = [
     "CANape",
     "Measurement",
@@ -21,11 +21,26 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-dependencies = []
+dependencies = [
+    "psutil",
+    "numpy",
+]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+dev = [
+    "black==22.8.*",
+    "sphinx==5.2.*",
+    "build",
+    "twine",
+]
+doc = [
+    "furo",
+    "sphinx==5.2.*",
+]
+
 [project.urls]
-Documentation = "https://github.com/zariiii9003/pycanape#readme"
+Documentation = "https://pycanape.readthedocs.io"
 Issues = "https://github.com/zariiii9003/pycanape/issues"
 Source = "https://github.com/zariiii9003/pycanape"
 Homepage = "https://github.com/zariiii9003/pycanape"

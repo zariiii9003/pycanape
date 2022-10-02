@@ -34,9 +34,18 @@ class Module:
         asap3_handle: cnp_class.TAsap3Hdl,
         module_handle: cnp_class.TModulHdl,
     ) -> None:
+        """The :class:`~pycanape.module.Module` class is not meant to be instantiated
+        by the user. Instead, :class:`~pycanape.module.Module` instances are returned by
+        :meth:`~pycanape.canape.CANape.create_module`, :meth:`~pycanape.canape.CANape.get_module_by_index`
+        and :meth:`~pycanape.canape.CANape.get_module_by_name`.
+
+        :param asap3_handle:
+        :param module_handle:
+        """
         if cnp_prototype is None:
             raise FileNotFoundError(
-                "CANape API not found. Add CANape API location to environment variable `PATH`."
+                "CANape API not found. Add CANape API "
+                "location to environment variable `PATH`."
             )
 
         self.asap3_handle = asap3_handle
@@ -231,7 +240,7 @@ class Module:
         return DriverType(c_driver_type.value)
 
     def get_calibration_object(self, name: str) -> CalibrationObject:
-        """Get calibration object by name or wildcard pattern (e.g. '*InitReset')."""
+        """Get calibration object by name or wildcard pattern (e.g. '\\*InitReset')."""
         if "*" in name:
             filtered = fnmatch.filter(names=self.get_database_objects(), pat=name)
             if len(filtered) == 1:

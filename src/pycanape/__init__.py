@@ -16,7 +16,7 @@ from .cnp_api.cnp_constants import (
     ValueType,
 )
 from .module import DBFileInfo, EcuTask, MeasurementListEntry, Module
-from .daq_handling import FifoReader
+from .daq import FifoReader
 from .recorder import Recorder
 from .calibration_object import (
     ScalarCalibrationObject,

@@ -23,6 +23,15 @@ class EcuTask:
         module_handle: cnp_class.TModulHdl,
         task_info: cnp_class.TTaskInfo2,
     ) -> None:
+        """The :class:`~pycanape.ecu_task.EcuTask` class is not meant to be instantiated
+        by the user. :class:`~pycanape.ecu_task.EcuTask` instances are returned by
+        :meth:`~pycanape.module.Module.get_ecu_tasks`.
+
+
+        :param asap3_handle:
+        :param module_handle:
+        :param task_info:
+        """
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
