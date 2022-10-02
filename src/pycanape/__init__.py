@@ -1,13 +1,6 @@
-import sys
+__version__ = "0.5.0.dev0"
+
 from typing import Dict, Any
-
-# compatibility fix for python 3.7
-if sys.version_info >= (3, 8):
-    import importlib.metadata as importlib_metadata
-else:
-    import importlib_metadata
-
-__version__ = importlib_metadata.metadata("pycanape")["Version"]
 
 RC: Dict[str, Any] = {"ENCODING": "latin-1"}  # runtime config
 
