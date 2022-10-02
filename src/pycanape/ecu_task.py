@@ -22,7 +22,7 @@ class EcuTask:
         asap3_handle: cnp_class.TAsap3Hdl,
         module_handle: cnp_class.TModulHdl,
         task_info: cnp_class.TTaskInfo2,
-    ):
+    ) -> None:
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
@@ -32,10 +32,10 @@ class EcuTask:
         self._module_handle = module_handle
         self._task_info = task_info
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"EcuTask {self.description}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     @property
@@ -67,7 +67,7 @@ class EcuTask:
 
     def daq_setup_channel(
         self, measurement_object_name: str, polling_rate: int, save_to_file: bool
-    ):
+    ) -> None:
         """Add a measurement object to the data acquisition channel list.
 
         :param measurement_object_name:
@@ -91,7 +91,7 @@ class EcuTask:
             save_to_file,
         )
 
-    def daq_check_overrun(self, reset_overrun: bool = False):
+    def daq_check_overrun(self, reset_overrun: bool = False) -> None:
         """Check if data have been lost due to FIFO overrun.
 
         Asap3CheckOverrun doesn't have any impact to the FIFO data. All data

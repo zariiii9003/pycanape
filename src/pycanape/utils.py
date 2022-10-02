@@ -29,7 +29,7 @@ def _synchronization_wrapper(func, func_name: str):
 class CLibrary(ctypes.WinDLL):
     """Based on https://github.com/hardbyte/python-can/blob/develop/can/ctypesutil.py"""
 
-    def __init__(self, library_or_path: str):
+    def __init__(self, library_or_path: str) -> None:
         library_path = find_library(library_or_path)
         if library_path is None:
             log_msg = "CANape API not found. Add CANape API location to environment variable `PATH`."
@@ -80,7 +80,7 @@ class CLibrary(ctypes.WinDLL):
 
 
 class CANapeError(Exception):
-    def __init__(self, error_code, error_string, function):
+    def __init__(self, error_code, error_string, function) -> None:
         self.error_code = error_code
         super().__init__(f"{function} failed ({error_string})")
 

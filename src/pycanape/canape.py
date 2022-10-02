@@ -39,7 +39,7 @@ class CANape:
         time_out: int = 0,
         clear_device_list: bool = True,
         modal_mode: bool = False,
-    ):
+    ) -> None:
         """Initialize and start the CANape runtime environment.
 
         The first parameter sets the project path where the A2L file and the
@@ -105,7 +105,7 @@ class CANape:
                 event_code,
             )
 
-    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int):
+    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int) -> None:
         """This function is called by CANape."""
         try:
             self._callback_lock.acquire()
@@ -114,12 +114,12 @@ class CANape:
         finally:
             self._callback_lock.release()
 
-    def register_callback(self, event_code: EventCode, callback_func: Callable):
+    def register_callback(self, event_code: EventCode, callback_func: Callable) -> None:
         self._callback_lock.acquire()
         self._callbacks[event_code].add(callback_func)
         self._callback_lock.release()
 
-    def unregister_callback(self, event_code: EventCode, callback_func: Callable):
+    def unregister_callback(self, event_code: EventCode, callback_func: Callable) -> None:
         self._callback_lock.acquire()
         self._callbacks[event_code].remove(callback_func)
         self._callback_lock.release()
@@ -301,7 +301,7 @@ class CANape:
         self._modules[module_handle.value] = module
         return self._modules[module_handle.value]
 
-    def set_interactive_mode(self, mode: bool):
+    def set_interactive_mode(self, mode: bool) -> None:
         """Enables the Interactive mode of CANape.
 
         :param mode:
@@ -313,7 +313,7 @@ class CANape:
             mode,  # bool mode
         )
 
-    def popup_debug_window(self):
+    def popup_debug_window(self) -> None:
         """Trouble shooting: call this function to popup the debug window of the MCD-system."""
         cnp_prototype.Asap3PopupDebugWindow(self.asap3_handle)
 
@@ -331,7 +331,7 @@ class CANape:
         )
         return bln.value
 
-    def reset_data_acquisition_channels(self):
+    def reset_data_acquisition_channels(self) -> None:
         """Clears the data acquisition channel list.
 
         .. note::
@@ -340,11 +340,11 @@ class CANape:
         """
         cnp_prototype.Asap3ResetDataAcquisitionChnls(self.asap3_handle)
 
-    def start_data_acquisition(self):
+    def start_data_acquisition(self) -> None:
         """Start data acquisition."""
         cnp_prototype.Asap3StartDataAcquisition(self.asap3_handle)
 
-    def stop_data_acquisition(self):
+    def stop_data_acquisition(self) -> None:
         """Stop data acquisition."""
         cnp_prototype.Asap3StopDataAcquisition(self.asap3_handle)
 
@@ -455,7 +455,7 @@ class CANape:
             self.asap3_handle, cna_file.encode(RC["ENCODING"])
         )
 
-    def exit(self, close_canape: bool = True):
+    def exit(self, close_canape: bool = True) -> None:
         """Shut down ASAP3 connection to CANape with optional termination of CANape.
 
         :param close_canape:

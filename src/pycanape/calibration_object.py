@@ -29,7 +29,7 @@ class BaseCalibrationObject:
         module_handle: typing.Union[cnp_class.TModulHdl, int],
         name: str,
         object_info: cnp_class.DBObjectInfo,
-    ):
+    ) -> None:
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
@@ -76,7 +76,7 @@ class BaseCalibrationObject:
         )
         return cov
 
-    def _write_calibration_object_value(self, cov: cnp_class.TCalibrationObjectValue):
+    def _write_calibration_object_value(self, cov: cnp_class.TCalibrationObjectValue) -> None:
         if self.object_type != ObjectType.OTT_CALIBRATE:
             raise TypeError("Cannot set value to a Measurement Object.")
         cnp_prototype.Asap3WriteCalibrationObject(
@@ -112,7 +112,7 @@ class BaseCalibrationObject:
         return self._object_info.minEx
 
     @property
-    def precision(self):
+    def precision(self) -> int:
         return self._object_info.precision
 
     @property
@@ -155,7 +155,7 @@ class ScalarCalibrationObject(BaseCalibrationObject):
         return float(cov.value.value)
 
     @value.setter
-    def value(self, new_value: float):
+    def value(self, new_value: float) -> None:
         cov = self._read_calibration_object_value()
         cov.value.value = new_value
         self._write_calibration_object_value(cov)

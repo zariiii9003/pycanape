@@ -13,7 +13,7 @@ except FileNotFoundError:
 class Recorder:
     def __init__(
         self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID
-    ):
+    ) -> None:
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
@@ -58,7 +58,7 @@ class Recorder:
         )
         return c_bln.value
 
-    def enable(self):
+    def enable(self) -> None:
         """Enable Recorder."""
         cnp_prototype.Asap3EnableRecorder(
             self._asap3_handle,
@@ -66,7 +66,7 @@ class Recorder:
             True,
         )
 
-    def disable(self):
+    def disable(self) -> None:
         """Disable Recorder."""
         cnp_prototype.Asap3EnableRecorder(
             self._asap3_handle,
@@ -86,7 +86,7 @@ class Recorder:
         )
         return c_name.value.decode(RC["ENCODING"])
 
-    def set_mdf_filename(self, filename: str):
+    def set_mdf_filename(self, filename: str) -> None:
         """Set the MDF Filename for a Recorder.
 
         :param filename:
@@ -98,14 +98,14 @@ class Recorder:
             filename.encode(RC["ENCODING"]),
         )
 
-    def start(self):
+    def start(self) -> None:
         """Starts the recording into the mdf file."""
         cnp_prototype.Asap3StartRecorder(
             self._asap3_handle,
             self._recorder_id,
         )
 
-    def stop(self, save_to_mdf: bool = True):
+    def stop(self, save_to_mdf: bool = True) -> None:
         """Stops the recording and writes an MDF File.
         :param save_to_mdf:
             save recorded data to a file if True
@@ -116,7 +116,7 @@ class Recorder:
             save_to_mdf,
         )
 
-    def pause(self, pause: bool):
+    def pause(self, pause: bool) -> None:
         """Pause or unpause recorder."""
         cnp_prototype.Asap3PauseRecorder(
             self._asap3_handle,

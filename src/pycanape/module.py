@@ -33,7 +33,7 @@ class Module:
         self,
         asap3_handle: cnp_class.TAsap3Hdl,
         module_handle: cnp_class.TModulHdl,
-    ):
+    ) -> None:
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."

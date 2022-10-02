@@ -10,7 +10,7 @@ from .canape import CANape
 
 
 class FifoReader:
-    def __init__(self, canape_instance: CANape, task: EcuTask, refresh_rate: float):
+    def __init__(self, canape_instance: CANape, task: EcuTask, refresh_rate: float) -> None:
         self._task = task
         self.refresh_rate = refresh_rate
 
@@ -30,7 +30,7 @@ class FifoReader:
         self._lock = Lock()
         self.stopped = True
 
-    def add_channel(self, channel_name: str, polling_rate: int, save_to_file: bool):
+    def add_channel(self, channel_name: str, polling_rate: int, save_to_file: bool) -> None:
         self._lock.acquire()
         if channel_name not in self._channels:
             self._task.daq_setup_channel(channel_name, polling_rate, save_to_file)
@@ -38,7 +38,7 @@ class FifoReader:
             self._count = len(self._channels)
         self._lock.release()
 
-    def clear_channels(self):
+    def clear_channels(self) -> None:
         self._lock.acquire()
         self._channels.clear()
         self._count = len(self._channels)
@@ -55,20 +55,20 @@ class FifoReader:
     def task(self) -> EcuTask:
         return self._task
 
-    def _start(self):
+    def _start(self) -> None:
         self._stop()
         self.stopped = False
         self._thread = Thread(target=self._read_fifo)
         self._thread.start()
 
-    def _stop(self):
+    def _stop(self) -> None:
         self.stopped = True
         if self._thread is not None:
             if self._thread.is_alive():
                 self._thread.join()
             self._thread = None
 
-    def _read_fifo(self):
+    def _read_fifo(self) -> None:
         self._task.daq_check_overrun(reset_overrun=True)
 
         while not self.stopped:
@@ -108,7 +108,7 @@ class FifoReader:
 
         return sample.value
 
-    def __del__(self):
+    def __del__(self) -> None:
         self._stop()
         self._canape.unregister_callback(
             event_code=EventCode.et_ON_DATA_ACQ_START, callback_func=self._start
