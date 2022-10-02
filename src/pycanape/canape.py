@@ -39,6 +39,7 @@ class CANape:
         time_out: int = 0,
         clear_device_list: bool = True,
         modal_mode: bool = False,
+        kill_open_instances: bool = True,
     ) -> None:
         """Initialize and start the CANape runtime environment.
 
@@ -63,13 +64,16 @@ class CANape:
             Sets the start mode of CANape Value:
             modal_mode = True -> non-modal (Python Client and CANape)
             modal_mode = False -> modal (only Python Client)
+        :param kill_open_instances:
+            If True, close all open CANape instances before start.
         """
         if cnp_prototype is None:
             raise FileNotFoundError(
                 "CANape API not found. Add CANape API location to environment variable `PATH`."
             )
 
-        _kill_canape_processes()
+        if kill_open_instances:
+            _kill_canape_processes()
 
         asap3_handle = cnp_class.TAsap3Hdl()
         ptr = ctypes.pointer(asap3_handle)
