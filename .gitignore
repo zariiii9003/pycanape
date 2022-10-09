@@ -6,3 +6,4 @@
 /.tox/
 /src/pycanape.egg-info/
 docs/_*
+/build/

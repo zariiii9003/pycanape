@@ -16,13 +16,37 @@ author = "Artur Drogunow"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+]
+
+# tls_verify = False
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+}
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 # Include documentation from both the class level and __init__
 autoclass_content = "both"
+
+# location of typehints
+autodoc_typehints = "both"
+
+nitpick_ignore = [
+    ("py:class", "pycanape.cnp_api.cnp_class.LP_tAsap3Hdl"),
+    ("py:class", "npt.NDArray"),
+    ("py:class", "npt.DTypeLike"),
+    ("py:class", "np.float64"),
+    ("py:class", "numpy.float64"),
+    ("py:class", "numpy.typing._dtype_like._SupportsDType"),
+    ("py:class", "numpy.typing._dtype_like._DTypeDict"),
+    ("py:class", "ctypes.wintypes.LP_c_ulong"),
+    ("py:class", "ctypes.POINTER"),
+]
 
 # mock Winodws specific modules and attributes for readthedocs.io (runs on ubuntu)
 sys.modules["winreg"] = MagicMock()
