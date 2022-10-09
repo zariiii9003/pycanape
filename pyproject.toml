@@ -48,17 +48,7 @@ Homepage = "https://github.com/zariiii9003/pycanape"
 version = {attr = "pycanape.__version__"}
 
 [tool.black]
-exclude = '''
-/(
-  | .venv
-  | venv
-  | .tox
-  | build
-  | dist
-  | .mypy_cache
-  | .pytest_cache
-)/
-'''
+include = '^/((docs|src)/.*|setup)\.pyi?$'
 
 [tool.mypy]
 show_error_codes = true
