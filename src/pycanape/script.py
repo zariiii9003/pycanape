@@ -16,12 +16,12 @@ class Script:
         asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         script_handle: cnp_class.TScriptHdl,
     ) -> None:
-        """The :class:`~pycanape.module.Script` class is not meant to be instantiated
-        by the user. Instead, :class:`~pycanape.module.Script` instances are returned by
+        """The :class:`~pycanape.script.Script` class is not meant to be instantiated
+        by the user. Instead, :class:`~pycanape.script.Script` instances are returned by
         :meth:`~pycanape.module.Module.execute_script_ex`.
 
         :param asap3_handle:
-        :param module_handle:
+        :param script_handle:
         """
         if cnp_prototype is None:
             raise FileNotFoundError(
