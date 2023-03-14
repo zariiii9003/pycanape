@@ -33,9 +33,8 @@ class Script:
         self.asap3_handle = asap3_handle
         self.script_handle = script_handle
 
-    def get_script_state(self) -> Dict[cnp_constants.TScriptStatus, str]:
+    def get_script_state(self) -> cnp_constants.TScriptStatus:
         scrstate = cnp_class.enum_type()
-        # call function first time to determine max_size
         max_size = ctypes.c_ulong(0)
         cnp_prototype.Asap3GetScriptState(
             self.asap3_handle,
@@ -44,21 +43,7 @@ class Script:
             None,
             ctypes.byref(max_size)
         )
-
-        # call function again to retrieve data
-        c_buffer = ctypes.create_string_buffer(max_size.value)
-        cnp_prototype.Asap3GetScriptState(
-            self.asap3_handle,
-            self.script_handle,
-            ctypes.byref(scrstate),
-            c_buffer,
-            ctypes.byref(max_size)
-        )
-
-        return dict(
-            state=cnp_constants.TScriptStatus(scrstate.value),
-            msg=c_buffer.value.decode(RC["ENCODING"])
-        )
+        return cnp_constants.TScriptStatus(scrstate.value)
 
     def start_script(self) -> None:
         cnp_prototype.Asap3StartScript(
