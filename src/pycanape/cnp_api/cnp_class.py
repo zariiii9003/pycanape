@@ -20,6 +20,7 @@ TAsap3Hdl = ctypes.POINTER(tAsap3Hdl)
 TModulHdl = ctypes.c_ushort
 TRecorderID = ctypes.POINTER(ctypes.c_ulong)
 TTime = ctypes.c_ulong
+TScriptHdl = ctypes.c_ulong
 
 EVENT_CALLBACK = ctypes.WINFUNCTYPE(None, TAsap3Hdl, ctypes.c_ulong)
 
