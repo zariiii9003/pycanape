@@ -316,6 +316,19 @@ class Module:
         )
 
     def execute_script_ex(self, script_file: bool, script: str) -> Script:
+        """Execute a script file or a single script command.
+
+        :param script_file:
+            Declares interpretation of parameter script.
+            If 'script_file' is true, parameter 'script' is
+            interpreted as the file name of the script file
+            to be executed. If 'script_file' is false,
+            'script' is interpreted as a single script command
+        :param script:
+            A script filename or an single script command
+        :return:
+            The instance of the Script class
+        """
         script_handle = cnp_class.TScriptHdl()
         cnp_prototype.Asap3ExecuteScriptEx(
             self.asap3_handle,

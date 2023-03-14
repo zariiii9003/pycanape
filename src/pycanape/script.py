@@ -32,6 +32,11 @@ class Script:
         self.script_handle = script_handle
 
     def get_script_state(self) -> cnp_constants.TScriptStatus:
+        """Returns the state of a script.
+
+        :return:
+            current state of the script
+        """
         scrstate = cnp_class.enum_type()
         max_size = ctypes.c_ulong(0)
         cnp_prototype.Asap3GetScriptState(
@@ -44,24 +49,34 @@ class Script:
         return cnp_constants.TScriptStatus(scrstate.value)
 
     def start_script(self) -> None:
+        """Starts a defined script."""
         cnp_prototype.Asap3StartScript(
             self.asap3_handle,
             self.script_handle,
         )
 
     def stop_script(self) -> None:
+        """Stops a running script."""
         cnp_prototype.Asap3StopScript(
             self.asap3_handle,
             self.script_handle,
         )
 
     def release_script(self) -> None:
+        """Removes a delcared script from the Tasklist to
+        receive the result you must use the scriptfunction
+        'SetScriptResult'."""
         cnp_prototype.Asap3ReleaseScript(
             self.asap3_handle,
             self.script_handle,
         )
 
     def get_script_result_value(self):
+        """Returns the exitcode of a script.
+
+        :return:
+            result value of the script
+        """
         val = ctypes.c_double()
         cnp_prototype.Asap3GetScriptResultValue(
             self.asap3_handle,
@@ -71,6 +86,11 @@ class Script:
         return val
 
     def get_script_result_string(self) -> str:
+        """Returns a script result.
+
+        :return:
+            result string of the script
+        """
         # call function first time to determine max_size
         max_size = ctypes.c_ulong(0)
         cnp_prototype.Asap3GetScriptResultString(
