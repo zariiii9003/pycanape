@@ -3,6 +3,7 @@ from ctypes import wintypes
 
 from . import RC
 from .cnp_api import cnp_class, cnp_constants
+from typing import Dict
 
 try:
     from .cnp_api import cnp_prototype
@@ -32,7 +33,7 @@ class Script:
         self.asap3_handle = asap3_handle
         self.script_handle = script_handle
 
-    def get_script_state(self) -> cnp_constants.TScriptStatus:
+    def get_script_state(self) -> Dict[cnp_constants.TScriptStatus, str]:
         scrstate = cnp_class.enum_type()
         # call function first time to determine max_size
         max_size = ctypes.c_ulong(0)
