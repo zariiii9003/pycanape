@@ -322,6 +322,6 @@ class Module:
             self.module_handle,
             script_file,
             script.encode(RC["ENCODING"]),
-            ctypes.byref(script_handle)
+            ctypes.byref(script_handle),
         )
         return Script(self.asap3_handle, script_handle)

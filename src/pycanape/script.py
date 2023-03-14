@@ -1,9 +1,7 @@
 import ctypes
-from ctypes import wintypes
 
 from . import RC
 from .cnp_api import cnp_class, cnp_constants
-from typing import Dict
 
 try:
     from .cnp_api import cnp_prototype
@@ -41,26 +39,26 @@ class Script:
             self.script_handle,
             ctypes.byref(scrstate),
             None,
-            ctypes.byref(max_size)
+            ctypes.byref(max_size),
         )
         return cnp_constants.TScriptStatus(scrstate.value)
 
     def start_script(self) -> None:
         cnp_prototype.Asap3StartScript(
             self.asap3_handle,
-            self.script_handle
+            self.script_handle,
         )
 
     def stop_script(self) -> None:
         cnp_prototype.Asap3StopScript(
             self.asap3_handle,
-            self.script_handle
+            self.script_handle,
         )
 
     def release_script(self) -> None:
         cnp_prototype.Asap3ReleaseScript(
             self.asap3_handle,
-            self.script_handle
+            self.script_handle,
         )
 
     def get_script_result_value(self):
@@ -68,26 +66,26 @@ class Script:
         cnp_prototype.Asap3GetScriptResultValue(
             self.asap3_handle,
             self.script_handle,
-            ctypes.byref(val)
+            ctypes.byref(val),
         )
         return val
 
     def get_script_result_string(self) -> str:
         # call function first time to determine max_size
         max_size = ctypes.c_ulong(0)
-        cnp_prototype.Asap3GetScriptResultValue(
+        cnp_prototype.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
             None,
-            ctypes.byref(max_size)
+            ctypes.byref(max_size),
         )
 
         # call function again to retrieve data
         c_buffer = ctypes.create_string_buffer(max_size.value)
-        cnp_prototype.Asap3GetScriptResultValue(
+        cnp_prototype.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
             c_buffer,
-            ctypes.byref(max_size)
+            ctypes.byref(max_size),
         )
         return c_buffer.value.decode(RC["ENCODING"])
