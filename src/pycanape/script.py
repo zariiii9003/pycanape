@@ -49,29 +49,29 @@ class Script:
         return cnp_constants.TScriptStatus(scrstate.value)
 
     def start_script(self) -> None:
-        """Starts a defined script."""
+        """Starts the script."""
         cnp_prototype.Asap3StartScript(
             self.asap3_handle,
             self.script_handle,
         )
 
     def stop_script(self) -> None:
-        """Stops a running script."""
+        """Stop the script."""
         cnp_prototype.Asap3StopScript(
             self.asap3_handle,
             self.script_handle,
         )
 
     def release_script(self) -> None:
-        """Removes a delcared script from the Tasklist to
-        receive the result you must use the scriptfunction
-        'SetScriptResult'."""
+        """Removes a declared script from the Tasklist.
+        To receive the result you must use the 'SetScriptResult' in
+        your CASL script."""
         cnp_prototype.Asap3ReleaseScript(
             self.asap3_handle,
             self.script_handle,
         )
 
-    def get_script_result_value(self):
+    def get_script_result_value(self) -> float:
         """Returns the exitcode of a script.
 
         :return:
@@ -83,7 +83,7 @@ class Script:
             self.script_handle,
             ctypes.byref(val),
         )
-        return val
+        return val.value
 
     def get_script_result_string(self) -> str:
         """Returns a script result.
