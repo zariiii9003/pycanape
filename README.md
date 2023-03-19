@@ -57,3 +57,32 @@ print(axis_obj.axis)
 # set axis values
 axis_obj.axis = [0] * axis_dim
 ````
+
+## How to contribute
+
+Setup your development environment:
+```shell script
+# clone the repository
+git clone https://github.com/zariiii9003/pycanape.git
+
+# install pyCANape in editable mode with all development dependencies
+pip install -e .[dev,doc]
+
+# install the pre-commit hook
+pre-commit install
+```
+
+After you implement your changes you should run the static code analysis and check the documentation:
+```shell script
+# format the code with black
+black .
+
+# run the linter
+ruff check --fix src
+
+# run the type checker
+mypy .
+
+# build the documentation
+python -m sphinx -Wan --keep-going docs build
+```
