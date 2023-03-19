@@ -50,6 +50,11 @@ Homepage = "https://github.com/zariiii9003/pycanape"
 [tool.setuptools.dynamic]
 version = {attr = "pycanape.__version__"}
 
+[tool.setuptools.package-data]
+"pycanape" = [
+  "py.typed",
+]
+
 [tool.black]
 include = '^/((docs|src)/.*|setup)\.pyi?$'
 
