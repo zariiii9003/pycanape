@@ -7,6 +7,7 @@ Library API
 
     canape
     module
+    script
     calibration_object
     ecu_task
     recorder

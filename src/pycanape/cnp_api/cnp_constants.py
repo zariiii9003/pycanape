@@ -474,3 +474,18 @@ class DBFileType(IntEnum):
     AutosarXML = 19
     System = 20
     Anonymous = 21
+
+
+class TScriptStatus(IntEnum):
+    eTScrReady = 1
+    eTScrStarting = 2
+    eTScrRunning = 3
+    eTScrSleeping = 4
+    eTScrSuspended = 5
+    eTScrTerminated = 6
+    eTScrFinishedReturn = 7
+    eTScrFinishedCancel = 8
+    eTScrFailure = 9
+    eTScrTimeout = 10
+    eTScrDelayedCompiling = 11
+    eTScrException = 12

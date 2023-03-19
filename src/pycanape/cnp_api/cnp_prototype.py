@@ -750,3 +750,82 @@ Asap3WriteCalibrationObject = CANAPEAPI.map_symbol(
     ],
     errcheck=get_last_error,
 )
+
+Asap3ExecuteScriptEx = CANAPEAPI.map_symbol(
+    func_name="Asap3ExecuteScriptEx",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TModulHdl,                    # > TModulHdl module
+        ctypes.c_bool,                          # > bool scriptFile
+        ctypes.c_char_p,                        # > const char *script
+        ctypes.POINTER(cnp_class.TScriptHdl),   # < TScriptHdl *hScript
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetScriptResultString = CANAPEAPI.map_symbol(
+    func_name="Asap3GetScriptResultString",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+        ctypes.POINTER(ctypes.c_char_p),        # < char *resultString
+        ctypes.POINTER(ctypes.c_ulong),         # < DWORD *sizeofBuffer
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetScriptResultValue = CANAPEAPI.map_symbol(
+    func_name="Asap3GetScriptResultValue",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+        ctypes.POINTER(ctypes.c_double),        # < double *Value
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetScriptState = CANAPEAPI.map_symbol(
+    func_name="Asap3GetScriptState",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+        ctypes.POINTER(cnp_class.enum_type),    # < TScriptStatus *scrstate
+        ctypes.POINTER(ctypes.c_char_p),        # < char *textBuffer
+        ctypes.POINTER(ctypes.c_ulong),         # < DWORD *sizeofBuffer
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3ReleaseScript = CANAPEAPI.map_symbol(
+    func_name="Asap3ReleaseScript",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3StartScript = CANAPEAPI.map_symbol(
+    func_name="Asap3StartScript",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3StopScript = CANAPEAPI.map_symbol(
+    func_name="Asap3StopScript",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+    ],
+    errcheck=get_last_error,
+)

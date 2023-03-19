@@ -12,6 +12,8 @@ from .ecu_task import EcuTask
 from .calibration_object import get_calibration_object, CalibrationObject
 from .cnp_api import cnp_class, cnp_constants
 
+from .script import Script
+
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
@@ -312,3 +314,27 @@ class Module:
             self.asap3_handle,
             self.module_handle,
         )
+
+    def execute_script_ex(self, script_file: bool, script: str) -> Script:
+        """Execute a script file or a single script command.
+
+        :param script_file:
+            Declares interpretation of parameter script.
+            If 'script_file' is true, parameter 'script' is
+            interpreted as the file name of the script file
+            to be executed. If 'script_file' is false,
+            'script' is interpreted as a single script command
+        :param script:
+            A script filename or an single script command
+        :return:
+            The instance of the Script class
+        """
+        script_handle = cnp_class.TScriptHdl()
+        cnp_prototype.Asap3ExecuteScriptEx(
+            self.asap3_handle,
+            self.module_handle,
+            script_file,
+            script.encode(RC["ENCODING"]),
+            ctypes.byref(script_handle),
+        )
+        return Script(self.asap3_handle, script_handle)
