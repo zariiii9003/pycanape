@@ -38,6 +38,7 @@ autodoc_typehints = "both"
 
 nitpick_ignore = [
     ("py:class", "pycanape.cnp_api.cnp_class.LP_tAsap3Hdl"),
+    ("py:class", "pycanape.cnp_api.cnp_class.LP_c_ulong"),
     ("py:class", "npt.NDArray"),
     ("py:class", "npt.DTypeLike"),
     ("py:class", "np.float64"),
@@ -64,4 +65,3 @@ ctypes.wintypes.MAX_PATH = 255
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_static_path = ["_static"]
