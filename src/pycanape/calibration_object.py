@@ -6,8 +6,6 @@ import ctypes
 import sys
 import typing
 
-from .config import RC
-
 # compatibility fix for python 3.7
 if sys.version_info >= (3, 8):
     from functools import cached_property
@@ -24,6 +22,7 @@ from .cnp_api.cnp_class import (
     enum_type,
 )
 from .cnp_api.cnp_constants import ObjectType, TAsap3DataType, TFormat, ValueType
+from .config import RC
 from .utils import CANapeError
 
 try:
