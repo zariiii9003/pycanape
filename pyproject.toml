@@ -31,6 +31,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
     "black==23.1.*",
+    "ruff==0.0.257",
     "mypy==1.1.*",
     "types-backports;python_version<'3.8'",
     "pre-commit",
