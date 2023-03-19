@@ -37,7 +37,7 @@ dev = [
 ]
 doc = [
     "furo",
-    "sphinx==5.2.*",
+    "sphinx==6.1.*",
 ]
 
 [project.urls]

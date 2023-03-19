@@ -8,5 +8,5 @@ Module
 .. autoclass:: pycanape.module.MeasurementListEntry
     :members:
 
-.. autoclass:: pycanape.module.DBFileInfo
+.. autoclass:: pycanape.module.DatabaseInfo
     :members:
