@@ -6,9 +6,24 @@ import ctypes
 from threading import Lock
 from typing import Any, Callable, Dict, NamedTuple, Set
 
-from . import RC, MeasurementState, RecorderType
-from .cnp_api import cnp_class, cnp_constants
-from .cnp_api.cnp_constants import EventCode
+from .cnp_api.cnp_class import (
+    EVENT_CALLBACK,
+    Appversion,
+    TAsap3Hdl,
+    TModulHdl,
+    TRecorderID,
+    enum_type,
+    version_t,
+)
+from .cnp_api.cnp_constants import (
+    Channels,
+    DriverType,
+    ErrorCodes,
+    EventCode,
+    MeasurementState,
+    RecorderType,
+)
+from .config import RC
 from .module import Module
 from .recorder import Recorder
 from .utils import CANapeError, _kill_canape_processes
@@ -81,7 +96,7 @@ class CANape:
         if kill_open_instances:
             _kill_canape_processes()
 
-        asap3_handle = cnp_class.TAsap3Hdl()
+        asap3_handle = TAsap3Hdl()
         ptr = ctypes.pointer(asap3_handle)
 
         # fmt: off
@@ -104,7 +119,7 @@ class CANape:
         self._callbacks: Dict[EventCode, Set[Callable[[], Any]]] = {}
 
         # register callbacks for every event type
-        self._c_event_callback = cnp_class.EVENT_CALLBACK(self._on_event)
+        self._c_event_callback = EVENT_CALLBACK(self._on_event)
         self._callback_lock = Lock()
         for event_code in EventCode:
             self._callbacks[event_code] = set()
@@ -115,7 +130,7 @@ class CANape:
                 event_code,
             )
 
-    def _on_event(self, _: cnp_class.TAsap3Hdl, private_data: int) -> None:  # type: ignore[valid-type]
+    def _on_event(self, _: TAsap3Hdl, private_data: int) -> None:  # type: ignore[valid-type]
         """This function is called by CANape."""
         try:
             self._callback_lock.acquire()
@@ -140,7 +155,7 @@ class CANape:
 
     def get_application_version(self) -> AppVersion:
         """Call this function to get the current version of the server application."""
-        c_app_version = cnp_class.Appversion()
+        c_app_version = Appversion()
         cnp_prototype.Asap3GetApplicationVersion(
             self.asap3_handle,
             ctypes.byref(c_app_version),
@@ -156,14 +171,14 @@ class CANape:
     @staticmethod
     def get_dll_version() -> DllVersion:
         """Version control"""
-        version_t = cnp_class.version_t()
-        cnp_prototype.Asap3GetVersion(ctypes.byref(version_t))
+        _version_t = version_t()
+        cnp_prototype.Asap3GetVersion(ctypes.byref(_version_t))
         version = DllVersion(
-            dll_main_version=version_t.dllMainVersion,
-            dll_sub_version=version_t.dllSubVersion,
-            dll_release=version_t.dllRelease,
-            os_version=version_t.osVersion.decode(RC["ENCODING"]),
-            os_release=version_t.osRelease,
+            dll_main_version=_version_t.dllMainVersion,
+            dll_sub_version=_version_t.dllSubVersion,
+            dll_release=_version_t.dllRelease,
+            os_version=_version_t.osVersion.decode(RC["ENCODING"]),
+            os_release=_version_t.osRelease,
         )
         return version
 
@@ -182,8 +197,8 @@ class CANape:
         self,
         module_name: str,
         database_filename: str,
-        driver: cnp_constants.DriverType,
-        channel: cnp_constants.Channels,
+        driver: DriverType,
+        channel: Channels,
         go_online: bool = True,
         enable_cache: int = -1,
     ) -> Module:
@@ -223,7 +238,7 @@ class CANape:
         :return:
             The instance of the Module class
         """
-        module_handle = cnp_class.TModulHdl()
+        module_handle = TModulHdl()
 
         # fmt: off
         cnp_prototype.Asap3CreateModule3(
@@ -267,7 +282,7 @@ class CANape:
         :return:
             an instance of the Module class
         """
-        module_handle = cnp_class.TModulHdl()
+        module_handle = TModulHdl()
 
         cnp_prototype.Asap3GetModuleHandle(
             self.asap3_handle,  # TAsap3Hdl hdl
@@ -290,7 +305,7 @@ class CANape:
         :return:
             an instance of the Module class
         """
-        module_handle = cnp_class.TModulHdl(module_index)
+        module_handle = TModulHdl(module_index)
 
         # check if Module instance exists
         if module_handle.value in self._modules:
@@ -307,8 +322,8 @@ class CANape:
                 self._modules.pop(module_handle.value)
 
             raise CANapeError(
-                cnp_constants.ErrorCodes.AEC_INVALID_MODULE_HDL.value,
-                cnp_constants.ErrorCodes.AEC_INVALID_MODULE_HDL.name,
+                ErrorCodes.AEC_INVALID_MODULE_HDL.value,
+                ErrorCodes.AEC_INVALID_MODULE_HDL.name,
                 f"{self.__class__.__name__}.get_module_by_index",
             ) from None
 
@@ -385,7 +400,7 @@ class CANape:
         :return:
             an instance of the `Recorder` class
         """
-        c_recorder_id = cnp_class.TRecorderID()
+        c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
         cnp_prototype.Asap3DefineRecorder(
             self.asap3_handle,
@@ -396,7 +411,7 @@ class CANape:
         return Recorder(asap3_handle=self.asap3_handle, recorder_id=ptr.contents)
 
     def get_recorder_by_index(self, index: int) -> Recorder:
-        c_recorder_id = cnp_class.TRecorderID()
+        c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
         cnp_prototype.Asap3GetRecorderByIndex(
             self.asap3_handle,
@@ -407,7 +422,7 @@ class CANape:
 
     def get_selected_recorder(self) -> Recorder:
         """Retrieve the currently selected Recorder"""
-        c_recorder_id = cnp_class.TRecorderID()
+        c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
         cnp_prototype.Asap3GetSelectedRecorder(
             self.asap3_handle,
@@ -417,7 +432,7 @@ class CANape:
 
     def get_measurement_state(self) -> MeasurementState:
         """Get the current state of the measurement."""
-        c_state = cnp_class.enum_type()
+        c_state = enum_type()
         cnp_prototype.Asap3GetMeasurementState(
             self.asap3_handle,
             ctypes.byref(c_state),

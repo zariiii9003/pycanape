@@ -6,8 +6,8 @@ import ctypes
 import typing
 from typing import List
 
-from . import RC
 from .cnp_api import cnp_class, cnp_constants
+from .config import RC
 
 try:
     from .cnp_api import cnp_prototype

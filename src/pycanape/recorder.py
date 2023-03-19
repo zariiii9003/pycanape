@@ -5,8 +5,8 @@
 import ctypes
 from ctypes import wintypes
 
-from . import RC, RecorderState
-from .cnp_api import cnp_class
+from .cnp_api import cnp_class, cnp_constants
+from .config import RC
 
 try:
     from .cnp_api import cnp_prototype
@@ -49,7 +49,7 @@ class Recorder:
         )
         return c_name.value.decode(RC["ENCODING"])
 
-    def get_state(self) -> RecorderState:
+    def get_state(self) -> cnp_constants.RecorderState:
         """Return the state of a Recorder"""
         c_state = cnp_class.enum_type()
         cnp_prototype.Asap3GetRecorderState(
@@ -57,7 +57,7 @@ class Recorder:
             self._recorder_id,
             ctypes.byref(c_state),
         )
-        return RecorderState(c_state.value)
+        return cnp_constants.RecorderState(c_state.value)
 
     def is_enabled(self) -> bool:
         """Check if Recorder is enabled.

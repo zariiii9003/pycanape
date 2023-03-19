@@ -4,8 +4,6 @@
 
 __version__ = "0.5.0"
 
-from typing import Any, Dict
-
 from .calibration_object import (
     AsciiCalibrationObject,
     AxisCalibrationObject,
@@ -25,9 +23,8 @@ from .cnp_api.cnp_constants import (
     RecorderType,
     ValueType,
 )
+from .config import RC
 from .daq import FifoReader
 from .module import DBFileInfo, EcuTask, MeasurementListEntry, Module
 from .recorder import Recorder
 from .utils import CANapeError
-
-RC: Dict[str, Any] = {"ENCODING": "latin-1"}  # runtime config

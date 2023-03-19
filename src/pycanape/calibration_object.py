@@ -6,6 +6,8 @@ import ctypes
 import sys
 import typing
 
+from .config import RC
+
 # compatibility fix for python 3.7
 if sys.version_info >= (3, 8):
     from functools import cached_property
@@ -14,8 +16,15 @@ else:
 
 import numpy as np
 
-from . import RC, CANapeError, ObjectType, ValueType
-from .cnp_api import cnp_class, cnp_constants
+from .cnp_api.cnp_class import (
+    DBObjectInfo,
+    TAsap3Hdl,
+    TCalibrationObjectValue,
+    TModulHdl,
+    enum_type,
+)
+from .cnp_api.cnp_constants import ObjectType, TAsap3DataType, TFormat, ValueType
+from .utils import CANapeError
 
 try:
     from .cnp_api import cnp_prototype
@@ -29,10 +38,10 @@ if typing.TYPE_CHECKING:
 class BaseCalibrationObject:
     def __init__(
         self,
-        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
-        module_handle: typing.Union[cnp_class.TModulHdl, int],
+        asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
+        module_handle: typing.Union[TModulHdl, int],
         name: str,
-        object_info: cnp_class.DBObjectInfo,
+        object_info: DBObjectInfo,
     ) -> None:
         if cnp_prototype is None:
             err_msg = (
@@ -47,14 +56,12 @@ class BaseCalibrationObject:
         self._object_info = object_info
         self._force_upload = True
         try:
-            self._datatype: typing.Optional[
-                cnp_constants.TAsap3DataType
-            ] = self._read_datatype()
+            self._datatype: typing.Optional[TAsap3DataType] = self._read_datatype()
         except CANapeError:
             self._datatype = None
 
-    def _read_datatype(self) -> cnp_constants.TAsap3DataType:
-        _dtype = cnp_class.enum_type(0)
+    def _read_datatype(self) -> TAsap3DataType:
+        _dtype = enum_type(0)
         _address = ctypes.c_ulong(0)
         _min = ctypes.c_double(0)
         _max = ctypes.c_double(0)
@@ -63,30 +70,28 @@ class BaseCalibrationObject:
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
-            cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
+            TFormat.PHYSICAL_REPRESENTATION,
             ctypes.byref(_dtype),
             ctypes.byref(_address),
             ctypes.byref(_min),
             ctypes.byref(_max),
             ctypes.byref(_increment),
         )
-        return cnp_constants.TAsap3DataType(_dtype.value)
+        return TAsap3DataType(_dtype.value)
 
-    def _read_calibration_object_value(self) -> cnp_class.TCalibrationObjectValue:
-        cov = cnp_class.TCalibrationObjectValue()
+    def _read_calibration_object_value(self) -> TCalibrationObjectValue:
+        cov = TCalibrationObjectValue()
         cnp_prototype.Asap3ReadCalibrationObject2(
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
-            cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
+            TFormat.PHYSICAL_REPRESENTATION,
             self._force_upload,
             ctypes.byref(cov),
         )
         return cov
 
-    def _write_calibration_object_value(
-        self, cov: cnp_class.TCalibrationObjectValue
-    ) -> None:
+    def _write_calibration_object_value(self, cov: TCalibrationObjectValue) -> None:
         if self.object_type != ObjectType.OTT_CALIBRATE:
             err_msg = "Cannot set value to a Measurement Object."
             raise TypeError(err_msg)
@@ -94,7 +99,7 @@ class BaseCalibrationObject:
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
-            cnp_constants.TFormat.PHYSICAL_REPRESENTATION,
+            TFormat.PHYSICAL_REPRESENTATION,
             ctypes.byref(cov),
         )
 
@@ -362,11 +367,11 @@ CalibrationObject = typing.Union[
 
 
 def get_calibration_object(
-    asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
-    module_handle: typing.Union[cnp_class.TModulHdl, int],
+    asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
+    module_handle: typing.Union[TModulHdl, int],
     name: str,
 ) -> CalibrationObject:
-    object_info = cnp_class.DBObjectInfo()
+    object_info = DBObjectInfo()
     found = cnp_prototype.Asap3GetDBObjectInfo(
         asap3_handle,
         module_handle,

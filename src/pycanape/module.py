@@ -7,9 +7,18 @@ import fnmatch
 import os.path
 from typing import Dict, List, NamedTuple, Optional
 
-from . import RC, DriverType
 from .calibration_object import CalibrationObject, get_calibration_object
-from .cnp_api import cnp_class, cnp_constants
+from .cnp_api.cnp_class import (
+    DBFileInfo,
+    MeasurementListEntries,
+    TAsap3Hdl,
+    TModulHdl,
+    TScriptHdl,
+    TTaskInfo2,
+    enum_type,
+)
+from .cnp_api.cnp_constants import DBFileType, DriverType, TAsap3DBOType, TAsap3ECUState
+from .config import RC
 from .ecu_task import EcuTask
 from .script import Script
 
@@ -27,17 +36,17 @@ class MeasurementListEntry(NamedTuple):
     object_name: str
 
 
-class DBFileInfo(NamedTuple):
+class DatabaseInfo(NamedTuple):
     file_name: str
     file_path: str
-    file_type: cnp_constants.DBFileType
+    file_type: DBFileType
 
 
 class Module:
     def __init__(
         self,
-        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
-        module_handle: cnp_class.TModulHdl,
+        asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
+        module_handle: TModulHdl,
     ) -> None:
         """The :class:`~pycanape.module.Module` class is not meant to be instantiated
         by the user. Instead, :class:`~pycanape.module.Module` instances are returned by
@@ -59,18 +68,18 @@ class Module:
 
         self._objects_cache: Optional[List[str]] = None
 
-    def get_database_info(self) -> DBFileInfo:
+    def get_database_info(self) -> DatabaseInfo:
         """Get Info concerning the database file."""
-        cnp_info = cnp_class.DBFileInfo()
+        cnp_info = DBFileInfo()
         cnp_prototype.Asap3GetDatabaseInfo(
             self.asap3_handle,
             self.module_handle,
             ctypes.byref(cnp_info),
         )
-        db_info = DBFileInfo(
+        db_info = DatabaseInfo(
             file_name=cnp_info.asap2Fname.decode(RC["ENCODING"]),
             file_path=cnp_info.asap2Path.decode(RC["ENCODING"]),
-            file_type=cnp_constants.DBFileType(cnp_info.type),
+            file_type=DBFileType(cnp_info.type),
         )
         return db_info
 
@@ -108,11 +117,11 @@ class Module:
 
     def is_ecu_online(self) -> bool:
         """Asks CANape whether a ECU is online or offline"""
-        ecu_state = cnp_class.enum_type()
+        ecu_state = enum_type()
         cnp_prototype.Asap3IsECUOnline(
             self.asap3_handle, self.module_handle, ctypes.byref(ecu_state)
         )
-        if ecu_state.value == cnp_constants.TAsap3ECUState.TYPE_SWITCH_ONLINE:
+        if ecu_state.value == TAsap3ECUState.TYPE_SWITCH_ONLINE:
             return True
 
         return False
@@ -127,9 +136,9 @@ class Module:
             execute an download in case of online = True
         """
         ecu_state = (
-            cnp_constants.TAsap3ECUState.TYPE_SWITCH_ONLINE
+            TAsap3ECUState.TYPE_SWITCH_ONLINE
             if online
-            else cnp_constants.TAsap3ECUState.TYPE_SWITCH_OFFLINE
+            else TAsap3ECUState.TYPE_SWITCH_OFFLINE
         )
         cnp_prototype.Asap3ECUOnOffline(
             self.asap3_handle,
@@ -174,7 +183,7 @@ class Module:
                 self.module_handle,
                 None,
                 ctypes.byref(max_size),
-                cnp_constants.TAsap3DBOType.DBTYPE_ALL,
+                TAsap3DBOType.DBTYPE_ALL,
             )
 
             # call function again to retrieve data
@@ -184,7 +193,7 @@ class Module:
                 self.module_handle,
                 buffer,
                 ctypes.byref(max_size),
-                cnp_constants.TAsap3DBOType.DBTYPE_ALL,
+                TAsap3DBOType.DBTYPE_ALL,
             )
             self._objects_cache = (
                 buffer.value.strip(b";").decode(RC["ENCODING"]).split(";")
@@ -199,7 +208,7 @@ class Module:
             A dictionary with the ecu task description as keys
             and the `EcuTask` instances as values
         """
-        task_info_array = (cnp_class.TTaskInfo2 * 32)()
+        task_info_array = (TTaskInfo2 * 32)()
         ptr_task_no = ctypes.pointer(ctypes.c_ushort())
         cnp_prototype.Asap3GetEcuTasks2(
             self.asap3_handle,
@@ -210,7 +219,7 @@ class Module:
         )
         cnp_task_info_list = [*task_info_array][: ptr_task_no.contents.value]
 
-        def get_task_instance(task_info: cnp_class.TTaskInfo2) -> EcuTask:
+        def get_task_instance(task_info: TTaskInfo2) -> EcuTask:
             return EcuTask(
                 asap3_handle=self.asap3_handle,
                 module_handle=self.module_handle,
@@ -237,7 +246,7 @@ class Module:
         :return:
             DriverType enum
         """
-        c_driver_type = cnp_class.enum_type()
+        c_driver_type = enum_type()
         cnp_prototype.Asap3GetEcuDriverType(
             self.asap3_handle,
             self.module_handle,
@@ -275,7 +284,7 @@ class Module:
             A `dict` of Measurement list entries that uses the object name of
             the entries as key
         """
-        entries = cnp_class.MeasurementListEntries()
+        entries = MeasurementListEntries()
         ptr = ctypes.pointer(ctypes.pointer(entries))
         cnp_prototype.Asap3GetMeasurementListEntries(
             self.asap3_handle,
@@ -329,7 +338,7 @@ class Module:
         :return:
             The instance of the Script class
         """
-        script_handle = cnp_class.TScriptHdl()
+        script_handle = TScriptHdl()
         cnp_prototype.Asap3ExecuteScriptEx(
             self.asap3_handle,
             self.module_handle,
