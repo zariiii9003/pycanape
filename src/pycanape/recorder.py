@@ -5,7 +5,7 @@
 import ctypes
 from ctypes import wintypes
 
-from . import RecorderState, RC
+from . import RC, RecorderState
 from .cnp_api import cnp_class
 
 try:
@@ -28,9 +28,11 @@ class Recorder:
         :param recorder_id:
         """
         if cnp_prototype is None:
-            raise FileNotFoundError(
-                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            err_msg = (
+                "CANape API not found. Add CANape API "
+                "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         self._asap3_handle = asap3_handle
         self._recorder_id = recorder_id

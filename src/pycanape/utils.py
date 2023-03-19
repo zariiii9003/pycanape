@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-import winreg
 import ctypes
-from ctypes.util import find_library
 import logging
+import winreg
+from ctypes.util import find_library
 from threading import Lock
 
 import psutil
@@ -66,13 +66,10 @@ class CLibrary(ctypes.WinDLL):
         try:
             symbol = prototype((func_name, self))
         except AttributeError:
-            raise ImportError(
-                "Could not map function '{}' from library {}".format(
-                    func_name, self._name
-                )
-            )
+            err_msg = f"Could not map function '{func_name}' from library {self._name}"
+            raise ImportError(err_msg) from None
 
-        setattr(symbol, "__name__", func_name)
+        symbol.__name__ = func_name
 
         if errcheck:
             symbol.errcheck = errcheck

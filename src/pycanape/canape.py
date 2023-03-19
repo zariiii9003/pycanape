@@ -4,14 +4,14 @@
 
 import ctypes
 from threading import Lock
-from typing import NamedTuple, Dict, Callable, Set, Any
+from typing import Any, Callable, Dict, NamedTuple, Set
 
-from . import RecorderType, MeasurementState, RC
-from .recorder import Recorder
-from .module import Module
-from .utils import CANapeError, _kill_canape_processes
+from . import RC, MeasurementState, RecorderType
 from .cnp_api import cnp_class, cnp_constants
 from .cnp_api.cnp_constants import EventCode
+from .module import Module
+from .recorder import Recorder
+from .utils import CANapeError, _kill_canape_processes
 
 try:
     from .cnp_api import cnp_prototype
@@ -72,9 +72,11 @@ class CANape:
             If True, close all open CANape instances before start.
         """
         if cnp_prototype is None:
-            raise FileNotFoundError(
-                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            err_msg = (
+                "CANape API not found. Add CANape API "
+                "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         if kill_open_instances:
             _kill_canape_processes()
@@ -291,7 +293,7 @@ class CANape:
         module_handle = cnp_class.TModulHdl(module_index)
 
         # check if Module instance exists
-        if module_handle.value in self._modules.keys():
+        if module_handle.value in self._modules:
             module = self._modules[module_handle.value]
         # create new Module instance
         else:
@@ -301,7 +303,7 @@ class CANape:
         try:
             module.get_module_name()
         except CANapeError:
-            if module_handle.value in self._modules.keys():
+            if module_handle.value in self._modules:
                 self._modules.pop(module_handle.value)
 
             raise CANapeError(

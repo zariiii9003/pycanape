@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from enum import IntEnum
 import typing
+from enum import IntEnum
 
 import numpy as np
 

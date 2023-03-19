@@ -3,11 +3,11 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
-from ctypes import wintypes
 import platform
+from ctypes import wintypes
 
+from ..utils import CANapeError, CLibrary
 from . import cnp_class, cnp_constants
-from ..utils import CLibrary, CANapeError
 
 DLL_NAME = "CANapAPI64" if platform.architecture()[0] == "64bit" else "CANapAPI"
 CANAPEAPI = CLibrary(DLL_NAME)

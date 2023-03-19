@@ -14,7 +14,7 @@ else:
 
 import numpy as np
 
-from . import ObjectType, ValueType, CANapeError, RC
+from . import RC, CANapeError, ObjectType, ValueType
 from .cnp_api import cnp_class, cnp_constants
 
 try:
@@ -35,9 +35,11 @@ class BaseCalibrationObject:
         object_info: cnp_class.DBObjectInfo,
     ) -> None:
         if cnp_prototype is None:
-            raise FileNotFoundError(
-                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            err_msg = (
+                "CANape API not found. Add CANape API "
+                "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle
@@ -86,7 +88,8 @@ class BaseCalibrationObject:
         self, cov: cnp_class.TCalibrationObjectValue
     ) -> None:
         if self.object_type != ObjectType.OTT_CALIBRATE:
-            raise TypeError("Cannot set value to a Measurement Object.")
+            err_msg = "Cannot set value to a Measurement Object."
+            raise TypeError(err_msg)
         cnp_prototype.Asap3WriteCalibrationObject(
             self._asap3_handle,
             self._module_handle,
@@ -138,7 +141,8 @@ class BaseCalibrationObject:
     @force_upload.setter
     def force_upload(self, value: bool) -> None:
         if not isinstance(value, bool):
-            raise TypeError(f"value must be {bool}, but is {type(value)}")
+            err_msg = f"value must be {bool}, but is {type(value)}"
+            raise TypeError(err_msg)
         self._force_upload = value
 
     def __str__(self) -> str:
@@ -370,7 +374,8 @@ def get_calibration_object(
         ctypes.byref(object_info),
     )
     if not found:
-        raise KeyError(f"{name} not found.")
+        err_msg = f"{name} not found."
+        raise KeyError(err_msg)
 
     cal_obj_map: typing.Dict[ValueType, typing.Type[CalibrationObject]] = {
         ValueType.VALUE: ScalarCalibrationObject,
@@ -383,6 +388,7 @@ def get_calibration_object(
     try:
         cal_obj_type = cal_obj_map[object_info.type]
     except KeyError:
-        raise TypeError(f"Calibration object {name} has unknown value type.")
+        err_msg = f"Calibration object {name} has unknown value type."
+        raise TypeError(err_msg) from None
 
     return cal_obj_type(asap3_handle, module_handle, name, object_info)

@@ -37,9 +37,11 @@ class EcuTask:
         :param task_info:
         """
         if cnp_prototype is None:
-            raise FileNotFoundError(
-                "CANape API not found. Add CANape API location to environment variable `PATH`."
+            err_msg = (
+                "CANape API not found. Add CANape API "
+                "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle

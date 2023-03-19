@@ -4,13 +4,13 @@
 
 import math
 import time
-from threading import Thread, Lock
-from typing import List, Dict, Optional
+from threading import Lock, Thread
+from typing import Dict, List, Optional
 
+from .canape import CANape
+from .cnp_api.cnp_constants import ErrorCodes, EventCode
 from .ecu_task import EcuTask, Sample
 from .utils import CANapeError
-from .cnp_api.cnp_constants import ErrorCodes, EventCode
-from .canape import CANape
 
 
 class FifoReader:
@@ -90,7 +90,7 @@ class FifoReader:
 
             try:
                 self._task.daq_check_overrun()
-                for i in range(self._task.daq_get_fifo_level()):
+                for _i in range(self._task.daq_get_fifo_level()):
                     samples = self._task.daq_get_next_sample(self._count)
 
                     for j, channel_name in enumerate(self._channels):

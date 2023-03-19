@@ -23,10 +23,11 @@ class Script:
         :param script_handle:
         """
         if cnp_prototype is None:
-            raise FileNotFoundError(
+            err_msg = (
                 "CANape API not found. Add CANape API "
                 "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         self.asap3_handle = asap3_handle
         self.script_handle = script_handle

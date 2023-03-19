@@ -5,13 +5,12 @@
 import ctypes
 import fnmatch
 import os.path
-from typing import List, NamedTuple, Dict, Optional
+from typing import Dict, List, NamedTuple, Optional
 
-from . import DriverType, RC
-from .ecu_task import EcuTask
-from .calibration_object import get_calibration_object, CalibrationObject
+from . import RC, DriverType
+from .calibration_object import CalibrationObject, get_calibration_object
 from .cnp_api import cnp_class, cnp_constants
-
+from .ecu_task import EcuTask
 from .script import Script
 
 try:
@@ -49,10 +48,11 @@ class Module:
         :param module_handle:
         """
         if cnp_prototype is None:
-            raise FileNotFoundError(
+            err_msg = (
                 "CANape API not found. Add CANape API "
                 "location to environment variable `PATH`."
             )
+            raise FileNotFoundError(err_msg)
 
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
