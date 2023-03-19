@@ -69,7 +69,7 @@ class CLibrary(ctypes.WinDLL):
             err_msg = f"Could not map function '{func_name}' from library {self._name}"
             raise ImportError(err_msg) from None
 
-        symbol.__name__ = func_name
+        symbol.__name__ = func_name  # type: ignore[attr-defined]
 
         if errcheck:
             symbol.errcheck = errcheck
