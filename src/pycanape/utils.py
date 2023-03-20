@@ -106,10 +106,10 @@ def _kill_canape_processes() -> None:
 
 
 def get_canape_path() -> str:
-    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape")
-    return winreg.QueryValueEx(key, "Path")[0]
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
+        return winreg.QueryValueEx(key, "Path")[0]
 
 
 def get_canape_datapath() -> str:
-    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape")
-    return winreg.QueryValueEx(key, "DataPath")[0]
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
+        return winreg.QueryValueEx(key, "DataPath")[0]
