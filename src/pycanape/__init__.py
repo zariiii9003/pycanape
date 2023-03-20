@@ -25,7 +25,7 @@ from .cnp_api.cnp_constants import (
 )
 from .config import RC
 from .daq import FifoReader
-from .module import DBFileInfo, EcuTask, MeasurementListEntry, Module
+from .module import DatabaseInfo, EcuTask, MeasurementListEntry, Module
 from .recorder import Recorder
 from .script import Script
 from .utils import CANapeError
