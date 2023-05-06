@@ -30,9 +30,9 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "black==23.1.*",
-    "ruff==0.0.257",
-    "mypy==1.1.*",
+    "black==23.3.*",
+    "ruff==0.0.265",
+    "mypy==1.2.*",
     "types-backports;python_version<'3.8'",
     "pre-commit",
 ]
@@ -109,8 +109,3 @@ target-version = "py37"
 
 [tool.ruff.isort]
 known-first-party = ["pycanape"]
-
-[tool.ruff.per-file-ignores]
-"src/pycanape/__init__.py" = [
-    "F401",  # imported but unused
-]
