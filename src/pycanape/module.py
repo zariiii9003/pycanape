@@ -334,7 +334,7 @@ class Module:
             to be executed. If 'script_file' is false,
             'script' is interpreted as a single script command
         :param script:
-            A script filename or an single script command
+            A script filename or a single script command
         :return:
             The instance of the Script class
         """

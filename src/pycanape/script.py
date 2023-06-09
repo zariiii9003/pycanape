@@ -1,12 +1,17 @@
 import ctypes
+from typing import TYPE_CHECKING, Optional
 
 from .cnp_api import cnp_class, cnp_constants
+from .cnp_api.cnp_constants import ASAP3_INVALID_MODULE_HDL
 from .config import RC
 
 try:
     from .cnp_api import cnp_prototype
 except FileNotFoundError:
     cnp_prototype = None  # type: ignore[assignment]
+
+if TYPE_CHECKING:
+    from .module import Module
 
 
 class Script:
@@ -49,11 +54,30 @@ class Script:
         )
         return cnp_constants.TScriptStatus(scrstate.value)
 
-    def start_script(self) -> None:
-        """Starts the script."""
+    def start_script(
+        self,
+        *,
+        command_line: Optional[str] = None,
+        current_device: Optional["Module"] = None,
+    ) -> None:
+        """Starts the script.
+
+        :param command_line:
+            Set a commandline for the script.
+        :param current_device:
+            Set a module as current_device.
+        """
+        module_handle = (
+            current_device.module_handle
+            if current_device
+            else cnp_class.TModulHdl(ASAP3_INVALID_MODULE_HDL)
+        )
+        _command_line = command_line.encode(RC["ENCODING"]) if command_line else None
         cnp_prototype.Asap3StartScript(
             self.asap3_handle,
             self.script_handle,
+            _command_line,
+            module_handle,
         )
 
     def stop_script(self) -> None:

@@ -794,7 +794,7 @@ Asap3GetScriptState = CANAPEAPI.map_symbol(
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         cnp_class.TScriptHdl,                   # > TScriptHdl hScript
         ctypes.POINTER(cnp_class.enum_type),    # < TScriptStatus *scrstate
-        ctypes.POINTER(ctypes.c_char),        # < char *textBuffer
+        ctypes.POINTER(ctypes.c_char),          # < char *textBuffer
         ctypes.POINTER(ctypes.c_ulong),         # < DWORD *sizeofBuffer
     ],
     errcheck=get_last_error,
@@ -816,6 +816,8 @@ Asap3StartScript = CANAPEAPI.map_symbol(
     argtypes=[
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         cnp_class.TScriptHdl,                   # > TScriptHdl hScript
+        ctypes.c_char_p,                        # > char *  Commandline = NULL
+        cnp_class.TModulHdl,                    # > TModulHdl  moduleHdl = ASAP3_INVALID_MODULE_HDL
     ],
     errcheck=get_last_error,
 )
