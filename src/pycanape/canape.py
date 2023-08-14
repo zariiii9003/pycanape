@@ -253,7 +253,7 @@ class CANape:
         )
         # fmt: on
 
-        if module_handle.value not in self._modules.keys():
+        if module_handle.value not in self._modules:
             self._modules[module_handle.value] = Module(
                 self.asap3_handle, module_handle
             )
@@ -290,7 +290,7 @@ class CANape:
             ctypes.byref(module_handle),  # TModulHdl * module
         )
 
-        if module_handle.value not in self._modules.keys():
+        if module_handle.value not in self._modules:
             self._modules[module_handle.value] = Module(
                 self.asap3_handle, module_handle
             )
