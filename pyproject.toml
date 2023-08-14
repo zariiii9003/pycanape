@@ -30,15 +30,15 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "black==23.3.*",
-    "ruff==0.0.271",
+    "black==23.7.*",
+    "ruff==0.0.284",
     "mypy==1.3.*",
     "types-backports;python_version<'3.8'",
     "pre-commit",
 ]
 doc = [
     "furo",
-    "sphinx==6.1.*",
+    "sphinx==7.1.*",
 ]
 
 [project.urls]
@@ -100,12 +100,6 @@ select = [
 ignore = [
     "E501",  # line too long
 ]
-
-# Same as Black.
-line-length = 100
-
-# Assume Python 3.7.
-target-version = "py37"
 
 [tool.ruff.isort]
 known-first-party = ["pycanape"]
