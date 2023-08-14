@@ -13,16 +13,18 @@ DLL_NAME = "CANapAPI64" if platform.architecture()[0] == "64bit" else "CANapAPI"
 CANAPEAPI = CLibrary(DLL_NAME)
 
 
-def get_last_error(result, function, arguments):
+def get_last_error(result, function, args):
     if result:
-        return arguments
+        return args
 
-    error_code = Asap3GetLastError(arguments[0])
+    handle = args[0].contents if hasattr(args[0], "contents") else args[0]
+
+    error_code = Asap3GetLastError(handle)
     buffer = ctypes.c_char_p()
     ptr = ctypes.pointer(buffer)
 
     Asap3ErrorText(
-        arguments[0],
+        handle,
         error_code,
         ptr,
     )
@@ -33,7 +35,7 @@ def get_last_error(result, function, arguments):
             f"{ptr.contents.value.decode('ascii')}"  # type: ignore[union-attr]
         )
         raise CANapeError(error_code, error_msg, function.__name__)
-    return arguments
+    return args
 
 
 # fmt: off
