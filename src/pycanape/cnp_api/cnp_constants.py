@@ -11,12 +11,20 @@ if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
 
+DLL_INTERFACE_VERSION = b"02.03.01.Windows95/WindowsNT.1  "
 CANAPE_API_MAIN_VESION = 2
-CANAPE_API_SUB_VESION = 3
-CANAPE_API_RELEASE = 1
-CANAPE_API_OS_VERSION = "Windows95/WindowsNT"
-CANAPE_API_OS_RELEASE = 1
+CANAPE_API_SUB_VESION = 8
+CANAPE_API_RELEASE = 0
+CANAPE_API_OS_VERSION = b"Windows95/WindowsNT"
+CANAPE_API_OS_RELEASE = 0
 MAX_OS_VERSION = 50
+
+MAX_INTERFACENAME = 32
+MAX_TEMPLATENAME = 32
+
+# Definitions used by function Asap3GetApplicationSettings
+APPPARAM_PATH_MODULE = b"MODULE"
+APPPARAM_SETTINGS_PARAM = b"MODULE"
 
 ASAP3_INVALID_MODULE_HDL = -1
 
@@ -217,6 +225,27 @@ class ErrorCodes(IntEnum):
     ACE_ERR_UNSUPPORTED_TYPE = 136  # Unsupported data type for measurement
     ACE_ERR_DATA_SIZE = 137  # Datasize of object too large
     AEC_CALOBJ_INVALID_VALUE = 138  # Invalid value - object can't be read
+    AEC_ERR_SETTINGSPARAM = 139  # Invalid settings parameter
+    AEC_ERR_UNDEF_SETTINGSPARAM = 140  # Undefined settings parameter
+    ACE_ERR_SBL_ERROR = 141  # Streambased Logging configuration returns error
+    AEC_ERR_CALOBJECT_CREATION = 142  # Calibration Object could not be created
+    AEC_CALOBJ_NO_VALID_VAUE = (
+        143  # Warning :No valid Value available for Calibration Object
+    )
+    AEC_ERR_INTERFACEV3 = 144  # There is no Networkbased Interface defined
+    AEC_ERR_CREATING_MODULE = 145  # An error accourd while creating moidule
+    AEC_ERR_GOINGONLINE = 146  # Unable to switch to online
+    AEC_ERR_PHYSINTERFACE = 147  # Wrong physical interface for this driver
+    AEC_ERR_UNSUPPORTEDINTF = 148  # Wrong physical interface for this driver
+    AEC_ERR_APIPARAMETER = 149  # Wrong physical interface for this driver
+    AEC_INDEX_OUT_OF_RANGE = 150  # index is out of range
+    AEC_MEASUREMOBJ_NOT_FOUND = 151  # Measurement Object not found
+    AEC_PERMANENT_OFFLINE = (
+        152  # Online not possible - CANape is in permanent offline mode
+    )
+    AEC_OBJNAME_NOT_UNIQUE = 153  # Objectname not unique
+    AEC_INDEX_DO_NOT_MATCH = 154  # Index of Objectname does not unique
+    AEC_LAST_ERRCODE = 155
 
 
 class TApplicationType(IntEnum):
@@ -225,7 +254,20 @@ class TApplicationType(IntEnum):
     eAPPLOCATION = 3
 
 
+class TLogicalChannels(IntEnum):
+    ekUndefined = 0  # Undefined logical channel
+    ekCAN = 1  # CAN logical channel
+    ekSXI = 4  # SXI logical channel
+    ekLIN = 6  # LIN logical channel
+    ekFlexRay = 7  # FlexRay logical channel
+    ekUserDefinedDll = 8  # Userdefined logical channel
+    ekETH = 11  # Ethernet logical channel
+    ekDAIO = 13  # DAIO logical channel
+
+
 class Channels(IntEnum):
+    DEV_UNDEFINED_CHANNEL_ID = 0
+
     # Definitions for CAN
     DEV_CAN1 = 1
     DEV_CAN2 = 2
@@ -348,6 +390,40 @@ class ValueType(IntEnum):
     AXIS = 3  # Represents axis object
     ASCII = 4  # Represents ASCII string object
     VAL_BLK = 5  # Represents ValueBlock
+
+
+class TSettingsParameterType(IntEnum):
+    """Valid Parameter type for INI driversettings and Template Parameters"""
+
+    e_cfgType_Undef = 0  # Represents signed type for setting use cases
+    e_cfgType_SIGNED = 10  # Represents signed type for setting use cases
+    e_cfgType_UNSIGNED = 20  # Represents unsigned real type for setting use cases
+    e_cfgType_REAL = 30  # Represents  real type for setting use cases
+    e_cfgType_TEXT = 40  # Represents string object for setting use cases
+
+
+class TParameterClass(IntEnum):
+    """TParameterClass Class ID's of the available parameters"""
+
+    ePType_Undefined = -1  #  undefined Parameter class
+    ePType_CHannelID = 100  #  hardware ChannelID <unsigned>
+    ePType_NetWorkName = 101  #  hardware Network Name <text>
+    ePType_UseCANFD = 102  #  hardware CanFD option <unsigned>
+    ePType_secProfileId = (
+        103  #  Security Profile ID (used for Diagnostic devices) <unsigned>
+    )
+    ePType_securityRole = 104  #  Security Role (used for Diagnostic devices) <text>
+    ePType_diaginterfaceName = (
+        105  #  Diagnostic interface (optional part in Diagnostic databases) <text>
+    )
+    ePType_goOnline = (
+        106  #  Flag to go online after initialisation of the device <unsigned>
+    )
+    ePType_enableCache = 107  #  Flag to enable a mirror cache after initialisation of the device <unsigned>
+    ePType_descriptionFile = 108  #  Device database file (a2l,DB,arxml etc.) <text>
+    ePType_Driver = 109  #  Device driver ID <unsigned>
+    ePType_DeviceName = 110  #  Devicename <text>
+    ePType_DriverAsText = 111  #  Device driver ID as string <text>
 
 
 class ObjectType(IntEnum):

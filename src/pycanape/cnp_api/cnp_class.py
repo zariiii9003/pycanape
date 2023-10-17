@@ -21,6 +21,8 @@ TModulHdl = ctypes.c_ushort
 TRecorderID = ctypes.POINTER(ctypes.c_ulong)
 TTime = ctypes.c_ulong
 TScriptHdl = ctypes.c_ulong
+TParamTemplateHdl = ctypes.POINTER(ctypes.c_ulong)
+TParamItemHdl = ctypes.POINTER(ctypes.c_ulong)
 
 EVENT_CALLBACK = ctypes.WINFUNCTYPE(None, TAsap3Hdl, ctypes.c_ulong)
 
@@ -337,4 +339,53 @@ class DBFileInfo(ctypes.Structure):
         ("asap2Fname", ctypes.c_char * wintypes.MAX_PATH),
         ("asap2Path", ctypes.c_char * wintypes.MAX_PATH),
         ("type", wintypes.BYTE),
+    ]
+
+
+class TSettingsValue(ctypes.Union):
+    """
+    :var ctypes.c_int64 IVal:
+    :var ctypes.c_uint64 UIVal:
+    :var ctypes.c_double DVal:
+    :var ctypes.c_char_p STRVal:
+    """
+
+    _fields_ = [
+        ("IVal", ctypes.c_int64),
+        ("UIVal", ctypes.c_uint64),
+        ("DVal", ctypes.c_double),
+        ("STRVal", ctypes.c_char * 512),
+    ]
+
+
+class TSettingsParam(ctypes.Structure):
+    """
+    :var ~pycanape.cnp_api.cnp_constants.TSettingsParameterType type:
+        Parameter type
+    :var ctypes.c_uint size:
+        Parameter size
+    :var ctypes.c_int64 IVal:
+        corresponding union parameter for type ParamSigned
+    :var ctypes.c_uint64 UIVal:
+        corresponding union parameter for type ParamUnsigned
+    :var ctypes.c_double DVal:
+        corresponding union parameter for type ParamDouble
+    :var ctypes.c_char_p STRVal:
+        corresponding union parameter for type ParamChar
+    """
+
+    _pack_ = 1
+    _anonymous_ = ["settings_value"]
+    _fields_ = [
+        ("type", enum_type),
+        ("size", ctypes.c_uint),
+        ("settings_value", TSettingsValue),
+    ]
+
+
+class TPhysInterface(ctypes.Structure):
+    _pack_ = 1
+    _fields = [
+        ("m_CanapPhysInterfaceName", ctypes.c_char_p),
+        ("m_CanapPhysDeviceName", ctypes.c_char_p),
     ]

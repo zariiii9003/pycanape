@@ -65,6 +65,18 @@ Asap3CheckOverrun = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3CreateDevice = CANAPEAPI.map_symbol(
+    func_name="Asap3CreateDevice",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_char_p,                        # > const char* moduleName
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        ctypes.POINTER(cnp_class.TModulHdl),    # < TModulHdl* module
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3CreateModule = CANAPEAPI.map_symbol(
     func_name="Asap3CreateModule",
     restype=ctypes.c_bool,
@@ -91,6 +103,28 @@ Asap3CreateModule3 = CANAPEAPI.map_symbol(
         ctypes.c_bool,                          # > bool goOnline
         ctypes.c_short,                         # > short enablecache
         ctypes.POINTER(cnp_class.TModulHdl),    # < TModulHdl * module
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3CreateParameterTemplate = CANAPEAPI.map_symbol(
+    func_name="Asap3CreateParameterTemplate",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.POINTER(cnp_class.TParamTemplateHdl),  # < TParamTemplateHdl* paramHandle
+        ctypes.c_char_p,                        # > char* name = nullptr
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3CreateSBLConfiguration = CANAPEAPI.map_symbol(
+    func_name="Asap3CreateSBLConfiguration",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_char_p,                        # > char* ipAdress
+        ctypes.c_int,                           # > int port = 9815
     ],
     errcheck=get_last_error,
 )
@@ -130,6 +164,19 @@ Asap3EnableRecorder = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3EnumInterfaceNames = CANAPEAPI.map_symbol(
+    func_name="Asap3EnumInterfaceNames",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.enum_type,                    # > TLogicalChannels protocoltype
+        ctypes.c_uint,                          # > unsigned int index
+        ctypes.POINTER(ctypes.c_char_p),        # < char ** CANpName
+        ctypes.POINTER(ctypes.c_char_p),        # < char** PhysInterfacename
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3ErrorText = CANAPEAPI.map_symbol(
     func_name="Asap3ErrorText",
     restype=ctypes.c_bool,
@@ -146,6 +193,29 @@ Asap3Exit2 = CANAPEAPI.map_symbol(
     argtypes=[
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         ctypes.c_bool,                          # > bool close_CANape
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3FindParameterTemplate = CANAPEAPI.map_symbol(
+    func_name="Asap3FindParameterTemplate",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_char_p,                        # > char* Name
+        ctypes.POINTER(cnp_class.TParamTemplateHdl),  # < TParamTemplateHdl* paramHandle
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetApplicationSettings = CANAPEAPI.map_symbol(
+    func_name="Asap3GetApplicationSettings",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TModulHdl,                    # > TModulHdl module
+        ctypes.c_char_p,                        # > char* Keyname
+        ctypes.POINTER(cnp_class.TSettingsParam),  # > TSettingsParam* ResponseData
     ],
     errcheck=get_last_error,
 )
@@ -280,6 +350,17 @@ Asap3GetFifoLevel = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3GetInterfaceNames = CANAPEAPI.map_symbol(
+    func_name="Asap3GetInterfaceNames",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.enum_type,                    # > TLogicalChannels protocoltype
+        ctypes.POINTER(ctypes.c_int),           # < int *Count
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3GetLastError = CANAPEAPI.map_symbol(
     func_name="Asap3GetLastError",
     restype=ctypes.c_ushort,
@@ -364,6 +445,68 @@ Asap3GetNextSample = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3GetParameterCount = CANAPEAPI.map_symbol(
+    func_name="Asap3GetParameterCount",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* count
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetParameterInfoByClass = CANAPEAPI.map_symbol(
+    func_name="Asap3GetParameterInfoByClass",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.enum_type,                    # > eTParameterClass type
+        ctypes.POINTER(cnp_class.enum_type),    # < eTSettingsParameterType* settingstype
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* maxsize
+        ctypes.POINTER(ctypes.c_char_p),        # < char ** name
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetParameterInfoByIndex = CANAPEAPI.map_symbol(
+    func_name="Asap3GetParameterInfoByIndex",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_uint,                          # > unsigned int index
+        ctypes.POINTER(cnp_class.enum_type),    # < eTParameterClass* type
+        ctypes.POINTER(cnp_class.enum_type),    # < eTSettingsParameterType* settingstype
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* maxsize
+        ctypes.POINTER(ctypes.c_char_p),        # < char ** name
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetParameterInfoByClassName = CANAPEAPI.map_symbol(
+    func_name="Asap3GetParameterInfoByClassName",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        ctypes.c_char_p,                        # > const char* classname
+        ctypes.POINTER(cnp_class.enum_type),    # < eTParameterClass* type
+        ctypes.POINTER(cnp_class.enum_type),    # < eTSettingsParameterType* settingstype
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* maxsize
+        ctypes.POINTER(ctypes.c_char_p),        # < char ** name
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetParameterTemplateName = CANAPEAPI.map_symbol(
+    func_name="Asap3GetParameterTemplateName",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        ctypes.POINTER(ctypes.c_char_p),        # < char** Name
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3GetProjectDirectory = CANAPEAPI.map_symbol(
     func_name="Asap3GetProjectDirectory",
     restype=ctypes.c_bool,
@@ -437,6 +580,46 @@ Asap3GetSelectedRecorder = CANAPEAPI.map_symbol(
     argtypes=[
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         ctypes.POINTER(cnp_class.TRecorderID),  # < TRecorderID *recorderID
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetTemplateParameterByIndex = CANAPEAPI.map_symbol(
+    func_name="Asap3GetTemplateParameterByIndex",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        ctypes.c_uint,                          # > unsigned int index
+        ctypes.POINTER(cnp_class.enum_type),    # < eTParameterClass type
+        ctypes.POINTER(cnp_class.enum_type),    # < eTSettingsParameterType* settingstype
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* maxsize
+        ctypes.POINTER(ctypes.c_void_p),        # < void** data
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetTemplateParameterCount = CANAPEAPI.map_symbol(
+    func_name="Asap3GetTemplateParameterCount",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        ctypes.POINTER(ctypes.c_ulong),         # < unsigned long* count
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3GetTemplateParameterInfo = CANAPEAPI.map_symbol(
+    func_name="Asap3GetTemplateParameterInfo",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        ctypes.POINTER(cnp_class.enum_type),    # < eTParameterClass type
+        ctypes.POINTER(cnp_class.enum_type),    # < eTSettingsParameterType* settingstype
+        ctypes.POINTER(ctypes.c_ushort),        # < unsigned short* maxsize
+        ctypes.POINTER(ctypes.c_void_p),        # < void** data
     ],
     errcheck=get_last_error,
 )
@@ -532,6 +715,16 @@ Asap3IsRecorderEnabled = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3IsValidParameterTemplate = CANAPEAPI.map_symbol(
+    func_name="Asap3IsValidParameterTemplate",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3LoadCNAFile = CANAPEAPI.map_symbol(
     func_name="Asap3LoadCNAFile",
     restype=ctypes.c_bool,
@@ -615,12 +808,43 @@ Asap3RegisterCallBack = CANAPEAPI.map_symbol(
     errcheck=get_last_error,
 )
 
+Asap3ReleaseInterfaceNames = CANAPEAPI.map_symbol(
+    func_name="Asap3ReleaseInterfaceNames",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.enum_type,                    # > TLogicalChannels protocoltype
+    ],
+    errcheck=get_last_error,
+)
+
 Asap3ReleaseModule = CANAPEAPI.map_symbol(
     func_name="Asap3ReleaseModule",
     restype=ctypes.c_bool,
     argtypes=[
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         cnp_class.TModulHdl,                    # > TModulHdl module
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3ReleaseParameterTemplate = CANAPEAPI.map_symbol(
+    func_name="Asap3ReleaseParameterTemplate",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3ReleaseTemplateParameterItem = CANAPEAPI.map_symbol(
+    func_name="Asap3ReleaseTemplateParameterItem",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        cnp_class.enum_type,                    # > eTParameterClass type
     ],
     errcheck=get_last_error,
 )
@@ -650,6 +874,19 @@ Asap3SetInteractiveMode = CANAPEAPI.map_symbol(
     argtypes=[
         cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
         ctypes.c_bool,                          # > bool mode
+    ],
+    errcheck=get_last_error,
+)
+
+Asap3SetTemplateParameterItem = CANAPEAPI.map_symbol(
+    func_name="Asap3SetTemplateParameterItem",
+    restype=ctypes.c_bool,
+    argtypes=[
+        cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+        cnp_class.TParamTemplateHdl,            # > TParamTemplateHdl paramHandle
+        cnp_class.enum_type,                    # > eTParameterClass type
+        ctypes.c_void_p,                        # > void* data
+        ctypes.c_ushort,                        # > unsigned short sizeofdata
     ],
     errcheck=get_last_error,
 )
