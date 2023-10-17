@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
-from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, NamedTuple, Set, Union
+from typing import Any, Callable, Dict, NamedTuple, Set
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -30,7 +29,6 @@ from .module import Module
 from .recorder import Recorder
 from .utils import (
     CANapeError,
-    CANapeVersion,
     _kill_canape_processes,
     get_canape_dll_path,
 )
@@ -61,7 +59,6 @@ class CANape:
         clear_device_list: bool = True,
         modal_mode: bool = False,
         kill_open_instances: bool = True,
-        version: Union[CANapeVersion, Path, None] = None,
     ) -> None:
         """Initialize and start the CANape runtime environment.
 
@@ -88,16 +85,9 @@ class CANape:
             modal_mode = False -> modal (only Python Client)
         :param kill_open_instances:
             If True, close all open CANape instances before start.
-        :param version:
-            Specify the version or the path to the CANapAPI64.dll. If ``None``,
-            *pyCanape* will try to find the library from the PATH environment variable.
         """
-        if isinstance(version, Path):
-            dll_path = version
-        else:
-            dll_path = get_canape_dll_path(version=version)
-
-        self._dll = CANapeDll(dll_path)
+        _dll_path = get_canape_dll_path()
+        self._dll = CANapeDll(_dll_path)
 
         if kill_open_instances:
             _kill_canape_processes()

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2022-present Artur Drogunow <artur.drogunow@zf.com>
 #
 # SPDX-License-Identifier: MIT
-
+import contextlib
 import logging
 import platform
 import re
@@ -104,15 +104,25 @@ def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
 
 
 def get_canape_dll_path(version: CANapeVersion | None = None) -> Path:
+    """Return the path to the CANapAPI.dll from Windows registry or PATH.
+
+    :param version:
+        Select the CANape version that shall be found. If ``None``,
+        it will usually return the version, that was installed last.
+    :return:
+        Path to the CANapAPI.dll.
+    """
     dll_name = "CANapAPI64" if platform.architecture()[0] == "64bit" else "CANapAPI"
 
-    if version is not None:
+    # try to find dll via registry entry
+    with contextlib.suppress(FileNotFoundError):
         canape_path = get_canape_path(version)
         dll_path = canape_path / "CANapeAPI" / (dll_name + ".dll")
         if dll_path.exists():
             return dll_path
 
-    elif dll_path_string := find_library(dll_name):
+    # try ti find dll via PATH environment variable
+    if dll_path_string := find_library(dll_name):
         return Path(dll_path_string)
 
     err_msg = "CANape DLL not found."
