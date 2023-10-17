@@ -53,16 +53,13 @@ version = {attr = "pycanape.__version__"}
   "py.typed",
 ]
 
-[tool.black]
-include = '^/((docs|src)/.*|setup)\.pyi?$'
-
 [tool.mypy]
 show_error_codes = true
 ignore_missing_imports = false
 disallow_untyped_defs = false
-disallow_incomplete_defs = false
+disallow_incomplete_defs = true
 check_untyped_defs = true
-warn_unused_ignores = false
+warn_unused_ignores = true
 warn_redundant_casts = true
 disallow_any_generics = true
 disallow_subclassing_any = true
@@ -90,13 +87,16 @@ select = [
     "ISC",  # flake8-implicit-str-concat
     "PIE",  # flake8-pie
     "RSE",  # flake8-raise
+    "RUF",  # Ruff-specific rules
     "S",  # flake8-bandit
     "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
     "UP",  # pyupgrade
     "W",  # pycodestyle
 ]
 ignore = [
     "E501",  # line too long
+    "RUF012",  # mutable-class-default
 ]
 
 [tool.ruff.isort]

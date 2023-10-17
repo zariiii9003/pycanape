@@ -149,9 +149,9 @@ class BaseCalibrationObject:
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}("
-            f"asap3_handle={repr(self._asap3_handle)}, "
-            f"module_handle={repr(self._module_handle)}, "
-            f"name={repr(self._name)}, "
+            f"asap3_handle={self._asap3_handle!r}, "
+            f"module_handle={self._module_handle!r}, "
+            f"name={self._name!r}, "
             f"object_info)"
         )
 

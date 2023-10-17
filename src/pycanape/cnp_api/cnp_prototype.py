@@ -31,7 +31,7 @@ def get_last_error(result, function, args):
 
     if error_code > 0:
         error_msg = (
-            f"{cnp_constants.ErrorCodes(error_code).name}: "  # type: ignore[union-attr]
+            f"{cnp_constants.ErrorCodes(error_code).name}: "
             f"{ptr.contents.value.decode('ascii')}"  # type: ignore[union-attr]
         )
         raise CANapeError(error_code, error_msg, function.__name__)

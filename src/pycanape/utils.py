@@ -5,16 +5,23 @@
 import ctypes
 import logging
 import winreg
+from collections.abc import Callable
 from ctypes.util import find_library
 from threading import Lock
+from typing import Any, ParamSpec, TypeVar
 
 import psutil
 
 LOG = logging.getLogger(__name__)
 LOCK = Lock()
 
+P1 = ParamSpec("P1")
+T1 = TypeVar("T1")
 
-def _synchronization_wrapper(func, func_name: str):
+
+def _synchronization_wrapper(
+    func: Callable[P1, T1], func_name: str
+) -> Callable[P1, T1]:
     """Use locks to assure thread safety.
 
     Without synchronization it is possible that Asap3GetLastError
@@ -46,7 +53,7 @@ class CLibrary(ctypes.WinDLL):
     def function_type(self):
         return ctypes.WINFUNCTYPE
 
-    def map_symbol(self, func_name: str, restype=None, argtypes=(), errcheck=None):
+    def map_symbol(self, func_name: str, restype=None, argtypes=(), errcheck=None) -> Callable[..., Any]:  # type: ignore[no-untyped-def]
         """
         Map and return a symbol (function) from a C library. A reference to the
         mapped symbol is also held in the instance
@@ -81,7 +88,7 @@ class CLibrary(ctypes.WinDLL):
 
 
 class CANapeError(Exception):
-    def __init__(self, error_code, error_string, function) -> None:
+    def __init__(self, error_code: int, error_string: str, function: str) -> None:
         #: The error code according to :class:`~pycanape.cnp_api.cnp_constants.ErrorCodes`
         self.error_code = error_code
         super().__init__(f"{function} failed ({error_string})")

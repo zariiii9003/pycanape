@@ -63,7 +63,7 @@ jobs:
         python -m pip install -e .[dev]
     - name: Code Format Check with Black
       run: |
-        black --check --verbose .
+        black --check --verbose ./src
 
   build:
     name: Build artifacts

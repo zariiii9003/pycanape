@@ -4,6 +4,7 @@
 
 import ctypes
 from ctypes import wintypes
+from typing import ClassVar
 
 from . import cnp_constants
 
@@ -39,7 +40,7 @@ class TTaskInfo(ctypes.Structure):
     """
 
     _pack_ = 1
-    _fields_ = [
+    _fields_: ClassVar = [
         ("description", ctypes.c_char_p),
         ("taskId", ctypes.c_ushort),
         ("taskCycle", ctypes.c_ulong),
