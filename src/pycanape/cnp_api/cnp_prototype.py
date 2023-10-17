@@ -1145,6 +1145,7 @@ class CANapeDll:
                 f"Could not map function '{func_name}' to library {self.windll._name}"
             )
             LOG.warning(warning_msg)
+            # the function is not available, replace it with another function, that will raise a `NotImplementedError`
             symbol = functools.partial(self._not_implemented, func_name, self.version)  # type: ignore[assignment]
         else:
             symbol.__name__ = func_name  # type: ignore[attr-defined]

@@ -52,6 +52,7 @@ def _kill_canape_processes() -> None:
 
 
 def get_canape_versions() -> List[CANapeVersion]:
+    """Return a list of all CANape versions, that can be found in Windows Registry."""
     versions: List[CANapeVersion] = []
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
         _sub_key_count, value_count, _last_modified = winreg.QueryInfoKey(key)
@@ -67,6 +68,14 @@ def get_canape_versions() -> List[CANapeVersion]:
 
 
 def get_canape_path(version: CANapeVersion | None = None) -> Path:
+    """Return the path to the CANape installation from Windows registry.
+
+    :param version:
+        Select the CANape version that shall be found. If ``None``,
+        it will usually return the version, that was installed last.
+    :return:
+        Path to the CANape installation.
+    """
     name = f"Path{version.value}0" if version else "Path"
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
         try:
@@ -77,6 +86,14 @@ def get_canape_path(version: CANapeVersion | None = None) -> Path:
 
 
 def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
+    """Return the path to the CANape data folder from Windows registry.
+
+    :param version:
+        Select the CANape version that shall be found. If ``None``,
+        it will usually return the version, that was installed last.
+    :return:
+        Path to the CANape data folder.
+    """
     name = f"DataPath{version.value}0" if version else "DataPath"
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
         try:

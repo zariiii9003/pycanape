@@ -89,7 +89,7 @@ class CANape:
         :param kill_open_instances:
             If True, close all open CANape instances before start.
         :param version:
-            Specify the version or the path to the CANapAPI64.dll. If `None`,
+            Specify the version or the path to the CANapAPI64.dll. If ``None``,
             *pyCanape* will try to find the library from the PATH environment variable.
         """
         if isinstance(version, Path):
@@ -98,13 +98,6 @@ class CANape:
             dll_path = get_canape_dll_path(version=version)
 
         self._dll = CANapeDll(dll_path)
-
-        if self._dll is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
 
         if kill_open_instances:
             _kill_canape_processes()
