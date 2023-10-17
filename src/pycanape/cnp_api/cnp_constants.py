@@ -405,25 +405,25 @@ class TSettingsParameterType(IntEnum):
 class TParameterClass(IntEnum):
     """TParameterClass Class ID's of the available parameters"""
 
-    ePType_Undefined = -1  #  undefined Parameter class
-    ePType_CHannelID = 100  #  hardware ChannelID <unsigned>
-    ePType_NetWorkName = 101  #  hardware Network Name <text>
-    ePType_UseCANFD = 102  #  hardware CanFD option <unsigned>
+    ePType_Undefined = -1  # undefined Parameter class
+    ePType_CHannelID = 100  # hardware ChannelID <unsigned>
+    ePType_NetWorkName = 101  # hardware Network Name <text>
+    ePType_UseCANFD = 102  # hardware CanFD option <unsigned>
     ePType_secProfileId = (
-        103  #  Security Profile ID (used for Diagnostic devices) <unsigned>
+        103  # Security Profile ID (used for Diagnostic devices) <unsigned>
     )
-    ePType_securityRole = 104  #  Security Role (used for Diagnostic devices) <text>
+    ePType_securityRole = 104  # Security Role (used for Diagnostic devices) <text>
     ePType_diaginterfaceName = (
-        105  #  Diagnostic interface (optional part in Diagnostic databases) <text>
+        105  # Diagnostic interface (optional part in Diagnostic databases) <text>
     )
     ePType_goOnline = (
-        106  #  Flag to go online after initialisation of the device <unsigned>
+        106  # Flag to go online after initialisation of the device <unsigned>
     )
-    ePType_enableCache = 107  #  Flag to enable a mirror cache after initialisation of the device <unsigned>
-    ePType_descriptionFile = 108  #  Device database file (a2l,DB,arxml etc.) <text>
-    ePType_Driver = 109  #  Device driver ID <unsigned>
-    ePType_DeviceName = 110  #  Devicename <text>
-    ePType_DriverAsText = 111  #  Device driver ID as string <text>
+    ePType_enableCache = 107  # Flag to enable a mirror cache after initialisation of the device <unsigned>
+    ePType_descriptionFile = 108  # Device database file (a2l,DB,arxml etc.) <text>
+    ePType_Driver = 109  # Device driver ID <unsigned>
+    ePType_DeviceName = 110  # Devicename <text>
+    ePType_DriverAsText = 111  # Device driver ID as string <text>
 
 
 class ObjectType(IntEnum):

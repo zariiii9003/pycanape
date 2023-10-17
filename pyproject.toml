@@ -82,10 +82,12 @@ select = [
     "E",  # pycodestyle
     "EM",  # flake8-errmsg
     "F",  # pyflakes
+    "FURB",
     "G",  # flake8-logging-format
     "I",  # isort
     "ISC",  # flake8-implicit-str-concat
     "PIE",  # flake8-pie
+    "PL",
     "RSE",  # flake8-raise
     "RUF",  # Ruff-specific rules
     "S",  # flake8-bandit
@@ -96,6 +98,8 @@ select = [
 ]
 ignore = [
     "E501",  # line too long
+    "PLR0904",  # too-many-public-methods
+    "PLR0913",  # too-many-arguments
     "RUF012",  # mutable-class-default
 ]
 

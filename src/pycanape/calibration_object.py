@@ -28,6 +28,9 @@ if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
 
+_MULTIPLE_DIMENSION_THR: typing.Final = 2
+
+
 class BaseCalibrationObject:
     def __init__(
         self,
@@ -335,7 +338,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         np_array = np.ctypeslib.as_array(
             cov.valblk.values, shape=(cov.valblk.xDimension, cov.valblk.yDimension)
         )
-        if cov.valblk.yDimension < 2:
+        if cov.valblk.yDimension < _MULTIPLE_DIMENSION_THR:
             np_array = np_array.flatten()
         return np_array.astype(dtype=float, copy=True)
 
