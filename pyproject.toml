@@ -24,6 +24,7 @@ classifiers = [
 dependencies = [
     "psutil",
     "numpy>=1.21",
+    "typing-extensions;python_version<'3.10'",
 ]
 dynamic = ["version"]
 
@@ -82,7 +83,6 @@ select = [
     "E",  # pycodestyle
     "EM",  # flake8-errmsg
     "F",  # pyflakes
-    "FURB",
     "G",  # flake8-logging-format
     "I",  # isort
     "ISC",  # flake8-implicit-str-concat

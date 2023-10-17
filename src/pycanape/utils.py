@@ -4,13 +4,20 @@
 
 import ctypes
 import logging
+import sys
 import winreg
 from collections.abc import Callable
 from ctypes.util import find_library
 from threading import Lock
-from typing import Any, ParamSpec, TypeVar
+from typing import Any, TypeVar
 
 import psutil
+
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec
+else:
+    from typing_extensions import ParamSpec
+
 
 LOG = logging.getLogger(__name__)
 LOCK = Lock()
