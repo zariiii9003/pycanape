@@ -294,7 +294,7 @@ class Module:
         entries = ptr.contents[0]
 
         res = {}
-        for idx in range(0, entries.ItemCount):
+        for idx in range(entries.ItemCount):
             c_entry = entries.Entries[idx][0]
             mle = MeasurementListEntry(
                 task_id=c_entry.taskId,
