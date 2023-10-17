@@ -14,3 +14,4 @@ Library API
     daq
     exceptions
     ctypes
+    utils
