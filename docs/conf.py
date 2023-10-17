@@ -19,6 +19,8 @@ author = "Artur Drogunow"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
 ]
 
 # tls_verify = False

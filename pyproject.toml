@@ -38,7 +38,8 @@ dev = [
 ]
 doc = [
     "furo",
-    "sphinx==7.1.*",
+    "sphinx==7.2.*",
+    "sphinx-copybutton",
 ]
 
 [project.urls]
