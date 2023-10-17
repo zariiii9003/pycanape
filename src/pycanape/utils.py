@@ -9,7 +9,7 @@ import winreg
 from ctypes.util import find_library
 from enum import Enum
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import psutil
 
@@ -61,13 +61,14 @@ def get_canape_versions() -> List[CANapeVersion]:
             if not re.match(r"Path\d{3}", name):
                 continue
             try:
-                versions.append(CANapeVersion(name.removeprefix("Path")[:2]))
+                version_number = re.sub(pattern=r"Path", repl="", string=name)
+                versions.append(CANapeVersion(version_number[:2]))
             except ValueError:
                 continue
     return versions
 
 
-def get_canape_path(version: CANapeVersion | None = None) -> Path:
+def get_canape_path(version: Optional[CANapeVersion] = None) -> Path:
     """Return the path to the CANape installation from Windows registry.
 
     :param version:
@@ -85,7 +86,7 @@ def get_canape_path(version: CANapeVersion | None = None) -> Path:
             raise FileNotFoundError(err_msg) from None
 
 
-def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
+def get_canape_data_path(version: Optional[CANapeVersion] = None) -> Path:
     """Return the path to the CANape data folder from Windows registry.
 
     :param version:
@@ -103,7 +104,7 @@ def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
             raise FileNotFoundError(err_msg) from None
 
 
-def get_canape_dll_path(version: CANapeVersion | None = None) -> Path:
+def get_canape_dll_path(version: Optional[CANapeVersion] = None) -> Path:
     """Return the path to the CANapAPI.dll from Windows registry or PATH.
 
     :param version:

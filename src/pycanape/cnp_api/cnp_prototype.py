@@ -1109,8 +1109,8 @@ class CANapeDll:
 
         if error_code > 0:
             error_msg = (
-                f"{cnp_constants.ErrorCodes(error_code).name}: "
-                f"{ptr.contents.value.decode('ascii')}"  # type: ignore[union-attr]
+                f"{cnp_constants.ErrorCodes(error_code).name}: "  # type: ignore[union-attr]
+                f"{ptr.contents.value.decode('ascii')}"
             )
             raise CANapeError(error_code, error_msg, function.__name__)
         return args
