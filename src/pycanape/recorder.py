@@ -6,17 +6,16 @@ import ctypes
 from ctypes import wintypes
 
 from .cnp_api import cnp_class, cnp_constants
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
 
 
 class Recorder:
     def __init__(
-        self, asap3_handle: cnp_class.TAsap3Hdl, recorder_id: cnp_class.TRecorderID  # type: ignore[valid-type]
+        self,
+        dll: CANapeDll,
+        asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
+        recorder_id: cnp_class.TRecorderID,  # type: ignore[valid-type]
     ) -> None:
         """The :class:`~pycanape.recorder.Recorder` class is not meant to be instantiated
         by the user. :class:`~pycanape.recorder.Recorder` instances are returned by
@@ -27,13 +26,8 @@ class Recorder:
         :param asap3_handle:
         :param recorder_id:
         """
-        if cnp_prototype is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
 
+        self._dll = dll
         self._asap3_handle = asap3_handle
         self._recorder_id = recorder_id
 
@@ -41,7 +35,7 @@ class Recorder:
         """Get the name of the recorder."""
         length = ctypes.c_long(256)
         c_name = ctypes.create_string_buffer(length.value)
-        cnp_prototype.Asap3GetRecorderName(
+        self._dll.Asap3GetRecorderName(
             self._asap3_handle,
             self._recorder_id,
             ctypes.cast(c_name, ctypes.c_char_p),
@@ -52,7 +46,7 @@ class Recorder:
     def get_state(self) -> cnp_constants.RecorderState:
         """Return the state of a Recorder"""
         c_state = cnp_class.enum_type()
-        cnp_prototype.Asap3GetRecorderState(
+        self._dll.Asap3GetRecorderState(
             self._asap3_handle,
             self._recorder_id,
             ctypes.byref(c_state),
@@ -66,7 +60,7 @@ class Recorder:
             True if recorder is enabled
         """
         c_bln = ctypes.c_bool()
-        cnp_prototype.Asap3IsRecorderEnabled(
+        self._dll.Asap3IsRecorderEnabled(
             self._asap3_handle,
             self._recorder_id,
             ctypes.byref(c_bln),
@@ -75,7 +69,7 @@ class Recorder:
 
     def enable(self) -> None:
         """Enable Recorder."""
-        cnp_prototype.Asap3EnableRecorder(
+        self._dll.Asap3EnableRecorder(
             self._asap3_handle,
             self._recorder_id,
             True,
@@ -83,7 +77,7 @@ class Recorder:
 
     def disable(self) -> None:
         """Disable Recorder."""
-        cnp_prototype.Asap3EnableRecorder(
+        self._dll.Asap3EnableRecorder(
             self._asap3_handle,
             self._recorder_id,
             False,
@@ -93,7 +87,7 @@ class Recorder:
         """Retrieve the MDF Filename of a Recorder."""
         length = wintypes.DWORD(1024)
         c_name = ctypes.create_string_buffer(length.value)
-        cnp_prototype.Asap3GetRecorderMdfFileName(
+        self._dll.Asap3GetRecorderMdfFileName(
             self._asap3_handle,
             self._recorder_id,
             ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
@@ -107,7 +101,7 @@ class Recorder:
         :param filename:
             new recorder filename e.g. '{RECORDER}_{YEAR}-{MONTH}-{DAY}_{HOUR}-{MINUTE}-{SECOND}.MF4'
         """
-        cnp_prototype.Asap3SetRecorderMdfFileName(
+        self._dll.Asap3SetRecorderMdfFileName(
             self._asap3_handle,
             self._recorder_id,
             filename.encode(RC["ENCODING"]),
@@ -115,7 +109,7 @@ class Recorder:
 
     def start(self) -> None:
         """Starts the recording into the mdf file."""
-        cnp_prototype.Asap3StartRecorder(
+        self._dll.Asap3StartRecorder(
             self._asap3_handle,
             self._recorder_id,
         )
@@ -126,7 +120,7 @@ class Recorder:
         :param save_to_mdf:
             save recorded data to a file if True
         """
-        cnp_prototype.Asap3StopRecorder(
+        self._dll.Asap3StopRecorder(
             self._asap3_handle,
             self._recorder_id,
             save_to_mdf,
@@ -134,7 +128,7 @@ class Recorder:
 
     def pause(self, pause: bool) -> None:
         """Pause or unpause recorder."""
-        cnp_prototype.Asap3PauseRecorder(
+        self._dll.Asap3PauseRecorder(
             self._asap3_handle,
             self._recorder_id,
             pause,

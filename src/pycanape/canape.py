@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
+from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, NamedTuple, Set
+from typing import Any, Callable, Dict, NamedTuple, Set, Union
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -23,15 +24,16 @@ from .cnp_api.cnp_constants import (
     MeasurementState,
     RecorderType,
 )
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 from .module import Module
 from .recorder import Recorder
-from .utils import CANapeError, _kill_canape_processes
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
+from .utils import (
+    CANapeError,
+    CANapeVersion,
+    _kill_canape_processes,
+    get_canape_dll_path,
+)
 
 
 class AppVersion(NamedTuple):
@@ -59,6 +61,7 @@ class CANape:
         clear_device_list: bool = True,
         modal_mode: bool = False,
         kill_open_instances: bool = True,
+        version: Union[CANapeVersion, Path, None] = None,
     ) -> None:
         """Initialize and start the CANape runtime environment.
 
@@ -85,8 +88,18 @@ class CANape:
             modal_mode = False -> modal (only Python Client)
         :param kill_open_instances:
             If True, close all open CANape instances before start.
+        :param version:
+            Specify the version or the path to the CANapAPI64.dll. If `None`,
+            *pyCanape* will try to find the library from the PATH environment variable.
         """
-        if cnp_prototype is None:
+        if isinstance(version, Path):
+            dll_path = version
+        else:
+            dll_path = get_canape_dll_path(version=version)
+
+        self._dll = CANapeDll(dll_path)
+
+        if self._dll is None:
             err_msg = (
                 "CANape API not found. Add CANape API "
                 "location to environment variable `PATH`."
@@ -100,7 +113,7 @@ class CANape:
         ptr = ctypes.pointer(asap3_handle)
 
         # fmt: off
-        cnp_prototype.Asap3Init5(
+        self._dll.Asap3Init5(
             ptr,                                # TAsap3Hdl * hdl,
             time_out,                           # unsigned long responseTimeout,
             project_path.encode('ascii'),       # const char *workingDir,
@@ -123,7 +136,7 @@ class CANape:
         self._callback_lock = Lock()
         for event_code in EventCode:
             self._callbacks[event_code] = set()
-            cnp_prototype.Asap3RegisterCallBack(
+            self._dll.Asap3RegisterCallBack(
                 self.asap3_handle,
                 event_code,
                 self._c_event_callback,
@@ -156,7 +169,7 @@ class CANape:
     def get_application_version(self) -> AppVersion:
         """Call this function to get the current version of the server application."""
         c_app_version = Appversion()
-        cnp_prototype.Asap3GetApplicationVersion(
+        self._dll.Asap3GetApplicationVersion(
             self.asap3_handle,
             ctypes.byref(c_app_version),
         )
@@ -168,11 +181,10 @@ class CANape:
         )
         return app_version
 
-    @staticmethod
-    def get_dll_version() -> DllVersion:
+    def get_dll_version(self) -> DllVersion:
         """Version control"""
         _version_t = version_t()
-        cnp_prototype.Asap3GetVersion(ctypes.byref(_version_t))
+        self._dll.Asap3GetVersion(ctypes.byref(_version_t))
         version = DllVersion(
             dll_main_version=_version_t.dllMainVersion,
             dll_sub_version=_version_t.dllSubVersion,
@@ -186,7 +198,7 @@ class CANape:
         """Get the current project Directory."""
         c_buffer = ctypes.create_string_buffer(1024)
         c_length = ctypes.c_ulong(1024)
-        cnp_prototype.Asap3GetProjectDirectory(
+        self._dll.Asap3GetProjectDirectory(
             self.asap3_handle,
             ctypes.cast(c_buffer, ctypes.c_char_p),
             ctypes.byref(c_length),
@@ -241,7 +253,7 @@ class CANape:
         module_handle = TModulHdl()
 
         # fmt: off
-        cnp_prototype.Asap3CreateModule3(
+        self._dll.Asap3CreateModule3(
             self.asap3_handle,                      # TAsap3Hdl hdl
             module_name.encode('ascii'),            # const char * moduleName
             database_filename.encode('ascii'),      # const char * databaseFilename
@@ -255,7 +267,9 @@ class CANape:
 
         if module_handle.value not in self._modules:
             self._modules[module_handle.value] = Module(
-                self.asap3_handle, module_handle
+                dll=self._dll,
+                asap3_handle=self.asap3_handle,
+                module_handle=module_handle,
             )
 
         return self._modules[module_handle.value]
@@ -268,7 +282,7 @@ class CANape:
         """
         count = ctypes.c_ulong(0)
 
-        cnp_prototype.Asap3GetModuleCount(
+        self._dll.Asap3GetModuleCount(
             self.asap3_handle,  # TAsap3Hdl hdl
             ctypes.byref(count),  # unsigned long *count
         )
@@ -284,7 +298,7 @@ class CANape:
         """
         module_handle = TModulHdl()
 
-        cnp_prototype.Asap3GetModuleHandle(
+        self._dll.Asap3GetModuleHandle(
             self.asap3_handle,  # TAsap3Hdl hdl
             module_name.encode(RC["ENCODING"]),  # const char *moduleName
             ctypes.byref(module_handle),  # TModulHdl * module
@@ -292,7 +306,9 @@ class CANape:
 
         if module_handle.value not in self._modules:
             self._modules[module_handle.value] = Module(
-                self.asap3_handle, module_handle
+                dll=self._dll,
+                asap3_handle=self.asap3_handle,
+                module_handle=module_handle,
             )
 
         return self._modules[module_handle.value]
@@ -312,7 +328,11 @@ class CANape:
             module = self._modules[module_handle.value]
         # create new Module instance
         else:
-            module = Module(self.asap3_handle, module_handle)
+            module = Module(
+                dll=self._dll,
+                asap3_handle=self.asap3_handle,
+                module_handle=module_handle,
+            )
 
         # check validity
         try:
@@ -337,14 +357,14 @@ class CANape:
             Set this parameter to true to enable the interactive
             mode, otherwise set this paramater to false
         """
-        cnp_prototype.Asap3SetInteractiveMode(
+        self._dll.Asap3SetInteractiveMode(
             self.asap3_handle,  # TAsap3Hdl hdl
             mode,  # bool mode
         )
 
     def popup_debug_window(self) -> None:
         """Trouble shooting: call this function to popup the debug window of the MCD-system."""
-        cnp_prototype.Asap3PopupDebugWindow(self.asap3_handle)
+        self._dll.Asap3PopupDebugWindow(self.asap3_handle)
 
     def is_network_activated(self, network_name: str) -> bool:
         """Receives the state a given network interface.
@@ -355,7 +375,7 @@ class CANape:
             state of network (True = active) or (False = disactivated)
         """
         bln = ctypes.c_bool()
-        cnp_prototype.Asap3IsNetworkActivated(
+        self._dll.Asap3IsNetworkActivated(
             self.asap3_handle, network_name.encode(RC["ENCODING"]), ctypes.byref(bln)
         )
         return bln.value
@@ -367,20 +387,20 @@ class CANape:
            this function only clears these measurement objects from the
            API-Measurement-List which are defined by API
         """
-        cnp_prototype.Asap3ResetDataAcquisitionChnls(self.asap3_handle)
+        self._dll.Asap3ResetDataAcquisitionChnls(self.asap3_handle)
 
     def start_data_acquisition(self) -> None:
         """Start data acquisition."""
-        cnp_prototype.Asap3StartDataAcquisition(self.asap3_handle)
+        self._dll.Asap3StartDataAcquisition(self.asap3_handle)
 
     def stop_data_acquisition(self) -> None:
         """Stop data acquisition."""
-        cnp_prototype.Asap3StopDataAcquisition(self.asap3_handle)
+        self._dll.Asap3StopDataAcquisition(self.asap3_handle)
 
     def get_recorder_count(self) -> int:
         """Return count of defined Recorders."""
         c_count = ctypes.c_ulong()
-        cnp_prototype.Asap3GetRecorderCount(
+        self._dll.Asap3GetRecorderCount(
             self.asap3_handle,
             ctypes.byref(c_count),
         )
@@ -402,38 +422,44 @@ class CANape:
         """
         c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
-        cnp_prototype.Asap3DefineRecorder(
+        self._dll.Asap3DefineRecorder(
             self.asap3_handle,
             recorder_name.encode(RC["ENCODING"]),
             ptr,
             recorder_type,
         )
-        return Recorder(asap3_handle=self.asap3_handle, recorder_id=ptr.contents)
+        return Recorder(
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+        )
 
     def get_recorder_by_index(self, index: int) -> Recorder:
         c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
-        cnp_prototype.Asap3GetRecorderByIndex(
+        self._dll.Asap3GetRecorderByIndex(
             self.asap3_handle,
             index,
             ptr,
         )
-        return Recorder(asap3_handle=self.asap3_handle, recorder_id=ptr.contents)
+        return Recorder(
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+        )
 
     def get_selected_recorder(self) -> Recorder:
         """Retrieve the currently selected Recorder"""
         c_recorder_id = TRecorderID()
         ptr = ctypes.pointer(c_recorder_id)
-        cnp_prototype.Asap3GetSelectedRecorder(
+        self._dll.Asap3GetSelectedRecorder(
             self.asap3_handle,
             ptr,
         )
-        return Recorder(asap3_handle=self.asap3_handle, recorder_id=ptr.contents)
+        return Recorder(
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+        )
 
     def get_measurement_state(self) -> MeasurementState:
         """Get the current state of the measurement."""
         c_state = enum_type()
-        cnp_prototype.Asap3GetMeasurementState(
+        self._dll.Asap3GetMeasurementState(
             self.asap3_handle,
             ctypes.byref(c_state),
         )
@@ -442,7 +468,7 @@ class CANape:
     def has_mcd3_license(self) -> bool:
         """Check if the MCD option is enabled."""
         c_bln = ctypes.c_bool()
-        cnp_prototype.Asap3HasMCD3License(
+        self._dll.Asap3HasMCD3License(
             self.asap3_handle,
             ctypes.byref(c_bln),
         )
@@ -458,7 +484,7 @@ class CANape:
         # call function first time to determine max_size
         size = ctypes.c_ulong(0)
         try:
-            cnp_prototype.Asap3GetCNAFilename(
+            self._dll.Asap3GetCNAFilename(
                 self.asap3_handle,
                 None,
                 ctypes.byref(size),
@@ -471,7 +497,7 @@ class CANape:
 
         # call function again to retrieve data
         buffer = ctypes.create_string_buffer(size.value)
-        cnp_prototype.Asap3GetCNAFilename(
+        self._dll.Asap3GetCNAFilename(
             self.asap3_handle,
             buffer,
             ctypes.byref(size),
@@ -481,9 +507,7 @@ class CANape:
 
     def load_cna_file(self, cna_file: str) -> None:
         """Call this function to load a configuration file (CNA)."""
-        cnp_prototype.Asap3LoadCNAFile(
-            self.asap3_handle, cna_file.encode(RC["ENCODING"])
-        )
+        self._dll.Asap3LoadCNAFile(self.asap3_handle, cna_file.encode(RC["ENCODING"]))
 
     def exit(self, close_canape: bool = True) -> None:
         """Shut down ASAP3 connection to CANape with optional termination of CANape.
@@ -491,7 +515,7 @@ class CANape:
         :param close_canape:
             close CANape application if True
         """
-        cnp_prototype.Asap3Exit2(
+        self._dll.Asap3Exit2(
             self.asap3_handle,  # TAsap3Hdl hdl
             close_canape,  # bool close_CANape
         )

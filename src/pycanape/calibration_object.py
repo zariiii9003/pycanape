@@ -16,13 +16,9 @@ from .cnp_api.cnp_class import (
     enum_type,
 )
 from .cnp_api.cnp_constants import ObjectType, TAsap3DataType, TFormat, ValueType
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 from .utils import CANapeError
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
@@ -34,18 +30,13 @@ _MULTIPLE_DIMENSION_THR: typing.Final = 2
 class BaseCalibrationObject:
     def __init__(
         self,
+        dll: CANapeDll,
         asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: typing.Union[TModulHdl, int],
         name: str,
         object_info: DBObjectInfo,
     ) -> None:
-        if cnp_prototype is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
-
+        self._dll = dll
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle
         self._name = name
@@ -62,7 +53,7 @@ class BaseCalibrationObject:
         _min = ctypes.c_double(0)
         _max = ctypes.c_double(0)
         _increment = ctypes.c_double(0)
-        cnp_prototype.Asap3ReadObjectParameter(
+        self._dll.Asap3ReadObjectParameter(
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
@@ -77,7 +68,7 @@ class BaseCalibrationObject:
 
     def _read_calibration_object_value(self) -> TCalibrationObjectValue:
         cov = TCalibrationObjectValue()
-        cnp_prototype.Asap3ReadCalibrationObject2(
+        self._dll.Asap3ReadCalibrationObject2(
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
@@ -91,7 +82,7 @@ class BaseCalibrationObject:
         if self.object_type != ObjectType.OTT_CALIBRATE:
             err_msg = "Cannot set value to a Measurement Object."
             raise TypeError(err_msg)
-        cnp_prototype.Asap3WriteCalibrationObject(
+        self._dll.Asap3WriteCalibrationObject(
             self._asap3_handle,
             self._module_handle,
             self._name.encode(RC["ENCODING"]),
@@ -363,12 +354,13 @@ CalibrationObject = typing.Union[
 
 
 def get_calibration_object(
+    dll: CANapeDll,
     asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
     module_handle: typing.Union[TModulHdl, int],
     name: str,
 ) -> CalibrationObject:
     object_info = DBObjectInfo()
-    found = cnp_prototype.Asap3GetDBObjectInfo(
+    found = dll.Asap3GetDBObjectInfo(
         asap3_handle,
         module_handle,
         name.encode(RC["ENCODING"]),
@@ -392,4 +384,10 @@ def get_calibration_object(
         err_msg = f"Calibration object {name} has unknown value type."
         raise TypeError(err_msg) from None
 
-    return cal_obj_type(asap3_handle, module_handle, name, object_info)
+    return cal_obj_type(
+        dll=dll,
+        asap3_handle=asap3_handle,
+        module_handle=module_handle,
+        name=name,
+        object_info=object_info,
+    )

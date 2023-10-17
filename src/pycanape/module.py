@@ -18,14 +18,10 @@ from .cnp_api.cnp_class import (
     enum_type,
 )
 from .cnp_api.cnp_constants import DBFileType, DriverType, TAsap3DBOType, TAsap3ECUState
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 from .ecu_task import EcuTask
 from .script import Script
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
 
 
 class MeasurementListEntry(NamedTuple):
@@ -45,6 +41,7 @@ class DatabaseInfo(NamedTuple):
 class Module:
     def __init__(
         self,
+        dll: CANapeDll,
         asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: TModulHdl,
     ) -> None:
@@ -56,13 +53,7 @@ class Module:
         :param asap3_handle:
         :param module_handle:
         """
-        if cnp_prototype is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
-
+        self._dll = dll
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 
@@ -71,7 +62,7 @@ class Module:
     def get_database_info(self) -> DatabaseInfo:
         """Get Info concerning the database file."""
         cnp_info = DBFileInfo()
-        cnp_prototype.Asap3GetDatabaseInfo(
+        self._dll.Asap3GetDatabaseInfo(
             self.asap3_handle,
             self.module_handle,
             ctypes.byref(cnp_info),
@@ -95,7 +86,7 @@ class Module:
             activation state
         """
         active = ctypes.c_bool()
-        cnp_prototype.Asap3IsModuleActive(
+        self._dll.Asap3IsModuleActive(
             self.asap3_handle,
             self.module_handle,
             ctypes.byref(active),
@@ -109,7 +100,7 @@ class Module:
             True -> activate Module
             False -> deactivate Module
         """
-        cnp_prototype.Asap3ModuleActivation(
+        self._dll.Asap3ModuleActivation(
             self.asap3_handle,
             self.module_handle,
             activate,
@@ -118,7 +109,7 @@ class Module:
     def is_ecu_online(self) -> bool:
         """Asks CANape whether a ECU is online or offline"""
         ecu_state = enum_type()
-        cnp_prototype.Asap3IsECUOnline(
+        self._dll.Asap3IsECUOnline(
             self.asap3_handle, self.module_handle, ctypes.byref(ecu_state)
         )
         if ecu_state.value == TAsap3ECUState.TYPE_SWITCH_ONLINE:
@@ -140,7 +131,7 @@ class Module:
             if online
             else TAsap3ECUState.TYPE_SWITCH_OFFLINE
         )
-        cnp_prototype.Asap3ECUOnOffline(
+        self._dll.Asap3ECUOnOffline(
             self.asap3_handle,
             self.module_handle,
             ecu_state,
@@ -152,7 +143,7 @@ class Module:
         buffer = ctypes.c_char_p()
         ptr = ctypes.pointer(buffer)
 
-        cnp_prototype.Asap3GetModuleName(
+        self._dll.Asap3GetModuleName(
             self.asap3_handle,
             self.module_handle,
             ptr,
@@ -162,7 +153,7 @@ class Module:
     def get_communication_type(self) -> str:
         """Get current communication type (e.g. "CAN")."""
         buffer = ctypes.c_char_p()
-        cnp_prototype.Asap3GetCommunicationType(
+        self._dll.Asap3GetCommunicationType(
             self.asap3_handle,
             self.module_handle,
             ctypes.pointer(buffer),
@@ -178,7 +169,7 @@ class Module:
         if self._objects_cache is None:
             # call function first time to determine max_size
             max_size = ctypes.c_ulong(0)
-            cnp_prototype.Asap3GetDatabaseObjects(
+            self._dll.Asap3GetDatabaseObjects(
                 self.asap3_handle,
                 self.module_handle,
                 None,
@@ -188,7 +179,7 @@ class Module:
 
             # call function again to retrieve data
             buffer = ctypes.create_string_buffer(max_size.value)
-            cnp_prototype.Asap3GetDatabaseObjects(
+            self._dll.Asap3GetDatabaseObjects(
                 self.asap3_handle,
                 self.module_handle,
                 buffer,
@@ -210,7 +201,7 @@ class Module:
         """
         task_info_array = (TTaskInfo2 * 32)()
         ptr_task_no = ctypes.pointer(ctypes.c_ushort())
-        cnp_prototype.Asap3GetEcuTasks2(
+        self._dll.Asap3GetEcuTasks2(
             self.asap3_handle,
             self.module_handle,
             task_info_array,
@@ -221,6 +212,7 @@ class Module:
 
         def get_task_instance(task_info: TTaskInfo2) -> EcuTask:
             return EcuTask(
+                dll=self._dll,
                 asap3_handle=self.asap3_handle,
                 module_handle=self.module_handle,
                 task_info=task_info,
@@ -232,7 +224,7 @@ class Module:
     def get_network_name(self) -> str:
         """Receives the name of the used network."""
         c_name = ctypes.create_string_buffer(256)
-        cnp_prototype.Asap3GetNetworkName(
+        self._dll.Asap3GetNetworkName(
             self.asap3_handle,
             self.module_handle,
             ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
@@ -247,7 +239,7 @@ class Module:
             DriverType enum
         """
         c_driver_type = enum_type()
-        cnp_prototype.Asap3GetEcuDriverType(
+        self._dll.Asap3GetEcuDriverType(
             self.asap3_handle,
             self.module_handle,
             ctypes.byref(c_driver_type),
@@ -261,7 +253,12 @@ class Module:
             if len(filtered) == 1:
                 name = filtered[0]
 
-        return get_calibration_object(self.asap3_handle, self.module_handle, name)
+        return get_calibration_object(
+            dll=self._dll,
+            asap3_handle=self.asap3_handle,
+            module_handle=self.module_handle,
+            name=name,
+        )
 
     def has_resume_mode(self) -> bool:
         """Information about the Resume mode.
@@ -270,7 +267,7 @@ class Module:
             Function returns True if the device supports resume mode.
         """
         bln = ctypes.c_bool()
-        cnp_prototype.Asap3HasResumeMode(
+        self._dll.Asap3HasResumeMode(
             self.asap3_handle,
             self.module_handle,
             ctypes.byref(bln),
@@ -286,7 +283,7 @@ class Module:
         """
         entries = MeasurementListEntries()
         ptr = ctypes.pointer(ctypes.pointer(entries))
-        cnp_prototype.Asap3GetMeasurementListEntries(
+        self._dll.Asap3GetMeasurementListEntries(
             self.asap3_handle,
             self.module_handle,
             ptr,
@@ -313,13 +310,13 @@ class Module:
             this function only clears these measurement objects from the
             API-Measurement-List which are defined by API
         """
-        cnp_prototype.Asap3ResetDataAcquisitionChnlsByModule(
+        self._dll.Asap3ResetDataAcquisitionChnlsByModule(
             self.asap3_handle,
             self.module_handle,
         )
 
     def release_module(self) -> None:
-        cnp_prototype.Asap3ReleaseModule(
+        self._dll.Asap3ReleaseModule(
             self.asap3_handle,
             self.module_handle,
         )
@@ -339,11 +336,13 @@ class Module:
             The instance of the Script class
         """
         script_handle = TScriptHdl()
-        cnp_prototype.Asap3ExecuteScriptEx(
+        self._dll.Asap3ExecuteScriptEx(
             self.asap3_handle,
             self.module_handle,
             script_file,
             script.encode(RC["ENCODING"]),
             ctypes.byref(script_handle),
         )
-        return Script(self.asap3_handle, script_handle)
+        return Script(
+            dll=self._dll, asap3_handle=self.asap3_handle, script_handle=script_handle
+        )

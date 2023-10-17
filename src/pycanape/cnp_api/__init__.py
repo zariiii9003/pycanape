@@ -7,3 +7,5 @@ __all__ = [
     "cnp_constants",
     "cnp_prototype",
 ]
+
+from . import cnp_class, cnp_constants, cnp_prototype

@@ -2,96 +2,28 @@
 #
 # SPDX-License-Identifier: MIT
 
-import ctypes
 import logging
-import sys
+import platform
+import re
 import winreg
-from collections.abc import Callable
 from ctypes.util import find_library
-from threading import Lock
-from typing import Any, TypeVar
+from enum import Enum
+from pathlib import Path
+from typing import List
 
 import psutil
 
-if sys.version_info >= (3, 10):
-    from typing import ParamSpec
-else:
-    from typing_extensions import ParamSpec
-
-
 LOG = logging.getLogger(__name__)
-LOCK = Lock()
-
-P1 = ParamSpec("P1")
-T1 = TypeVar("T1")
 
 
-def _synchronization_wrapper(
-    func: Callable[P1, T1], func_name: str
-) -> Callable[P1, T1]:
-    """Use locks to assure thread safety.
-
-    Without synchronization it is possible that Asap3GetLastError
-    retrieves the error of the wrong function."""
-
-    if func_name in ("Asap3GetLastError", "Asap3ErrorText"):
-        return func
-
-    def wrapper(*args, **kwargs):
-        with LOCK:
-            return func(*args, **kwargs)
-
-    return wrapper
-
-
-class CLibrary(ctypes.WinDLL):
-    """Based on https://github.com/hardbyte/python-can/blob/develop/can/ctypesutil.py"""
-
-    def __init__(self, library_or_path: str) -> None:
-        library_path = find_library(library_or_path)
-        if library_path is None:
-            log_msg = "CANape API not found. Add CANape API location to environment variable `PATH`."
-            LOG.warning(log_msg)
-            raise FileNotFoundError(log_msg)
-
-        super().__init__(library_path)
-
-    @property
-    def function_type(self):
-        return ctypes.WINFUNCTYPE
-
-    def map_symbol(self, func_name: str, restype=None, argtypes=(), errcheck=None) -> Callable[..., Any]:  # type: ignore[no-untyped-def]
-        """
-        Map and return a symbol (function) from a C library. A reference to the
-        mapped symbol is also held in the instance
-        :param str func_name:
-            symbol_name
-        :param ctypes.c_* restype:
-            function result type (i.e. ctypes.c_ulong...), defaults to void
-        :param tuple(ctypes.c_* ... ) argtypes:
-            argument types, defaults to no args
-        :param callable errcheck:
-            optional error checking function, see ctypes docs for _FuncPtr
-        """
-        if argtypes:
-            prototype = ctypes.WINFUNCTYPE(restype, *argtypes)
-        else:
-            prototype = ctypes.WINFUNCTYPE(restype)
-        try:
-            symbol = prototype((func_name, self))
-        except AttributeError:
-            err_msg = f"Could not map function '{func_name}' from library {self._name}"
-            raise ImportError(err_msg) from None
-
-        symbol.__name__ = func_name  # type: ignore[attr-defined]
-
-        if errcheck:
-            symbol.errcheck = errcheck
-
-        func = _synchronization_wrapper(symbol, func_name)
-
-        setattr(self, func_name, func)
-        return func
+class CANapeVersion(Enum):
+    CANAPE_17 = "17"
+    CANAPE_18 = "18"
+    CANAPE_19 = "19"
+    CANAPE_20 = "20"
+    CANAPE_21 = "21"
+    CANAPE_22 = "22"
+    CANAPE_23 = "23"
 
 
 class CANapeError(Exception):
@@ -119,11 +51,52 @@ def _kill_canape_processes() -> None:
                 proc.kill()
 
 
-def get_canape_path() -> str:
+def get_canape_versions() -> List[CANapeVersion]:
+    versions: List[CANapeVersion] = []
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
-        return winreg.QueryValueEx(key, "Path")[0]
+        _sub_key_count, value_count, _last_modified = winreg.QueryInfoKey(key)
+        for idx in range(value_count):
+            name, _data, _type = winreg.EnumValue(key, idx)
+            if not re.match(r"Path\d{3}", name):
+                continue
+            try:
+                versions.append(CANapeVersion(name.removeprefix("Path")[:2]))
+            except ValueError:
+                continue
+    return versions
 
 
-def get_canape_datapath() -> str:
+def get_canape_path(version: CANapeVersion | None = None) -> Path:
+    name = f"Path{version.value}0" if version else "Path"
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
-        return winreg.QueryValueEx(key, "DataPath")[0]
+        try:
+            return Path(winreg.QueryValueEx(key, name)[0])
+        except FileNotFoundError:
+            err_msg = "CANape path not found in Windows registry."
+            raise FileNotFoundError(err_msg) from None
+
+
+def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
+    name = f"DataPath{version.value}0" if version else "DataPath"
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
+        try:
+            return Path(winreg.QueryValueEx(key, name)[0])
+        except FileNotFoundError:
+            err_msg = "CANape data path not found in Windows registry."
+            raise FileNotFoundError(err_msg) from None
+
+
+def get_canape_dll_path(version: CANapeVersion | None = None) -> Path:
+    dll_name = "CANapAPI64" if platform.architecture()[0] == "64bit" else "CANapAPI"
+
+    if version is not None:
+        canape_path = get_canape_path(version)
+        dll_path = canape_path / "CANapeAPI" / (dll_name + ".dll")
+        if dll_path.exists():
+            return dll_path
+
+    elif dll_path_string := find_library(dll_name):
+        return Path(dll_path_string)
+
+    err_msg = "CANape DLL not found."
+    raise FileNotFoundError(err_msg)

@@ -7,12 +7,8 @@ import typing
 from typing import List
 
 from .cnp_api import cnp_class, cnp_constants
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
 
 
 class Sample(typing.NamedTuple):
@@ -23,6 +19,7 @@ class Sample(typing.NamedTuple):
 class EcuTask:
     def __init__(
         self,
+        dll: CANapeDll,
         asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         module_handle: cnp_class.TModulHdl,
         task_info: cnp_class.TTaskInfo2,
@@ -36,13 +33,7 @@ class EcuTask:
         :param module_handle:
         :param task_info:
         """
-        if cnp_prototype is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
-
+        self._dll = dll
         self._asap3_handle = asap3_handle
         self._module_handle = module_handle
         self._task_info = task_info
@@ -96,7 +87,7 @@ class EcuTask:
             Save this channel to measurement file. Therefore the currently
             selected Recorder will be used
         """
-        cnp_prototype.Asap3SetupDataAcquisitionChnl(
+        self._dll.Asap3SetupDataAcquisitionChnl(
             self._asap3_handle,
             self._module_handle,
             measurement_object_name.encode(RC["ENCODING"]),
@@ -115,7 +106,7 @@ class EcuTask:
         :param reset_overrun:
             If True reset the overrun flag in CANape
         """
-        cnp_prototype.Asap3CheckOverrun(
+        self._dll.Asap3CheckOverrun(
             self._asap3_handle,
             self._module_handle,
             self.task_id,
@@ -124,7 +115,7 @@ class EcuTask:
 
     def daq_get_fifo_level(self) -> int:
         """Get number of samples in FIFO."""
-        fifo_level = cnp_prototype.Asap3GetFifoLevel(
+        fifo_level = self._dll.Asap3GetFifoLevel(
             self._asap3_handle,
             self._module_handle,
             self.task_id,
@@ -135,7 +126,7 @@ class EcuTask:
         c_time = cnp_class.TTime()
         value = ctypes.c_double()
         ptr = ctypes.pointer(ctypes.pointer(value))
-        cnp_prototype.Asap3GetNextSample(
+        self._dll.Asap3GetNextSample(
             self._asap3_handle,
             self._module_handle,
             self.task_id,
@@ -151,7 +142,7 @@ class EcuTask:
     def daq_get_current_values(self, channel_count: int) -> List[Sample]:
         c_time = cnp_class.TTime()
         values = (ctypes.c_double * channel_count)()
-        cnp_prototype.Asap3GetCurrentValues(
+        self._dll.Asap3GetCurrentValues(
             self._asap3_handle,
             self._module_handle,
             self.task_id,

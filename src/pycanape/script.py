@@ -3,12 +3,8 @@ from typing import TYPE_CHECKING, Optional
 
 from .cnp_api import cnp_class, cnp_constants
 from .cnp_api.cnp_constants import ASAP3_INVALID_MODULE_HDL
+from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
-
-try:
-    from .cnp_api import cnp_prototype
-except FileNotFoundError:
-    cnp_prototype = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:
     from .module import Module
@@ -17,6 +13,7 @@ if TYPE_CHECKING:
 class Script:
     def __init__(
         self,
+        dll: CANapeDll,
         asap3_handle: cnp_class.TAsap3Hdl,  # type: ignore[valid-type]
         script_handle: cnp_class.TScriptHdl,
     ) -> None:
@@ -27,13 +24,7 @@ class Script:
         :param asap3_handle:
         :param script_handle:
         """
-        if cnp_prototype is None:
-            err_msg = (
-                "CANape API not found. Add CANape API "
-                "location to environment variable `PATH`."
-            )
-            raise FileNotFoundError(err_msg)
-
+        self._dll = dll
         self.asap3_handle = asap3_handle
         self.script_handle = script_handle
 
@@ -45,7 +36,7 @@ class Script:
         """
         scrstate = cnp_class.enum_type()
         max_size = ctypes.c_ulong(0)
-        cnp_prototype.Asap3GetScriptState(
+        self._dll.Asap3GetScriptState(
             self.asap3_handle,
             self.script_handle,
             ctypes.byref(scrstate),
@@ -73,7 +64,7 @@ class Script:
             else cnp_class.TModulHdl(ASAP3_INVALID_MODULE_HDL)
         )
         _command_line = command_line.encode(RC["ENCODING"]) if command_line else None
-        cnp_prototype.Asap3StartScript(
+        self._dll.Asap3StartScript(
             self.asap3_handle,
             self.script_handle,
             _command_line,
@@ -82,7 +73,7 @@ class Script:
 
     def stop_script(self) -> None:
         """Stop the script."""
-        cnp_prototype.Asap3StopScript(
+        self._dll.Asap3StopScript(
             self.asap3_handle,
             self.script_handle,
         )
@@ -91,7 +82,7 @@ class Script:
         """Removes a declared script from the Tasklist.
         To receive the result you must use the 'SetScriptResult' in
         your CASL script."""
-        cnp_prototype.Asap3ReleaseScript(
+        self._dll.Asap3ReleaseScript(
             self.asap3_handle,
             self.script_handle,
         )
@@ -103,7 +94,7 @@ class Script:
             result value of the script
         """
         val = ctypes.c_double()
-        cnp_prototype.Asap3GetScriptResultValue(
+        self._dll.Asap3GetScriptResultValue(
             self.asap3_handle,
             self.script_handle,
             ctypes.byref(val),
@@ -118,7 +109,7 @@ class Script:
         """
         # call function first time to determine max_size
         max_size = ctypes.c_ulong(0)
-        cnp_prototype.Asap3GetScriptResultString(
+        self._dll.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
             None,
@@ -127,7 +118,7 @@ class Script:
 
         # call function again to retrieve data
         c_buffer = ctypes.create_string_buffer(max_size.value)
-        cnp_prototype.Asap3GetScriptResultString(
+        self._dll.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
             c_buffer,
