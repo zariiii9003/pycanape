@@ -6,7 +6,7 @@ requires = ["setuptools >= 62.0"]
 name = "pyCANape"
 description = 'Pythonic wrapper around the VECTOR CANape API'
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { text = "MIT" }
 keywords = [
     "CANape",
@@ -24,16 +24,14 @@ classifiers = [
 dependencies = [
     "psutil",
     "numpy>=1.21",
-    "typing-extensions;python_version<'3.8'",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "black==23.9.*;python_version>='3.8'",
+    "black==23.9.*",
     "ruff==0.1.*",
     "mypy==1.6.*",
-    "types-backports;python_version<'3.8'",
     "pre-commit",
 ]
 doc = [

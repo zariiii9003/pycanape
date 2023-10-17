@@ -3,14 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
-import sys
 import typing
-
-# compatibility fix for python 3.7
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from backports.cached_property import cached_property
+from functools import cached_property
 
 import numpy as np
 
