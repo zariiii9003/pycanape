@@ -1151,8 +1151,6 @@ class CANapeDll:
                 symbol.errcheck = errcheck
 
         func = _synchronize(symbol)
-
-        setattr(self, func_name, func)
         return func
 
     @staticmethod
