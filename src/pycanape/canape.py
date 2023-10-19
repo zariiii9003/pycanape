@@ -92,12 +92,11 @@ class CANape:
         if kill_open_instances:
             _kill_canape_processes()
 
-        asap3_handle = TAsap3Hdl()
-        ptr = ctypes.pointer(asap3_handle)
+        self.asap3_handle = TAsap3Hdl()
 
         # fmt: off
         self._dll.Asap3Init5(
-            ptr,                                # TAsap3Hdl * hdl,
+            ctypes.byref(self.asap3_handle),    # TAsap3Hdl * hdl,
             time_out,                           # unsigned long responseTimeout,
             project_path.encode('ascii'),       # const char *workingDir,
             fifo_size,                          # unsigned long fifoSize,
@@ -108,8 +107,6 @@ class CANape:
             modal_mode,                         # bool bModalMode
         )
         # fmt: on
-
-        self.asap3_handle = ptr.contents
 
         self._modules: Dict[int, Module] = {}
         self._callbacks: Dict[EventCode, Set[Callable[[], Any]]] = {}
@@ -404,39 +401,36 @@ class CANape:
             an instance of the `Recorder` class
         """
         c_recorder_id = TRecorderID()
-        ptr = ctypes.pointer(c_recorder_id)
         self._dll.Asap3DefineRecorder(
             self.asap3_handle,
             recorder_name.encode(RC["ENCODING"]),
-            ptr,
+            ctypes.byref(c_recorder_id),
             recorder_type,
         )
         return Recorder(
-            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=c_recorder_id
         )
 
     def get_recorder_by_index(self, index: int) -> Recorder:
         c_recorder_id = TRecorderID()
-        ptr = ctypes.pointer(c_recorder_id)
         self._dll.Asap3GetRecorderByIndex(
             self.asap3_handle,
             index,
-            ptr,
+            ctypes.byref(c_recorder_id),
         )
         return Recorder(
-            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=c_recorder_id
         )
 
     def get_selected_recorder(self) -> Recorder:
         """Retrieve the currently selected Recorder"""
         c_recorder_id = TRecorderID()
-        ptr = ctypes.pointer(c_recorder_id)
         self._dll.Asap3GetSelectedRecorder(
             self.asap3_handle,
-            ptr,
+            ctypes.byref(c_recorder_id),
         )
         return Recorder(
-            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=ptr.contents
+            dll=self._dll, asap3_handle=self.asap3_handle, recorder_id=c_recorder_id
         )
 
     def get_measurement_state(self) -> MeasurementState:
