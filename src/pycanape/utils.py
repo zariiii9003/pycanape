@@ -7,7 +7,7 @@ import platform
 import re
 import winreg
 from ctypes.util import find_library
-from enum import Enum
+from enum import IntEnum
 from pathlib import Path
 from typing import List, Optional
 
@@ -16,14 +16,14 @@ import psutil
 LOG = logging.getLogger(__name__)
 
 
-class CANapeVersion(Enum):
-    CANAPE_17 = "17"
-    CANAPE_18 = "18"
-    CANAPE_19 = "19"
-    CANAPE_20 = "20"
-    CANAPE_21 = "21"
-    CANAPE_22 = "22"
-    CANAPE_23 = "23"
+class CANapeVersion(IntEnum):
+    CANAPE_17 = 17
+    CANAPE_18 = 18
+    CANAPE_19 = 19
+    CANAPE_20 = 20
+    CANAPE_21 = 21
+    CANAPE_22 = 22
+    CANAPE_23 = 23
 
 
 class CANapeError(Exception):
@@ -62,7 +62,7 @@ def get_canape_versions() -> List[CANapeVersion]:
                 continue
             try:
                 version_number = re.sub(pattern=r"Path", repl="", string=name)
-                versions.append(CANapeVersion(version_number[:2]))
+                versions.append(CANapeVersion(int(version_number[:2])))
             except ValueError:
                 continue
     return versions
@@ -122,7 +122,7 @@ def get_canape_dll_path(version: Optional[CANapeVersion] = None) -> Path:
         if dll_path.exists():
             return dll_path
 
-    # try ti find dll via PATH environment variable
+    # try to find dll via PATH environment variable
     if dll_path_string := find_library(dll_name):
         return Path(dll_path_string)
 
