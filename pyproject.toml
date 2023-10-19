@@ -88,6 +88,7 @@ select = [
     "G",  # flake8-logging-format
     "I",  # isort
     "ISC",  # flake8-implicit-str-concat
+    "N",  # pep8-naming
     "PIE",  # flake8-pie
     "PL",  # pylint
     "RSE",  # flake8-raise
@@ -106,6 +107,9 @@ ignore = [
 ]
 
 [tool.ruff.per-file-ignores]
+"src/pycanape/cnp_api/**/*.py" = [
+    "N",  # names are mostly equal to CANapAPI.h
+]
 "tests/**/*.py" = [
     "S101", # asserts allowed in tests...
     "ARG", # Unused function args -> fixtures nevertheless are functionally relevant
