@@ -4,6 +4,8 @@
 
 import ctypes
 from ctypes import wintypes
+from pathlib import Path
+from typing import Union
 
 from .cnp_api import cnp_class, cnp_constants
 from .cnp_api.cnp_prototype import CANapeDll
@@ -95,7 +97,7 @@ class Recorder:
         )
         return c_name.value.decode(RC["ENCODING"])
 
-    def set_mdf_filename(self, filename: str) -> None:
+    def set_mdf_filename(self, filename: Union[str, Path]) -> None:
         """Set the MDF Filename for a Recorder.
 
         :param filename:
@@ -104,7 +106,7 @@ class Recorder:
         self._dll.Asap3SetRecorderMdfFileName(
             self._asap3_handle,
             self._recorder_id,
-            filename.encode(RC["ENCODING"]),
+            str(filename).encode(RC["ENCODING"]),
         )
 
     def start(self) -> None:

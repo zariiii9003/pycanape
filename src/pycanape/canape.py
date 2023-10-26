@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
+from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, NamedTuple, Set
+from typing import Any, Callable, Dict, NamedTuple, Set, Union
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -52,7 +53,7 @@ class DllVersion(NamedTuple):
 class CANape:
     def __init__(
         self,
-        project_path: str,
+        project_path: Union[str, Path],
         fifo_size: int = 128,
         sample_size: int = 256,
         time_out: int = 0,
@@ -98,7 +99,7 @@ class CANape:
         self._dll.Asap3Init5(
             ctypes.byref(self.asap3_handle),    # TAsap3Hdl * hdl,
             time_out,                           # unsigned long responseTimeout,
-            project_path.encode('ascii'),       # const char *workingDir,
+            str(project_path).encode('ascii'),  # const char *workingDir,
             fifo_size,                          # unsigned long fifoSize,
             sample_size,                        # unsigned long sampleSize,
             False,                              # bool debugMode,
@@ -188,7 +189,7 @@ class CANape:
     def create_module(
         self,
         module_name: str,
-        database_filename: str,
+        database_filename: Union[str, Path],
         driver: DriverType,
         channel: Channels,
         go_online: bool = True,
@@ -234,14 +235,14 @@ class CANape:
 
         # fmt: off
         self._dll.Asap3CreateModule3(
-            self.asap3_handle,                      # TAsap3Hdl hdl
-            module_name.encode('ascii'),            # const char * moduleName
-            database_filename.encode('ascii'),      # const char * databaseFilename
-            driver.value,                           # short driverType
-            channel.value,                          # short channelNo
-            go_online,                              # bool goOnline
-            enable_cache,                           # short enablecache
-            ctypes.byref(module_handle),            # TModulHdl * module
+            self.asap3_handle,                       # TAsap3Hdl hdl
+            module_name.encode('ascii'),             # const char * moduleName
+            str(database_filename).encode('ascii'),  # const char * databaseFilename
+            driver.value,                            # short driverType
+            channel.value,                           # short channelNo
+            go_online,                               # bool goOnline
+            enable_cache,                            # short enablecache
+            ctypes.byref(module_handle),             # TModulHdl * module
         )
         # fmt: on
 
@@ -482,9 +483,11 @@ class CANape:
 
         return buffer.value.decode(RC["ENCODING"])
 
-    def load_cna_file(self, cna_file: str) -> None:
+    def load_cna_file(self, cna_file: Union[str, Path]) -> None:
         """Call this function to load a configuration file (CNA)."""
-        self._dll.Asap3LoadCNAFile(self.asap3_handle, cna_file.encode(RC["ENCODING"]))
+        self._dll.Asap3LoadCNAFile(
+            self.asap3_handle, str(cna_file).encode(RC["ENCODING"])
+        )
 
     def exit(self, close_canape: bool = True) -> None:
         """Shut down ASAP3 connection to CANape with optional termination of CANape.
