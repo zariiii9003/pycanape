@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
+import warnings
 from pathlib import Path
 from threading import Lock
 from typing import Any, Callable, Dict, NamedTuple, Set, Union
@@ -124,28 +125,32 @@ class CANape:
                 event_code,
             )
 
-    def _on_event(self, _: TAsap3Hdl, private_data: int) -> None:  # type: ignore[valid-type]
+    def _on_event(self, _: TAsap3Hdl, private_data: int, /) -> int:  # type: ignore[valid-type]
         """This function is called by CANape."""
-        try:
-            self._callback_lock.acquire()
-            for func in self._callbacks[EventCode(private_data)]:
-                func()
-        finally:
-            self._callback_lock.release()
+        with self._callback_lock:
+            event = EventCode(private_data)
+            for func in self._callbacks[event]:
+                try:
+                    func()
+                    raise ValueError
+                except Exception as exc:
+                    warnings.warn(
+                        f"Exception in CANape callback for event {event.name}: {exc}",
+                        stacklevel=0,
+                    )
+        return 0
 
     def register_callback(
         self, event_code: EventCode, callback_func: Callable[[], Any]
     ) -> None:
-        self._callback_lock.acquire()
-        self._callbacks[event_code].add(callback_func)
-        self._callback_lock.release()
+        with self._callback_lock:
+            self._callbacks[event_code].add(callback_func)
 
     def unregister_callback(
         self, event_code: EventCode, callback_func: Callable[[], Any]
     ) -> None:
-        self._callback_lock.acquire()
-        self._callbacks[event_code].remove(callback_func)
-        self._callback_lock.release()
+        with self._callback_lock:
+            self._callbacks[event_code].remove(callback_func)
 
     def get_application_version(self) -> AppVersion:
         """Call this function to get the current version of the server application."""
