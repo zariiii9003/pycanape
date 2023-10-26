@@ -31,6 +31,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
+    "python-can==4.*",  # for tests
     "black==23.10.*",
     "ruff==0.1.*",
     "mypy==1.6.*",
@@ -111,9 +112,10 @@ ignore = [
     "N",  # names are mostly equal to CANapAPI.h
 ]
 "tests/**/*.py" = [
-    "S101", # asserts allowed in tests...
+    "S", # irrelevant for tests
     "ARG", # Unused function args -> fixtures nevertheless are functionally relevant
     "PLR2004", # Magic value used in comparison
+    "PLR0915", # Too many statements
 ]
 
 [tool.ruff.isort]
