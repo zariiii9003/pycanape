@@ -83,6 +83,9 @@ ruff check --fix src
 # run the type checker
 mypy .
 
+# run the tests
+python -m pytest
+
 # build the documentation
 python -m sphinx -Wan --keep-going docs build
 ```

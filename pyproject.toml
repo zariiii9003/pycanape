@@ -31,7 +31,8 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
+    "pytest",  # for tests
+    "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
     "black==23.10.*",
     "ruff==0.1.*",
@@ -122,3 +123,37 @@ ignore = [
 
 [tool.ruff.isort]
 known-first-party = ["pycanape"]
+
+[tool.pytest.ini_options]
+addopts = """\
+          -v --assert=plain \
+          --cov-config=./pyproject.toml --cov=pycanape  --cov-report=term --cov-report=html\
+          """
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+    ]
+
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "coverage_html_report"
