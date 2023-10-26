@@ -125,14 +125,13 @@ class CANape:
                 event_code,
             )
 
-    def _on_event(self, _: TAsap3Hdl, private_data: int, /) -> int:  # type: ignore[valid-type]
+    def _on_event(self, _hdl: TAsap3Hdl, private_data: int, /) -> int:  # type: ignore[valid-type]
         """This function is called by CANape."""
         with self._callback_lock:
             event = EventCode(private_data)
             for func in self._callbacks[event]:
                 try:
                     func()
-                    raise ValueError
                 except Exception as exc:
                     warnings.warn(
                         f"Exception in CANape callback for event {event.name}: {exc}",
