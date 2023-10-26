@@ -107,21 +107,18 @@ class Script:
         :return:
             result string of the script
         """
-        # call function first time to determine max_size
-        max_size = ctypes.c_ulong(0)
+        length = ctypes.c_ulong()
         self._dll.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
             None,
-            ctypes.byref(max_size),
+            ctypes.byref(length),
         )
-
-        # call function again to retrieve data
-        c_buffer = ctypes.create_string_buffer(max_size.value)
+        buffer = ctypes.create_string_buffer(length.value)
         self._dll.Asap3GetScriptResultString(
             self.asap3_handle,
             self.script_handle,
-            c_buffer,
-            ctypes.byref(max_size),
+            buffer,
+            ctypes.byref(length),
         )
-        return c_buffer.value.decode(RC["ENCODING"])
+        return buffer.value.decode(RC["ENCODING"])

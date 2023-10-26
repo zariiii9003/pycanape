@@ -35,15 +35,21 @@ class Recorder:
 
     def get_name(self) -> str:
         """Get the name of the recorder."""
-        length = ctypes.c_long(256)
-        c_name = ctypes.create_string_buffer(length.value)
+        length = ctypes.c_long()
         self._dll.Asap3GetRecorderName(
             self._asap3_handle,
             self._recorder_id,
-            ctypes.cast(c_name, ctypes.c_char_p),
+            None,
             ctypes.byref(length),
         )
-        return c_name.value.decode(RC["ENCODING"])
+        buffer = ctypes.create_string_buffer(length.value)
+        self._dll.Asap3GetRecorderName(
+            self._asap3_handle,
+            self._recorder_id,
+            buffer,
+            ctypes.byref(length),
+        )
+        return buffer.value.decode(RC["ENCODING"])
 
     def get_state(self) -> cnp_constants.RecorderState:
         """Return the state of a Recorder"""
@@ -87,15 +93,21 @@ class Recorder:
 
     def get_mdf_filename(self) -> str:
         """Retrieve the MDF Filename of a Recorder."""
-        length = wintypes.DWORD(1024)
-        c_name = ctypes.create_string_buffer(length.value)
+        length = wintypes.DWORD()
         self._dll.Asap3GetRecorderMdfFileName(
             self._asap3_handle,
             self._recorder_id,
-            ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
+            None,
             ctypes.byref(length),
         )
-        return c_name.value.decode(RC["ENCODING"])
+        buffer = ctypes.create_string_buffer(length.value)
+        self._dll.Asap3GetRecorderMdfFileName(
+            self._asap3_handle,
+            self._recorder_id,
+            buffer,
+            ctypes.byref(length),
+        )
+        return buffer.value.decode(RC["ENCODING"])
 
     def set_mdf_filename(self, filename: Union[str, Path]) -> None:
         """Set the MDF Filename for a Recorder.

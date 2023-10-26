@@ -177,14 +177,19 @@ class CANape:
 
     def get_project_directory(self) -> str:
         """Get the current project Directory."""
-        c_buffer = ctypes.create_string_buffer(1024)
-        c_length = ctypes.c_ulong(1024)
+        length = ctypes.c_ulong()
         self._dll.Asap3GetProjectDirectory(
             self.asap3_handle,
-            ctypes.cast(c_buffer, ctypes.c_char_p),
-            ctypes.byref(c_length),
+            None,
+            ctypes.byref(length),
         )
-        return c_buffer.value.decode(RC["ENCODING"])
+        buffer = ctypes.create_string_buffer(length.value)
+        self._dll.Asap3GetProjectDirectory(
+            self.asap3_handle,
+            buffer,
+            ctypes.byref(length),
+        )
+        return buffer.value.decode(RC["ENCODING"])
 
     def create_module(
         self,
@@ -459,28 +464,18 @@ class CANape:
         :return:
             Path to .cna file
         """
-        # call function first time to determine max_size
-        size = ctypes.c_ulong(0)
-        try:
-            self._dll.Asap3GetCNAFilename(
-                self.asap3_handle,
-                None,
-                ctypes.byref(size),
-            )
-        except CANapeError:
-            if size.value > 0:
-                pass
-            else:
-                raise
-
-        # call function again to retrieve data
-        buffer = ctypes.create_string_buffer(size.value)
+        length = ctypes.c_ulong()
+        self._dll.Asap3GetCNAFilename(
+            self.asap3_handle,
+            None,
+            ctypes.byref(length),
+        )
+        buffer = ctypes.create_string_buffer(length.value)
         self._dll.Asap3GetCNAFilename(
             self.asap3_handle,
             buffer,
-            ctypes.byref(size),
+            ctypes.byref(length),
         )
-
         return buffer.value.decode(RC["ENCODING"])
 
     def load_cna_file(self, cna_file: Union[str, Path]) -> None:

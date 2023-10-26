@@ -167,31 +167,25 @@ class Module:
             List of object names
         """
         if self._objects_cache is None:
-            # call function first time to determine max_size
-            max_size = ctypes.c_ulong(0)
+            length = ctypes.c_ulong(0)
             self._dll.Asap3GetDatabaseObjects(
                 self.asap3_handle,
                 self.module_handle,
                 None,
-                ctypes.byref(max_size),
+                ctypes.byref(length),
                 TAsap3DBOType.DBTYPE_ALL,
             )
-
-            # call function again to retrieve data
-            buffer = ctypes.create_string_buffer(max_size.value)
+            buffer = ctypes.create_string_buffer(length.value)
             self._dll.Asap3GetDatabaseObjects(
                 self.asap3_handle,
                 self.module_handle,
                 buffer,
-                ctypes.byref(max_size),
+                ctypes.byref(length),
                 TAsap3DBOType.DBTYPE_ALL,
             )
             self._objects_cache = (
-                buffer.value.strip(b";")[: max_size.value]
-                .decode(RC["ENCODING"])
-                .split(";")
+                buffer.value.strip(b";").decode(RC["ENCODING"]).split(";")
             )
-
         return copy.copy(self._objects_cache)
 
     def get_ecu_tasks(self) -> Dict[str, EcuTask]:
@@ -225,15 +219,21 @@ class Module:
 
     def get_network_name(self) -> str:
         """Receives the name of the used network."""
-        c_name = ctypes.create_string_buffer(256)
         size = ctypes.c_uint()
         self._dll.Asap3GetNetworkName(
             self.asap3_handle,
             self.module_handle,
-            ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
+            None,
             ctypes.byref(size),
         )
-        return c_name.value[: size.value].decode(RC["ENCODING"])
+        buffer = ctypes.create_string_buffer(size.value)
+        self._dll.Asap3GetNetworkName(
+            self.asap3_handle,
+            self.module_handle,
+            buffer,
+            ctypes.byref(size),
+        )
+        return buffer.value.decode(RC["ENCODING"])
 
     def get_ecu_driver_type(self) -> DriverType:
         """Retrieves the drivertype of an ECU.

@@ -25,6 +25,7 @@ __all__ = [
     "CANapeDll",
     "CANapeVersion",
     "CurveCalibrationObject",
+    "DllVersion",
     "MapCalibrationObject",
     "ScalarCalibrationObject",
     "ValueBlockCalibrationObject",
@@ -69,7 +70,7 @@ from .calibration_object import (
     ScalarCalibrationObject,
     ValueBlockCalibrationObject,
 )
-from .canape import AppVersion, CANape
+from .canape import AppVersion, CANape, DllVersion
 from .cnp_api.cnp_constants import (
     Channels,
     DriverType,
