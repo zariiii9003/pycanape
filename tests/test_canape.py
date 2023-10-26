@@ -1,5 +1,6 @@
 import os
 import subprocess
+import unittest.mock
 from pathlib import Path
 from typing import Callable, Iterator, List
 
@@ -146,6 +147,22 @@ def test_canape(canape_fixture: Callable[[bool], pycanape.CANape], set_channels)
     assert Path(canape.get_cna_filename()) == CANAPE_PROJECT / "XCPsimDemo.cna"
     canape.load_cna_file(CANAPE_PROJECT / "XCPsimDemo.cna")
 
+    data_acq_before_start_callback = unittest.mock.Mock()
+    canape.register_callback(
+        event_code=pycanape.EventCode.et_ON_BEFORE_DATA_ACQ_START,
+        callback_func=data_acq_before_start_callback,
+    )
+    data_acq_start_callback = unittest.mock.Mock()
+    canape.register_callback(
+        event_code=pycanape.EventCode.et_ON_DATA_ACQ_START,
+        callback_func=data_acq_start_callback,
+    )
+    data_acq_stop_callback = unittest.mock.Mock()
+    canape.register_callback(
+        event_code=pycanape.EventCode.et_ON_DATA_ACQ_STOP,
+        callback_func=data_acq_stop_callback,
+    )
+
     assert (
         canape.get_measurement_state()
         is pycanape.MeasurementState.eT_MEASUREMENT_STOPPED
@@ -160,6 +177,9 @@ def test_canape(canape_fixture: Callable[[bool], pycanape.CANape], set_channels)
         canape.get_measurement_state()
         is pycanape.MeasurementState.eT_MEASUREMENT_STOPPED
     )
+    assert data_acq_before_start_callback.call_count == 1
+    assert data_acq_start_callback.call_count == 1
+    assert data_acq_stop_callback.call_count == 1
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
