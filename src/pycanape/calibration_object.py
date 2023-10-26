@@ -303,7 +303,7 @@ class AsciiCalibrationObject(BaseCalibrationObject):
     @property
     def ascii(self) -> str:
         cov = self._read_calibration_object_value()
-        return cov.ascii.ascii.decode(RC["ENCODING"])
+        return cov.ascii.ascii[: self.len].decode(RC["ENCODING"])
 
     @ascii.setter
     def ascii(self, new_ascii: str) -> None:
