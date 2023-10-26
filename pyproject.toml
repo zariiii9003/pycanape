@@ -31,6 +31,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = [
+    "pytest",
     "python-can==4.*",  # for tests
     "black==23.10.*",
     "ruff==0.1.*",
@@ -39,7 +40,7 @@ dev = [
 ]
 doc = [
     "furo",
-    "sphinx==7.2.*",
+    "sphinx==7.*",
     "sphinx-copybutton",
 ]
 
