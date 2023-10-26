@@ -54,7 +54,9 @@ def _kill_canape_processes() -> None:
 def get_canape_versions() -> List[CANapeVersion]:
     """Return a list of all CANape versions, that can be found in Windows Registry."""
     versions: List[CANapeVersion] = []
-    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key:
+    with contextlib.suppress(FileNotFoundError), winreg.OpenKey(
+        winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape"
+    ) as key:
         _sub_key_count, value_count, _last_modified = winreg.QueryInfoKey(key)
         for idx in range(value_count):
             name, _data, _type = winreg.EnumValue(key, idx)
