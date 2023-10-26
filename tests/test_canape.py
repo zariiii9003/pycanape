@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pathlib import Path
+from typing import Callable, Iterator, List
 
 import numpy as np
 import psutil
@@ -33,7 +34,7 @@ if CANAPE_INSTALLED:
     XCPSIM_FOUND = XCPSIM_PATH.exists() and CANAPE_PROJECT.exists()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture()
 def set_channels():
     VectorBus.set_application_config(
         app_name="XCPsim",
@@ -53,10 +54,7 @@ def set_channels():
     )
 
 
-@pytest.fixture()
-def empty_canape():
-    # initialization
-
+def start_xcpsim() -> "subprocess.Popen[bytes]":
     # search for open xcpsim processes and kill them
     for proc in psutil.process_iter():
         try:
@@ -68,29 +66,105 @@ def empty_canape():
                 proc.kill()
 
     # start new XCPsim ECU simulator
-    sim_process = subprocess.Popen(XCPSIM_PATH)
+    return subprocess.Popen(XCPSIM_PATH)
 
-    # open new canape instance
-    canape = pycanape.CANape(
+
+def get_canape_instance(modal_mode: bool) -> pycanape.CANape:
+    return pycanape.CANape(
         project_path=CANAPE_PROJECT,
         fifo_size=128,
         sample_size=256,
         time_out=0,
         clear_device_list=True,
-        modal_mode=False,
+        modal_mode=modal_mode,
     )
-    # end of initialization
 
-    yield canape
 
-    # tear down
-    canape.exit(close_canape=True)
-    sim_process.kill()
+@pytest.fixture()
+def canape_fixture() -> Iterator[Callable[[bool], pycanape.CANape]]:
+    sim_process = start_xcpsim()
+
+    # use the list to save a reference to the instance
+    canape_instances: List[pycanape.CANape] = []
+
+    def _callback(modal_mode: bool) -> pycanape.CANape:
+        canape = get_canape_instance(modal_mode=modal_mode)
+        canape_instances.append(canape)
+        return canape
+
+    try:
+        yield _callback
+
+    finally:
+        for instance in canape_instances:
+            instance.exit(close_canape=True)
+
+        sim_process.kill()
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_create_module(empty_canape):
-    canape = empty_canape
+def test_canape(canape_fixture: Callable[[bool], pycanape.CANape], set_channels):
+    canape = canape_fixture(True)
+
+    assert canape.has_mcd3_license()
+
+    app_version = canape.get_application_version()
+    assert isinstance(app_version, pycanape.AppVersion)
+
+    dll_version = canape.get_dll_version()
+    assert isinstance(dll_version, pycanape.DllVersion)
+
+    assert Path(canape.get_project_directory()) == CANAPE_PROJECT
+    assert canape.get_module_count() == 1
+
+    canape.set_interactive_mode(True)
+    canape.set_interactive_mode(False)
+
+    module = canape.get_module_by_name("XCPsim")
+    module.module_activation(True)
+    module.switch_ecu_on_offline(True)
+
+    network_name = module.get_network_name()
+    assert canape.is_network_activated(network_name)
+
+    assert canape.get_recorder_count() == 2
+    assert isinstance(canape.get_selected_recorder(), pycanape.Recorder)
+    assert isinstance(canape.get_recorder_by_index(0), pycanape.Recorder)
+
+    blf_recorder = canape.define_recorder(
+        recorder_name="MyBlfRecorder",
+        recorder_type=pycanape.RecorderType.eTRecorderTypeBLF,
+    )
+    assert canape.get_recorder_count() == 3
+    assert isinstance(blf_recorder, pycanape.Recorder)
+    assert blf_recorder.get_name() == "MyBlfRecorder"
+    assert (
+        blf_recorder.get_mdf_filename()
+        == "{RECORDER}_{YEAR}-{MONTH}-{DAY}_{HOUR}-{MINUTE}-{SECOND}.blf"
+    )
+
+    assert Path(canape.get_cna_filename()) == CANAPE_PROJECT / "XCPsimDemo.cna"
+    canape.load_cna_file(CANAPE_PROJECT / "XCPsimDemo.cna")
+
+    assert (
+        canape.get_measurement_state()
+        is pycanape.MeasurementState.eT_MEASUREMENT_STOPPED
+    )
+    canape.start_data_acquisition()
+    assert (
+        canape.get_measurement_state()
+        is pycanape.MeasurementState.eT_MEASUREMENT_THREAD_RUNNING
+    )
+    canape.stop_data_acquisition()
+    assert (
+        canape.get_measurement_state()
+        is pycanape.MeasurementState.eT_MEASUREMENT_STOPPED
+    )
+
+
+@pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
+def test_create_module(canape_fixture: Callable[[bool], pycanape.CANape], set_channels):
+    canape = canape_fixture(False)
 
     assert canape.get_module_count() == 0
 
@@ -107,8 +181,8 @@ def test_create_module(empty_canape):
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_remove_module(empty_canape):
-    canape = empty_canape
+def test_remove_module(canape_fixture: Callable[[bool], pycanape.CANape], set_channels):
+    canape = canape_fixture(False)
     assert canape.get_module_count() == 0
 
     canape.create_module(
@@ -131,10 +205,9 @@ def test_remove_module(empty_canape):
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_get_module(empty_canape):
-    canape = empty_canape
-
-    created_module = canape.create_module(
+def test_get_module(canape_fixture: Callable[[bool], pycanape.CANape], set_channels):
+    canape = canape_fixture(False)
+    canape.create_module(
         module_name="XCPsim",
         database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
         driver=pycanape.DriverType.ASAP3_DRIVER_XCP,
@@ -145,19 +218,21 @@ def test_get_module(empty_canape):
 
     module = canape.get_module_by_name("XCPsim")
     assert isinstance(module, pycanape.Module)
-    assert module.module_handle == created_module.module_handle
+    assert module.module_handle == module.module_handle
 
-    module = canape.get_module_by_index(created_module.module_handle.value)
+    module = canape.get_module_by_index(module.module_handle.value)
     assert isinstance(module, pycanape.Module)
-    assert module.module_handle == created_module.module_handle
+    assert module.module_handle == module.module_handle
 
     with pytest.raises(pycanape.CANapeError):
         _ = canape.get_module_by_name("NonExistingModule")
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_module_methods(empty_canape):
-    canape = empty_canape
+def test_module_methods(
+    canape_fixture: Callable[[bool], pycanape.CANape], set_channels
+):
+    canape = canape_fixture(False)
     module = canape.create_module(
         module_name="XCPsim",
         database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),
@@ -202,6 +277,8 @@ def test_module_methods(empty_canape):
     module.reset_data_acquisition_channels_by_module()
     assert module.get_measurement_list_entries() == {}
 
+    assert module.get_ecu_driver_type() is pycanape.DriverType.ASAP3_DRIVER_XCP
+
     script = module.execute_script_ex(script_file=False, script='printf("Hello");')
     assert isinstance(script, pycanape.Script)
 
@@ -209,8 +286,10 @@ def test_module_methods(empty_canape):
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_get_calibration_object(empty_canape):
-    canape = empty_canape
+def test_get_calibration_object(
+    canape_fixture: Callable[[bool], pycanape.CANape], set_channels
+):
+    canape = canape_fixture(False)
     module = canape.create_module(
         module_name="XCPsim",
         database_filename=os.path.join(CANAPE_PROJECT, "XCPsim.a2l"),

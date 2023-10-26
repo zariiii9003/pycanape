@@ -28,6 +28,7 @@ def test_toplevel_attributes() -> None:
     assert hasattr(pycanape, "AppVersion")
     assert hasattr(pycanape, "CANape")
     assert hasattr(pycanape, "Channels")
+    assert hasattr(pycanape, "DllVersion")
     assert hasattr(pycanape, "DriverType")
     assert hasattr(pycanape, "EventCode")
     assert hasattr(pycanape, "MeasurementState")
