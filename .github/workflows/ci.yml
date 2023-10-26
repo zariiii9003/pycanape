@@ -31,7 +31,7 @@ jobs:
         python -m pip install .
     - name: Test
       run: |
-        python -m pytest -v --assert=plain ./tests
+        python -m pytest
 
   mypy:
     runs-on: windows-latest

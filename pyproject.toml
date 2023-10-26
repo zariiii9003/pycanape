@@ -125,10 +125,7 @@ ignore = [
 known-first-party = ["pycanape"]
 
 [tool.pytest.ini_options]
-addopts = """\
-          -v --assert=plain \
-          --cov-config=./pyproject.toml --cov=pycanape  --cov-report=term --cov-report=html\
-          """
+addopts = "-v --assert=plain"
 testpaths = ["tests"]
 
 [tool.coverage.run]

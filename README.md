@@ -74,6 +74,9 @@ pre-commit install
 
 After you implement your changes you should run the static code analysis and check the documentation:
 ```shell script
+# install pycanape in editable mode
+python -m pip install -e .[dev,doc]
+
 # format the code with black
 black .
 
@@ -84,7 +87,7 @@ ruff check --fix src
 mypy .
 
 # run the tests
-python -m pytest
+python -m pytest --cov-config=./pyproject.toml --cov=pycanape  --cov-report=term --cov-report=html
 
 # build the documentation
 python -m sphinx -Wan --keep-going docs build
