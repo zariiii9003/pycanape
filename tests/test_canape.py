@@ -156,7 +156,7 @@ def test_get_module(empty_canape):
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")
-def test_get_database_info(empty_canape):
+def test_module_methods(empty_canape):
     canape = empty_canape
     module = canape.create_module(
         module_name="XCPsim",
@@ -177,6 +177,35 @@ def test_get_database_info(empty_canape):
 
     database_objects = module.get_database_objects()
     assert len(database_objects) > 1000
+
+    assert module.is_module_active()
+    module.module_activation(False)
+    assert not module.is_module_active()
+    module.module_activation(True)
+    assert module.is_module_active()
+
+    assert module.is_ecu_online()
+    module.switch_ecu_on_offline(False)
+    assert not module.is_ecu_online()
+    module.switch_ecu_on_offline(True)
+    assert module.is_ecu_online()
+
+    assert module.get_communication_type() == "XCP"
+    ecu_tasks = module.get_ecu_tasks()
+    assert isinstance(ecu_tasks, dict)
+    assert len(ecu_tasks) == 7
+    assert all(isinstance(x, pycanape.EcuTask) for x in ecu_tasks.values())
+
+    assert module.get_network_name() == "CAN_Network"
+    assert module.has_resume_mode()
+
+    module.reset_data_acquisition_channels_by_module()
+    assert module.get_measurement_list_entries() == {}
+
+    script = module.execute_script_ex(script_file=False, script='printf("Hello");')
+    assert isinstance(script, pycanape.Script)
+
+    module.release_module()
 
 
 @pytest.mark.skipif(not XCPSIM_FOUND, reason="CANape example project not found")

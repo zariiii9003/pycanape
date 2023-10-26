@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2022-present Artur Drogunow <artur.drogunow@zf.com>
 #
 # SPDX-License-Identifier: MIT
-
+import copy
 import ctypes
 import fnmatch
 import os.path
@@ -187,10 +187,12 @@ class Module:
                 TAsap3DBOType.DBTYPE_ALL,
             )
             self._objects_cache = (
-                buffer.value.strip(b";").decode(RC["ENCODING"]).split(";")
+                buffer.value.strip(b";")[: max_size.value]
+                .decode(RC["ENCODING"])
+                .split(";")
             )
 
-        return self._objects_cache
+        return copy.copy(self._objects_cache)
 
     def get_ecu_tasks(self) -> Dict[str, EcuTask]:
         """Get available data acquisition tasks.
@@ -224,13 +226,14 @@ class Module:
     def get_network_name(self) -> str:
         """Receives the name of the used network."""
         c_name = ctypes.create_string_buffer(256)
+        size = ctypes.c_uint()
         self._dll.Asap3GetNetworkName(
             self.asap3_handle,
             self.module_handle,
             ctypes.cast(ctypes.byref(c_name), ctypes.c_char_p),
-            ctypes.byref(ctypes.c_uint()),
+            ctypes.byref(size),
         )
-        return c_name.value.decode(RC["ENCODING"])
+        return c_name.value[: size.value].decode(RC["ENCODING"])
 
     def get_ecu_driver_type(self) -> DriverType:
         """Retrieves the drivertype of an ECU.
