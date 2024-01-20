@@ -84,7 +84,8 @@ from .cnp_api.cnp_constants import (
 from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 from .daq import FifoReader
-from .module import DatabaseInfo, EcuTask, MeasurementListEntry, Module
+from .ecu_task import EcuTask
+from .module import DatabaseInfo, MeasurementListEntry, Module
 from .recorder import Recorder
 from .script import Script
 from .utils import (

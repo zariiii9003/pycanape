@@ -30,10 +30,10 @@ _T1 = TypeVar("_T1")
 def _synchronize(func: Callable[_P1, _T1]) -> Callable[_P1, _T1]:
     """Use locks to assure thread safety.
 
-    Without synchronization it is possible that Asap3GetLastError
+    Without synchronization, it is possible that Asap3GetLastError
     retrieves the error of the wrong function."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: _P1.args, **kwargs: _P1.kwargs) -> _T1:
         with CANapeDll.lock:
             return func(*args, **kwargs)
 

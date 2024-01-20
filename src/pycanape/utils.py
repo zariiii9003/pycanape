@@ -9,7 +9,7 @@ import winreg
 from ctypes.util import find_library
 from enum import IntEnum
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional, Tuple, Union
 
 import psutil
 
@@ -35,7 +35,7 @@ class CANapeError(Exception):
         # keep reference to args for pickling
         self._args = error_code, error_string, function
 
-    def __reduce__(self):
+    def __reduce__(self) -> Union[str, Tuple[Any, ...]]:
         return CANapeError, self._args, {}
 
 

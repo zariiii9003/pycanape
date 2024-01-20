@@ -34,9 +34,9 @@ dev = [
     "pytest",  # for tests
     "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
-    "black==23.10.*",
-    "ruff==0.1.*",
-    "mypy==1.6.*",
+    "black==23.12.1",
+    "ruff==0.1.14",
+    "mypy==1.8.0",
     "pre-commit",
 ]
 doc = [
