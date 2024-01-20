@@ -98,7 +98,7 @@ class CANape:
 
         # fmt: off
         self._dll.Asap3Init5(
-            ctypes.byref(self.asap3_handle),    # TAsap3Hdl * hdl,
+            ctypes.pointer(self.asap3_handle),  # TAsap3Hdl * hdl,
             time_out,                           # unsigned long responseTimeout,
             str(project_path).encode('ascii'),  # const char *workingDir,
             fifo_size,                          # unsigned long fifoSize,
