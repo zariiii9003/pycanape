@@ -2588,7 +2588,7 @@ class CANapeDll:
 
     # fmt: on
 
-    @property
+    @functools.cached_property
     def version(self) -> Version:
         _dll_version = cnp_class.version_t()
         self.Asap3GetVersion(ctypes.byref(_dll_version))
@@ -2646,7 +2646,8 @@ class CANapeDll:
             symbol = prototype((func_name, self.windll))
         except AttributeError:
             warning_msg = (
-                f"Could not map function '{func_name}' to library {self.windll._name}"
+                f"Function '{func_name}' not found in "
+                f"{Path(self.windll._name).name} (v{self.version})"
             )
             LOG.warning(warning_msg)
             # the function is not available, replace it with another function, that will raise a `NotImplementedError`
