@@ -6,7 +6,7 @@ import ctypes
 import warnings
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, NamedTuple, Set, Union
+from typing import Any, Callable, Dict, NamedTuple, Optional, Set, Union
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -61,6 +61,7 @@ class CANape:
         clear_device_list: bool = True,
         modal_mode: bool = False,
         kill_open_instances: bool = True,
+        **kwargs: Any,
     ) -> None:
         """Initialize and start the CANape runtime environment.
 
@@ -88,7 +89,9 @@ class CANape:
         :param kill_open_instances:
             If True, close all open CANape instances before start.
         """
-        _dll_path = get_canape_dll_path()
+        _dll_path: Optional[Path] = kwargs.get("_dll_path")
+        if _dll_path is None:
+            _dll_path = get_canape_dll_path()
         self._dll = CANapeDll(_dll_path)
 
         if kill_open_instances:
