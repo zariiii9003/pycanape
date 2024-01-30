@@ -1,7 +1,8 @@
-from typing import Optional, Union, Callable
-import canape
+from typing import Callable, Optional, Union
 
-CanapeAction = Union[Callable[[canape], canape], 'ActionBuilder']
+from .canape import CANape
+
+CanapeAction = Union[Callable[[CANape], CANape], "ActionBuilder"]
 
 
 class ActionBuilder:
@@ -19,38 +20,41 @@ class ActionBuilder:
     project_path: str
     modal_mode: bool
 
-    context: Optional[canape.CANape]
+    context: Optional[CANape]
 
     def __init__(self, _action: CanapeAction = lambda x: x):
         self._action = _action
 
     def __enter__(self):
-        self.context = canape.CANape(self.project_path, self.modal_mode)
-        self.context.___backup = self.__getattribute__
-        self.__getattribute__ = self.context.__getattribute__
+        # NOTE: Until methods are implemented to allow transparent use of
+        # context, require the user to use the context directly.
+        self.context = CANape(self.project_path, self.modal_mode)
 
-    def __exit__(self):
-        # This hack *should* work I think.
-        # NOTE: This might break the __getattribute__ method
-        # of the context by setting it to self.__getattribute__
-        # but this behaviour should be fine because self.context
-        # only exists in this method and __enter__.
-        self.__getattribute__ = self.___backup
-        self.context.exit(self.close_canape)
+    def __exit__(self, primus, secundus, tertius):
+        # It is apropriate to ignore the below line for
+        # typing because __exit__ should only be called
+        # after __enter__, and __enter__ ensures context
+        # is not None. It is notable that the user can
+        # screw around but I don't need to worry about
+        # that.
+        self.context.exit(self.close_canape)  # type: ignore
 
-    def __call__(self, context: Optional[CanapeAction] = None):
+    def __call__(self, context: Optional[CANape] = None) -> CANape:
         """Using this wrapper will lock
         the application only for the
-        duration of this function."""
+        duration of this function.
+        This function ultimately returns
+        a closed CANape object IE. unusable."""
         if context is None:
-            context = canape.CANape(self.project_path, self.modal_mode)
-            self._action(context)
-            context.exit(self.close_canape)
+            canape = CANape(self.project_path, self.modal_mode)
+            self._action(canape)
+            canape.exit(self.close_canape)
+            return canape
         else:
             self._action(context)
             return context
 
-    def also(self, next_action: CanapeAction) -> 'ActionBuilder':
+    def also(self, next_action: CanapeAction) -> "ActionBuilder":
         """This function allows the chaining of
         multiple operations into the same lock window."""
         return ActionBuilder(lambda x: next_action(self._action(x)))
