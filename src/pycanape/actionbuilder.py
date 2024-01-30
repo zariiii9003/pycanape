@@ -26,9 +26,16 @@ class ActionBuilder:
 
     def __enter__(self):
         self.context = canape.CANape(self.project_path, self.modal_mode)
-        # TODO: figure out using context directly as CANape object.
+        self.context.___backup = self.__getattribute__
+        self.__getattribute__ = self.context.__getattribute__
 
     def __exit__(self):
+        # This hack *should* work I think.
+        # NOTE: This might break the __getattribute__ method
+        # of the context by setting it to self.__getattribute__
+        # but this behaviour should be fine because self.context
+        # only exists in this method and __enter__.
+        self.__getattribute__ = self.___backup
         self.context.exit(self.close_canape)
 
     def __call__(self, context: Optional[CanapeAction] = None):
