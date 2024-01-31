@@ -34,6 +34,15 @@ class ActionBuilder:
         Whether or not to connect to
         CANape in modal mode. What this
         means isn't clearly documented.
+
+    context: Optional[CANape]
+        This attribute is special and is
+        used only to allow the inner CANape
+        connection to be used within a
+        with block as a context manager.
+        At all times except under a with
+        block this will be functionally
+        None.
     """
 
     close_canape: bool
