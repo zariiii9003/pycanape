@@ -35,7 +35,7 @@ class ActionBuilder:
         CANape in modal mode. What this
         means isn't clearly documented.
 
-    context: Optional[CANape]
+    canape: Optional[CANape]
         This attribute is special and is
         used only to allow the inner CANape
         connection to be used within a
@@ -49,13 +49,13 @@ class ActionBuilder:
     project_path: str
     modal_mode: bool
 
-    context: Optional[CANape]
+    canape: Optional[CANape]
 
     def __init__(self, _action: CanapeAction = lambda x: x):
         self._action = _action
 
     def __enter__(self):
-        self.context = CANape(self.project_path, self.modal_mode)
+        self.canape = CANape(self.project_path, self.modal_mode)
 
     def __exit__(self, primus, secundus, tertius):
         # It is apropriate to ignore the below line for
@@ -64,22 +64,22 @@ class ActionBuilder:
         # is not None. It is notable that the user can
         # screw around but I don't need to worry about
         # that.
-        self.context.exit(self.close_canape)  # type: ignore
+        self.canape.exit(self.close_canape)  # type: ignore
 
-    def __call__(self, context: Optional[CANape] = None) -> CANape:
+    def __call__(self, canape: Optional[CANape] = None) -> CANape:
         """Using this wrapper will lock
         the application only for the
         duration of this function.
         This function ultimately returns
         a closed CANape object IE. unusable."""
-        if context is None:
-            canape = CANape(self.project_path, self.modal_mode)
-            self._action(canape)
+        if canape is None:
+            self.canape = CANape(self.project_path, self.modal_mode)
+            self._action(self.canape)
             canape.exit(self.close_canape)
             return canape
         else:
-            self._action(context)
-            return context
+            self._action(canape)
+            return canape
 
     def also(self, next_action: CanapeAction) -> "ActionBuilder":
         """This function allows the chaining of
