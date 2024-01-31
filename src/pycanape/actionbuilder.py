@@ -55,8 +55,6 @@ class ActionBuilder:
         self._action = _action
 
     def __enter__(self):
-        # NOTE: Until methods are implemented to allow transparent use of
-        # context, require the user to use the context directly.
         self.context = CANape(self.project_path, self.modal_mode)
 
     def __exit__(self, primus, secundus, tertius):
