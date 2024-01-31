@@ -14,6 +14,26 @@ class ActionBuilder:
     so that the time the program
     spends locking the application
     from the user is minimized.
+
+    All attributes correspond to
+    arguments of the CANape class
+    and serve to pass through the
+    options to the constructor.
+
+    Attributes:
+    close_canape: bool
+        When called with this set
+        to true, on closing connection
+        to CANape on action completion,
+        CANape will close.
+    project_path: str
+        You must set this to the path
+        to the CANape project before
+        performing the action.
+    modal_mode: bool
+        Whether or not to connect to
+        CANape in modal mode. What this
+        means isn't clearly documented.
     """
 
     close_canape: bool
