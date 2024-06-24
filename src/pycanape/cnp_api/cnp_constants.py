@@ -245,13 +245,26 @@ class ErrorCodes(IntEnum):
     )
     AEC_OBJNAME_NOT_UNIQUE = 153  # Objectname not unique
     AEC_INDEX_DO_NOT_MATCH = 154  # Index of Objectname does not unique
-    AEC_LAST_ERRCODE = 155
+    AEC_MEASUREMENT_NOT_ALLOWED = 155  # Index of Objectname does not unique
+    ACE_ERROR_ASSIGN_TO_RECORDER = 156  # Error assigning object to Recorder
+    ACE_DATAYPE_NOT_ALLOWED = 157  # Datatype not allowed
+    ACE_MISSING_MONITOR_DEVICE = 158  # No Monitor device available in this Network
+    ACE_WRONG_OBJECT_STATE = 159  # Wrong object state for current function
+    AEC_LAST_ERRCODE = 160
 
 
 class TApplicationType(IntEnum):
     eUNDEFINED = 0
     eCANAPE = 1
+    eCANAPETBE = 2
     eAPPLOCATION = 3
+
+
+class TeSyncOption(IntEnum):
+    e_UPLOAD = 0
+    e_DOWNLOAD = 1
+    e_SKIP = 2
+    e_UNKNOWN = 3
 
 
 class TLogicalChannels(IntEnum):
@@ -455,7 +468,7 @@ class TAsap3DataType(IntEnum):
 
     @property
     def dtype(self) -> "npt.DTypeLike":
-        datatype_map: typing.Dict[TAsap3DataType, "npt.DTypeLike"] = {
+        datatype_map: typing.Dict[TAsap3DataType, npt.DTypeLike] = {
             TAsap3DataType.TYPE_INT: np.int32,
             TAsap3DataType.TYPE_FLOAT: np.float32,
             TAsap3DataType.TYPE_DOUBLE: np.float64,

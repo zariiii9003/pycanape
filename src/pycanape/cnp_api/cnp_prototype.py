@@ -699,6 +699,18 @@ class CANapeDll:
             errcheck=self._get_last_error,
         )
 
+        self.Asap3ECUOnOffline2 = self._map_symbol(
+            func_name="Asap3ECUOnOffline2",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                cnp_class.TModulHdl,                    # > TModulHdl module
+                cnp_class.enum_type,                    # > TAsap3ECUState State
+                cnp_class.enum_type,                    # > TeSyncOption  syncaction
+            ],
+            errcheck=self._get_last_error,
+        )
+
         self.Asap3EnableBusLoggingRecorderByModule = self._map_symbol(
             func_name="Asap3EnableBusLoggingRecorderByModule",
             restype=ctypes.c_bool,
