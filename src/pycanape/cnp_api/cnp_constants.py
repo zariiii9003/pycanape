@@ -121,7 +121,7 @@ class ErrorCodes(IntEnum):
     AEC_TCP_SERV_NOT_CONNECTED = (
         52  # Connection between ASAP3 Server and TCP CANapeAPI is not active
     )
-    AEC_TCP_EXIT_NOTCLOSED = 53  #
+    AEC_TCP_EXIT_NOTCLOSED = 53
     AEC_FIFO_ALREADY_INIT = (
         54  # The FIFO Memory was already created. Close all conections to reconfigure.
     )
@@ -166,7 +166,7 @@ class ErrorCodes(IntEnum):
     AEC_FLASH_INVALID_MANAGER = 89  # Flash manager invalid
     AEC_FLASH_OBJ_OUT_OF_RANGE = 90  # Flash object out of range
     AEC_FLASH_MANAGER_ERROR = 91  # Flash manager error
-    AEC_FLASH_ALLREADY_RUNNING = 92  #
+    AEC_FLASH_ALLREADY_RUNNING = 92
     AEC_FLASH_INVALID_APPNAME = 93  # Invalid application name
     AEC_FUNCTION_NOT_SUPPORTED = (
         94  # This function is not supported in this program version

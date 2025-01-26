@@ -34,14 +34,14 @@ dev = [
     "pytest",  # for tests
     "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
-    "black==24.4.*",
-    "ruff==0.4.10",
-    "mypy==1.10.*",
+    "black==24.10.*",
+    "ruff==0.9.3",
+    "mypy==1.14.*",
     "pre-commit",
 ]
 doc = [
     "furo",
-    "sphinx==7.*",
+    "sphinx==8.*",
     "sphinx-copybutton",
 ]
 
@@ -83,7 +83,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.ruff.lint]
-select = [
+extend-select = [
     "B",  # flake8-bugbear
     "C4",  # flake8-comprehensions
     "E",  # pycodestyle

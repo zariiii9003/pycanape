@@ -112,10 +112,7 @@ class Module:
         self._dll.Asap3IsECUOnline(
             self.asap3_handle, self.module_handle, ctypes.byref(ecu_state)
         )
-        if ecu_state.value == TAsap3ECUState.TYPE_SWITCH_ONLINE:
-            return True
-
-        return False
+        return ecu_state.value == TAsap3ECUState.TYPE_SWITCH_ONLINE
 
     def switch_ecu_on_offline(self, online: bool, download: bool = True) -> None:
         """Switches an ECU from online to offline and vice versa.
