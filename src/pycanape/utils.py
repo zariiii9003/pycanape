@@ -3,13 +3,19 @@
 # SPDX-License-Identifier: MIT
 import contextlib
 import logging
+import os
 import platform
 import re
-import winreg
 from ctypes.util import find_library
 from enum import IntEnum
 from pathlib import Path
 from typing import Any, List, Optional, Tuple, Union
+
+try:
+    import winreg
+except ModuleNotFoundError:
+    if not os.getenv("SPHINX_BUILD"):
+        raise
 
 import psutil
 

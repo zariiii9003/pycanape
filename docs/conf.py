@@ -3,8 +3,10 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import ctypes
-import sys
+import os
 from unittest.mock import MagicMock
+
+os.environ["SPHINX_BUILD"] = "1"
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -53,7 +55,6 @@ nitpick_ignore = [
 ]
 
 # mock Winodws specific modules and attributes for readthedocs.io (runs on ubuntu)
-sys.modules["winreg"] = MagicMock()
 ctypes.WinDLL = ctypes.CDLL
 ctypes.WINFUNCTYPE = ctypes.CFUNCTYPE
 ctypes.wintypes = MagicMock()
