@@ -141,7 +141,7 @@ jobs:
         pip install -e .[doc]
     - name: Build documentation
       run: |
-        python -m sphinx -Wan --keep-going docs build
+        python -m sphinx -TWan --keep-going docs build
 
   upload_pypi:
     name: Create release
