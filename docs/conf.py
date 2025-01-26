@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import ctypes
 import os
+from importlib.metadata import version as get_version
 from unittest.mock import MagicMock
 
 os.environ["SPHINX_BUILD"] = "1"
@@ -14,6 +15,11 @@ os.environ["SPHINX_BUILD"] = "1"
 project = "pyCANape"
 copyright = "2022, Artur Drogunow"
 author = "Artur Drogunow"
+
+# The full version, including alpha/beta/rc tags.
+release: str = get_version("pycanape")
+# The short X.Y version.
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
