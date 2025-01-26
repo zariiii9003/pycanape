@@ -16,6 +16,7 @@ jobs:
           "3.10",
           "3.11",
           "3.12",
+          "3.13",
         ]
       fail-fast: false
     steps:
@@ -40,7 +41,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
 
     - name: Install dependencies
       run: |
@@ -61,6 +62,9 @@ jobs:
     - name: mypy 3.12
       run: |
         mypy --python-version 3.12 .
+    - name: mypy 3.13
+      run: |
+        mypy --python-version 3.13 .
 
   linter:
     runs-on: windows-latest
@@ -88,9 +92,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -e .[dev]
-    - name: Code Format Check with Black
+    - name: Code Format Check with Ruff
       run: |
-        black --check --verbose ./src
+        ruff format --check .
 
   build:
     name: Build artifacts

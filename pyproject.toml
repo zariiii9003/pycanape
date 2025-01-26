@@ -34,7 +34,6 @@ dev = [
     "pytest",  # for tests
     "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
-    "black==24.10.*",
     "ruff==0.9.3",
     "mypy==1.14.*",
     "pre-commit",
@@ -105,6 +104,7 @@ extend-select = [
 ]
 ignore = [
     "E501",  # line too long
+    "ISC001",  # single-line-implicit-string-concatenation
     "PLR0904",  # too-many-public-methods
     "PLR0913",  # too-many-arguments
     "RUF012",  # mutable-class-default

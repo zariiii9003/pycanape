@@ -68,4 +68,3 @@ With pyCANape you can:
    map1_counter = xcpsim.get_calibration_object("map1Counter")
    old_value = map1_counter.value
    map1_counter.value = 0
-
