@@ -120,7 +120,7 @@ jobs:
     - name: Check artifacts
       run: pipx run twine check dist/*
 
-    - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b  # 4.5.0
+    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08  # 4.6.0
       with:
         name: artifact
         path: dist/*
@@ -164,14 +164,14 @@ jobs:
         path: dist
 
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb  # 2.1.0
+      uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4  # 2.2.0
       with:
         subject-path: 'dist/*'
 
     - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70  # 1.12.3
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # 1.12.4
 
     - name: Release
-      uses: softprops/action-gh-release@7b4da11513bf3f43f9999e90eabced41ab8bb048  # 2.2.0
+      uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda  # 2.2.1
       with:
         files: dist/*
