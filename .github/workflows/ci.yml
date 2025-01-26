@@ -2,6 +2,8 @@ name: CI
 
 on: [push, pull_request]
 
+permissions: {}
+
 env:
   PY_COLORS: "1"
 
@@ -20,9 +22,11 @@ jobs:
         ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -37,9 +41,11 @@ jobs:
   mypy:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
       with:
         python-version: "3.13"
 
@@ -69,9 +75,11 @@ jobs:
   linter:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -84,9 +92,11 @@ jobs:
   format:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -100,25 +110,29 @@ jobs:
     name: Build artifacts
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
 
-      - name: Build wheel and sdist
-        run: pipx run build
+    - name: Build wheel and sdist
+      run: pipx run build
 
-      - name: Check artifacts
-        run: pipx run twine check dist/*
+    - name: Check artifacts
+      run: pipx run twine check dist/*
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: artifact
-          path: dist/*
+    - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b  # 4.5.0
+      with:
+        name: artifact
+        path: dist/*
 
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+      with:
+        persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
       with:
         python-version: "3.10"
     - name: Install dependencies
@@ -139,19 +153,25 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
       contents: write  # for action-gh-release
+      attestations: write  # for attest-build-provenance
 
     # create a new release for tagged commits
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: artifact
-          path: dist
+    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16  # 4.1.8
+      with:
+        name: artifact
+        path: dist
 
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Generate artifact attestation
+      uses: actions/attest-build-provenance@7668571508540a607bdfd90a87a560489fe372eb  # 2.1.0
+      with:
+        subject-path: 'dist/*'
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70  # 1.12.3
+
+    - name: Release
+      uses: softprops/action-gh-release@7b4da11513bf3f43f9999e90eabced41ab8bb048  # 2.2.0
+      with:
+        files: dist/*
