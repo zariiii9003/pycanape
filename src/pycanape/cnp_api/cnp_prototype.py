@@ -2229,8 +2229,21 @@ class CANapeDll:
             argtypes=[
                 cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
                 ctypes.c_char_p,                        # > char *Name
-                ctypes.c_bool,                          # > bool includeMeaMode = false
-                ctypes.c_int,                           # > int mode = 1
+                ctypes.c_bool,                          # > bool includeMeaMode = true
+                cnp_class.enum_type,                    # > enLabelListMode mode = e_AddSignals
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3SelectModuleLabelList = self._map_symbol(
+            func_name="Asap3SelectModuleLabelList",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                cnp_class.TModulHdl,                    # > TModulHdl module
+                ctypes.c_char_p,                        # > char* Name
+                ctypes.c_bool,                          # > bool includeMeaMode = true
+                cnp_class.enum_type,                    # > enLabelListMode mode = e_AddSignals
             ],
             errcheck=self._get_last_error,
         )
@@ -2307,6 +2320,16 @@ class CANapeDll:
             argtypes=[
                 cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
                 ctypes.c_char_p,                        # > const char *mdfFilename
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3SetMeasurementComment = self._map_symbol(
+            func_name="Asap3SetMeasurementComment",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                ctypes.c_char_p,                        # > const char* comment
             ],
             errcheck=self._get_last_error,
         )
@@ -2417,6 +2440,28 @@ class CANapeDll:
             errcheck=self._get_last_error,
         )
 
+        self.Asap3StartDataAcquisition2 = self._map_symbol(
+            func_name="Asap3StartDataAcquisition2",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                ctypes.c_uint,                          # > unsigned int errtimeout = 0
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3StartDataAcquisition3 = self._map_symbol(
+            func_name="Asap3StartDataAcquisition3",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                ctypes.c_uint,                          # > unsigned int timeout
+                ctypes.c_bool,                          # > bool StartwithoutRecording = false
+                ctypes.c_bool,                          # > bool resumemode=false
+            ],
+            errcheck=self._get_last_error,
+        )
+
         self.Asap3StartRecorder = self._map_symbol(
             func_name="Asap3StartRecorder",
             restype=ctypes.c_bool,
@@ -2432,6 +2477,16 @@ class CANapeDll:
             restype=ctypes.c_bool,
             argtypes=[
                 cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3StartResumedDataAcquisition2 = self._map_symbol(
+            func_name="Asap3StartResumedDataAcquisition2",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                ctypes.c_uint,                          # > unsigned int timeout
             ],
             errcheck=self._get_last_error,
         )
@@ -2453,6 +2508,16 @@ class CANapeDll:
             restype=ctypes.c_bool,
             argtypes=[
                 cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3StopDataAcquisition2 = self._map_symbol(
+            func_name="Asap3StopDataAcquisition2",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                ctypes.c_ulong,                         # > unsigned long timeout = NULL
             ],
             errcheck=self._get_last_error,
         )

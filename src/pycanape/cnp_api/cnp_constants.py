@@ -68,7 +68,7 @@ class ErrorCodes(IntEnum):
     AEC_NO_DATABASE = 10  # No database assigned
     AEC_PAR_SIZE_OVERFLOW = 11  # Parameter 'size' too large
     AEC_NOT_WRITE_ACCESS = 12  # Object has no write access
-    AEC_OBJECT_TYPE_DOESNT_MATCH = 13  # Object type doens't match
+    AEC_OBJECT_TYPE_DOESNT_MATCH = 13  # Object type doesn't match
     AEC_NO_TASKS_OVERFLOW = 14  # Number of tasks overflow
     AEC_CCP_RESPONSE_SIZE_INVALID = 15  # Invalid CCP response size
     AEC_TIMEOUT_RESPONSE = 16  # Timeout reading response from memory mapped file
@@ -77,7 +77,7 @@ class ErrorCodes(IntEnum):
     AEC_NO_RASTER_OVERFLOW = 19  # Too many rasters selected for data acquisition (overflow of internal parameter)
     AEC_CANAPE_CREATE_PROC_FAILED = 20  # CreateProcess of CANape failed
     AEC_EXIT_DENIED_WHILE_ACQU = (
-        21  # Asap3Exit denied because data acquistion is still running
+        21  # Asap3Exit denied because data acquisition is still running
     )
     AEC_WRITE_DATA_FAILED = 22  # Error writing data to application RAM
     AEC_NO_RESPONSE_FROM_ECU = 23  # No response from ECU (attach Asap2 failed)
@@ -123,7 +123,7 @@ class ErrorCodes(IntEnum):
     )
     AEC_TCP_EXIT_NOTCLOSED = 53
     AEC_FIFO_ALREADY_INIT = (
-        54  # The FIFO Memory was already created. Close all conections to reconfigure.
+        54  # The FIFO Memory was already created. Close all connections to reconfigure.
     )
     AEC_ILLEGAL_OPERATION = 55  # It is not possible to operate this command
     AEC_WRONG_TYPE = 56  # The given type is not supported
@@ -158,7 +158,7 @@ class ErrorCodes(IntEnum):
     AEC_DIAG_UNKNOWN_PARAM_TYPE = 83  # Unknown parameter type
     AEC_DIAG_NO_INFO_AVAILABLE = 84  # Currently no information available
     AEC_DIAG_UNKNOWN_RESPHANDLE = 85  # Unknown response handle
-    ACE_DIAG_WRONG_SERVICE_STATE = (
+    AEC_DIAG_WRONG_SERVICE_STATE = (
         86  # The current request is in the wrong state for this operation
     )
     AEC_DIAG_INVALID_INDEX_SIZE = 87  # Complex index does not match
@@ -166,14 +166,14 @@ class ErrorCodes(IntEnum):
     AEC_FLASH_INVALID_MANAGER = 89  # Flash manager invalid
     AEC_FLASH_OBJ_OUT_OF_RANGE = 90  # Flash object out of range
     AEC_FLASH_MANAGER_ERROR = 91  # Flash manager error
-    AEC_FLASH_ALLREADY_RUNNING = 92
+    AEC_FLASH_ALREADY_RUNNING = 92
     AEC_FLASH_INVALID_APPNAME = 93  # Invalid application name
     AEC_FUNCTION_NOT_SUPPORTED = (
         94  # This function is not supported in this program version
     )
     AEC_LICENSE_NOT_FOUND = 95  # License file not found
-    AEC_RECORDER_ALLREADY_EXISTS = 96  # Recorder already exists
-    AEC_RECORDER_NOT_FOUND = 97  # Recorder does not exists
+    AEC_RECORDER_ALREADY_EXISTS = 96  # Recorder already exists
+    AEC_RECORDER_NOT_FOUND = 97  # Recorder does not exist
     AEC_RECORDER_INDEX_OUTOFRANGE = 98  # Recorder index out of range
     AEC_REMOVE_RECORDER_ERR = 99  # Error deleting Recorder
     AEC_INVALID_PARAMETER = 100  # Wrong parameter value
@@ -191,12 +191,12 @@ class ErrorCodes(IntEnum):
     AEC_UNDEFINED_CHANNEL = 112  # undefined channel parameter
     AEC_ERR_DRIVER_CONFIG = 113  # No configuration for this drivertype available
     AEC_ERR_DCB_EXPORT = 114  # Error creating DBC export file
-    ACE_NOT_AVAILABLE_WHILE_ACQ = (
+    AEC_NOT_AVAILABLE_WHILE_ACQ = (
         115  # Function not available while a measurement is running
     )
-    ACE_NOT_MISSING_LICENSE = 116  # ILinkRT Recorder available only with option MCD3
-    ACE_EVENT_ALLREADY_REGISERED = 117  # Callback Event already registered
-    AEC_OBJECT_ALLREADY_DEFINED = 118  # Measurement object already defined
+    AEC_NOT_MISSING_LICENSE = 116  # ILinkRT Recorder available only with option MCD3
+    AEC_EVENT_ALREADY_REGISTERED = 117  # Callback Event already registered
+    AEC_OBJECT_ALREADY_DEFINED = 118  # Measurement object already defined
     AEC_CAL_NOT_ALLOWED = (
         119  # Calibration not allowed if online calibration is switched off
     )
@@ -220,20 +220,20 @@ class ErrorCodes(IntEnum):
     AEC_PATCHENTRY_NOT_FOUND = 131  # Patch section not found
     AEC_PATCHSECTION_NOT_FOUND = 132  # Patch entry not found
     AEC_SEC_MANAGER_ERROR = 133  # Security manager access error
-    ACE_CHANNEL_OPTIMIZED = 134  # Measurement channel is optimized because it's parent will already be measured
-    ACE_ERR_PROFILE_ID = 135  # Profile not registered
-    ACE_ERR_UNSUPPORTED_TYPE = 136  # Unsupported data type for measurement
-    ACE_ERR_DATA_SIZE = 137  # Datasize of object too large
+    AEC_CHANNEL_OPTIMIZED = 134  # Measurement channel is optimized because it's parent will already be measured
+    AEC_ERR_PROFILE_ID = 135  # Profile not registered
+    AEC_ERR_UNSUPPORTED_TYPE = 136  # Unsupported data type for measurement
+    AEC_ERR_DATA_SIZE = 137  # Datasize of object too large
     AEC_CALOBJ_INVALID_VALUE = 138  # Invalid value - object can't be read
     AEC_ERR_SETTINGSPARAM = 139  # Invalid settings parameter
     AEC_ERR_UNDEF_SETTINGSPARAM = 140  # Undefined settings parameter
-    ACE_ERR_SBL_ERROR = 141  # Streambased Logging configuration returns error
+    AEC_ERR_SBL_ERROR = 141  # Streambased Logging configuration returns error
     AEC_ERR_CALOBJECT_CREATION = 142  # Calibration Object could not be created
     AEC_CALOBJ_NO_VALID_VAUE = (
         143  # Warning :No valid Value available for Calibration Object
     )
     AEC_ERR_INTERFACEV3 = 144  # There is no Networkbased Interface defined
-    AEC_ERR_CREATING_MODULE = 145  # An error accourd while creating moidule
+    AEC_ERR_CREATING_MODULE = 145  # An error occurred while creating moidule
     AEC_ERR_GOINGONLINE = 146  # Unable to switch to online
     AEC_ERR_PHYSINTERFACE = 147  # Wrong physical interface for this driver
     AEC_ERR_UNSUPPORTEDINTF = 148  # Wrong physical interface for this driver
@@ -246,11 +246,17 @@ class ErrorCodes(IntEnum):
     AEC_OBJNAME_NOT_UNIQUE = 153  # Objectname not unique
     AEC_INDEX_DO_NOT_MATCH = 154  # Index of Objectname does not unique
     AEC_MEASUREMENT_NOT_ALLOWED = 155  # Index of Objectname does not unique
-    ACE_ERROR_ASSIGN_TO_RECORDER = 156  # Error assigning object to Recorder
-    ACE_DATAYPE_NOT_ALLOWED = 157  # Datatype not allowed
-    ACE_MISSING_MONITOR_DEVICE = 158  # No Monitor device available in this Network
-    ACE_WRONG_OBJECT_STATE = 159  # Wrong object state for current function
-    AEC_LAST_ERRCODE = 160
+    AEC_ERROR_ASSIGN_TO_RECORDER = 156  # Error assigning object to Recorder
+    AEC_DATAYPE_NOT_ALLOWED = 157  # Datatype not allowed
+    AEC_MISSING_MONITOR_DEVICE = 158  # No Monitor device available in this Network
+    AEC_WRONG_OBJECT_STATE = 159  # Wrong object state for current function
+    AEC_BINARY_FILE_NOT_FOUND = 160  # binary file not found
+    AEC_ACQ_START_TIME_OVER = (
+        161  # Data acquisition can't be started because selected time is elapsed.
+    )
+    AEC_COMMENT_DISABLED = 162  # Comment function is disabled.
+    AEC_MEASUREMENT_NOT_RUNNING = 163  # Only available if measurement is running
+    AEC_LAST_ERRCODE = 164
 
 
 class TApplicationType(IntEnum):
@@ -258,6 +264,11 @@ class TApplicationType(IntEnum):
     eCANAPE = 1
     eCANAPETBE = 2
     eAPPLOCATION = 3
+
+
+class LabelListMode(IntEnum):
+    e_AddSignals = 2
+    e_RemoveSignals = 3
 
 
 class TeSyncOption(IntEnum):
@@ -385,6 +396,8 @@ class DriverType(IntEnum):
     ASAP3_DAIO_SYSTEM = 160  # DAIO_SYSTEM driver
     ASAP3_DRIVER_SOME_IP = 170  # SOME-IP driver
     ASAP3_DRIVER_DLT = 180  # DLT driver
+    ASAP3_DRIVER_FUNCTION = 190  # Function driver
+    ASAP3_DRIVER_XETK = 200  # XETK driver
 
 
 class TFormat(IntEnum):
@@ -437,6 +450,7 @@ class TParameterClass(IntEnum):
     ePType_Driver = 109  # Device driver ID <unsigned>
     ePType_DeviceName = 110  # Devicename <text>
     ePType_DriverAsText = 111  # Device driver ID as string <text>
+    ePType_BinaryFile = 112  # Memory image file of the device (e.g. XETK device) <text>
 
 
 class ObjectType(IntEnum):
