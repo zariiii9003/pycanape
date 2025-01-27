@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 import psutil
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger("pycanape")
 
 
 class CANapeVersion(IntEnum):

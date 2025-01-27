@@ -21,7 +21,7 @@ if sys.version_info >= (3, 10):
 else:
     from typing_extensions import ParamSpec
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger("pycanape")
 
 _P1 = ParamSpec("_P1")
 _T1 = TypeVar("_T1")
