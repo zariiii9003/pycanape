@@ -26,7 +26,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # 5.4.0
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -45,7 +45,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # 5.4.0
       with:
         python-version: "3.13"
 
@@ -79,7 +79,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # 5.4.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -96,7 +96,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # 5.4.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -120,7 +120,7 @@ jobs:
     - name: Check artifacts
       run: pipx run twine check dist/*
 
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08  # 4.6.0
+    - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1  # 4.6.1
       with:
         name: artifact
         path: dist/*
@@ -132,7 +132,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # 5.3.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38  # 5.4.0
       with:
         python-version: "3.10"
     - name: Install dependencies
@@ -158,13 +158,13 @@ jobs:
     # create a new release for tagged commits
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
-    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16  # 4.1.8
+    - uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806  # 4.1.9
       with:
         name: artifact
         path: dist
 
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@520d128f165991a6c774bcb264f323e3d70747f4  # 2.2.0
+      uses: actions/attest-build-provenance@bd77c077858b8d561b7a36cbe48ef4cc642ca39d  # 2.2.2
       with:
         subject-path: 'dist/*'
 
