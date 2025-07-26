@@ -9,7 +9,7 @@ import sys
 from ctypes import wintypes
 from pathlib import Path
 from threading import RLock
-from typing import Any, Callable, Final, TypeVar
+from typing import Any, Callable, Final, TypeVar, Union
 
 from packaging.version import Version
 
@@ -2719,6 +2719,8 @@ class CANapeDll:
             prototype = ctypes.WINFUNCTYPE(restype, *argtypes)
         else:
             prototype = ctypes.WINFUNCTYPE(restype)
+
+        symbol: Union[ctypes._FuncPointer, Callable[..., Any]]
         try:
             symbol = prototype((func_name, self.windll))
         except AttributeError:
@@ -2730,7 +2732,7 @@ class CANapeDll:
             # the function is not available, replace it with another function, that will raise a `NotImplementedError`
             symbol = functools.partial(self._not_implemented, func_name, self.version)
         else:
-            symbol.__name__ = func_name
+            symbol.__name__ = func_name  # type: ignore[attr-defined]
 
             if errcheck:
                 symbol.errcheck = errcheck
