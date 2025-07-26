@@ -9,7 +9,7 @@ import re
 from ctypes.util import find_library
 from enum import IntEnum
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 try:
     import winreg
@@ -41,7 +41,7 @@ class CANapeError(Exception):
         # keep reference to args for pickling
         self._args = error_code, error_string, function
 
-    def __reduce__(self) -> Union[str, Tuple[Any, ...]]:
+    def __reduce__(self) -> Union[str, tuple[Any, ...]]:
         return CANapeError, self._args, {}
 
 
@@ -57,12 +57,13 @@ def _kill_canape_processes() -> None:
                 proc.kill()
 
 
-def get_canape_versions() -> List[CANapeVersion]:
+def get_canape_versions() -> list[CANapeVersion]:
     """Return a list of all CANape versions, that can be found in Windows Registry."""
-    versions: List[CANapeVersion] = []
-    with contextlib.suppress(FileNotFoundError), winreg.OpenKey(
-        winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape"
-    ) as key:
+    versions: list[CANapeVersion] = []
+    with (
+        contextlib.suppress(FileNotFoundError),
+        winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\\VECTOR\\CANape") as key,
+    ):
         _sub_key_count, value_count, _last_modified = winreg.QueryInfoKey(key)
         for idx in range(value_count):
             name, _data, _type = winreg.EnumValue(key, idx)

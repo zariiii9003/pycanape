@@ -1,3 +1,3 @@
-from typing import Any, Dict, Final
+from typing import Any, Final
 
-RC: Final[Dict[str, Any]] = {"ENCODING": "latin-1"}  # runtime config
+RC: Final[dict[str, Any]] = {"ENCODING": "latin-1"}  # runtime config

@@ -1,8 +1,9 @@
 import os
 import subprocess
 import unittest.mock
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Callable, Iterator, List
+from typing import Callable
 
 import numpy as np
 import psutil
@@ -86,7 +87,7 @@ def canape_fixture() -> Iterator[Callable[[bool], pycanape.CANape]]:
     sim_process = start_xcpsim()
 
     # use the list to save a reference to the instance
-    canape_instances: List[pycanape.CANape] = []
+    canape_instances: list[pycanape.CANape] = []
 
     def _callback(modal_mode: bool) -> pycanape.CANape:
         canape = get_canape_instance(modal_mode=modal_mode)

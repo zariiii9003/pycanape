@@ -5,7 +5,7 @@ import copy
 import ctypes
 import fnmatch
 import os.path
-from typing import Dict, List, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 from .calibration_object import CalibrationObject, get_calibration_object
 from .cnp_api.cnp_class import (
@@ -57,7 +57,7 @@ class Module:
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 
-        self._objects_cache: Optional[List[str]] = None
+        self._objects_cache: Optional[list[str]] = None
 
     def get_database_info(self) -> DatabaseInfo:
         """Get Info concerning the database file."""
@@ -157,7 +157,7 @@ class Module:
         )
         return buffer.value.decode(RC["ENCODING"])  # type: ignore[union-attr]
 
-    def get_database_objects(self) -> List[str]:
+    def get_database_objects(self) -> list[str]:
         """Get a list of all object names in database.
 
         :return:
@@ -185,7 +185,7 @@ class Module:
             )
         return copy.copy(self._objects_cache)
 
-    def get_ecu_tasks(self) -> Dict[str, EcuTask]:
+    def get_ecu_tasks(self) -> dict[str, EcuTask]:
         """Get available data acquisition tasks.
 
         :return:
@@ -274,7 +274,7 @@ class Module:
         )
         return bln.value
 
-    def get_measurement_list_entries(self) -> Dict[str, MeasurementListEntry]:
+    def get_measurement_list_entries(self) -> dict[str, MeasurementListEntry]:
         """Retrieve the entries from the CANape Measurement list.
 
         :return:

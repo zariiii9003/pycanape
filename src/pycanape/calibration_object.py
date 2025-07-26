@@ -3,8 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
-import typing
+from collections.abc import Sequence
 from functools import cached_property
+from typing import TYPE_CHECKING, Final, Optional, Union
 
 import numpy as np
 
@@ -20,11 +21,11 @@ from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 from .utils import CANapeError
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     import numpy.typing as npt
 
 
-_MULTIPLE_DIMENSION_THR: typing.Final = 2
+_MULTIPLE_DIMENSION_THR: Final = 2
 
 
 class BaseCalibrationObject:
@@ -32,7 +33,7 @@ class BaseCalibrationObject:
         self,
         dll: CANapeDll,
         asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
-        module_handle: typing.Union[TModulHdl, int],
+        module_handle: Union[TModulHdl, int],
         name: str,
         object_info: DBObjectInfo,
     ) -> None:
@@ -43,7 +44,7 @@ class BaseCalibrationObject:
         self._object_info = object_info
         self._force_upload = True
         try:
-            self._datatype: typing.Optional[TAsap3DataType] = self._read_datatype()
+            self._datatype: Optional[TAsap3DataType] = self._read_datatype()
         except CANapeError:
             self._datatype = None
 
@@ -177,7 +178,7 @@ class AxisCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @axis.setter
-    def axis(self, new_axis: typing.Sequence[float]) -> None:
+    def axis(self, new_axis: Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         axis = (ctypes.c_double * len(new_axis))(*new_axis)
         cov.axis.axis = axis
@@ -199,7 +200,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @axis.setter
-    def axis(self, new_axis: typing.Sequence[float]) -> None:
+    def axis(self, new_axis: Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         axis = (ctypes.c_double * cov.curve.dimension)(*new_axis)
         cov.curve.axis = axis
@@ -212,7 +213,7 @@ class CurveCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @values.setter
-    def values(self, values: typing.Sequence[float]) -> None:
+    def values(self, values: Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         c_array = (ctypes.c_double * cov.curve.dimension)(*values)
         cov.curve.values = c_array
@@ -239,7 +240,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @x_axis.setter
-    def x_axis(self, new_x_axis: typing.Sequence[float]) -> None:
+    def x_axis(self, new_x_axis: Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         c_array = (ctypes.c_double * cov.map.xDimension)(*new_x_axis)
         cov.map.xAxis = c_array
@@ -252,7 +253,7 @@ class MapCalibrationObject(BaseCalibrationObject):
         return np_array.astype(dtype=float, copy=True)
 
     @y_axis.setter
-    def y_axis(self, new_y_axis: typing.Sequence[float]) -> None:
+    def y_axis(self, new_y_axis: Sequence[float]) -> None:
         cov = self._read_calibration_object_value()
         c_array = (ctypes.c_double * cov.map.yDimension)(*new_y_axis)
         cov.map.yAxis = c_array
@@ -340,7 +341,7 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
 
-CalibrationObject = typing.Union[
+CalibrationObject = Union[
     ScalarCalibrationObject,
     AxisCalibrationObject,
     CurveCalibrationObject,
@@ -353,7 +354,7 @@ CalibrationObject = typing.Union[
 def get_calibration_object(
     dll: CANapeDll,
     asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
-    module_handle: typing.Union[TModulHdl, int],
+    module_handle: Union[TModulHdl, int],
     name: str,
 ) -> CalibrationObject:
     object_info = DBObjectInfo()
@@ -367,7 +368,7 @@ def get_calibration_object(
         err_msg = f"{name} not found."
         raise KeyError(err_msg)
 
-    cal_obj_map: typing.Dict[ValueType, typing.Type[CalibrationObject]] = {
+    cal_obj_map: dict[ValueType, type[CalibrationObject]] = {
         ValueType.VALUE: ScalarCalibrationObject,
         ValueType.CURVE: CurveCalibrationObject,
         ValueType.MAP: MapCalibrationObject,

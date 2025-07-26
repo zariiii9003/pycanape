@@ -13,7 +13,6 @@ jobs:
     strategy:
       matrix:
         python-version: [
-          "3.8",
           "3.9",
           "3.10",
           "3.11",
@@ -53,9 +52,6 @@ jobs:
       run: |
         python -m pip install -e .[dev]
 
-    - name: mypy 3.8
-      run: |
-        mypy --python-version 3.8 .
     - name: mypy 3.9
       run: |
         mypy --python-version 3.9 .

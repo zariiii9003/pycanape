@@ -3,15 +3,14 @@
 # SPDX-License-Identifier: MIT
 
 import ctypes
-import typing
-from typing import List
+from typing import NamedTuple, cast
 
 from .cnp_api import cnp_class, cnp_constants
 from .cnp_api.cnp_prototype import CANapeDll
 from .config import RC
 
 
-class Sample(typing.NamedTuple):
+class Sample(NamedTuple):
     timestamp: float
     value: float
 
@@ -122,7 +121,7 @@ class EcuTask:
         )
         return fifo_level
 
-    def daq_get_next_sample(self, channel_count: int) -> List[Sample]:
+    def daq_get_next_sample(self, channel_count: int) -> list[Sample]:
         c_time = cnp_class.TTime()
         value = ctypes.c_double()
         ptr = ctypes.pointer(ctypes.pointer(value))
@@ -135,11 +134,11 @@ class EcuTask:
         )
         time_ms = c_time.value / 10
         return [
-            Sample(time_ms, typing.cast("float", ptr.contents[i]))
+            Sample(time_ms, cast("float", ptr.contents[i]))
             for i in range(channel_count)
         ]
 
-    def daq_get_current_values(self, channel_count: int) -> List[Sample]:
+    def daq_get_current_values(self, channel_count: int) -> list[Sample]:
         c_time = cnp_class.TTime()
         values = (ctypes.c_double * channel_count)()
         self._dll.Asap3GetCurrentValues(

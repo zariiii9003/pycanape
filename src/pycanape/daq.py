@@ -5,7 +5,7 @@
 import math
 import time
 from threading import Lock, Thread
-from typing import Dict, List, Optional
+from typing import Optional
 
 from .canape import CANape
 from .cnp_api.cnp_constants import ErrorCodes, EventCode
@@ -35,7 +35,7 @@ class FifoReader:
             event_code=EventCode.et_ON_DATA_ACQ_STOP, callback_func=self._stop
         )
 
-        self._channels: Dict[str, Sample] = {}
+        self._channels: dict[str, Sample] = {}
         self._count = 0
 
         self._thread: Optional[Thread] = None
@@ -59,7 +59,7 @@ class FifoReader:
         self._lock.release()
 
     @property
-    def channel_names(self) -> List[str]:
+    def channel_names(self) -> list[str]:
         self._lock.acquire()
         names = list(self._channels)
         self._lock.release()

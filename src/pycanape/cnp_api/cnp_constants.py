@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-import typing
 from enum import IntEnum
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     import numpy.typing as npt
 
 
@@ -482,7 +482,7 @@ class TAsap3DataType(IntEnum):
 
     @property
     def dtype(self) -> "npt.DTypeLike":
-        datatype_map: typing.Dict[TAsap3DataType, npt.DTypeLike] = {
+        datatype_map: dict[TAsap3DataType, npt.DTypeLike] = {
             TAsap3DataType.TYPE_INT: np.int32,
             TAsap3DataType.TYPE_FLOAT: np.float32,
             TAsap3DataType.TYPE_DOUBLE: np.float64,

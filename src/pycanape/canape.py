@@ -6,7 +6,7 @@ import ctypes
 import warnings
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, NamedTuple, Optional, Set, Union
+from typing import Any, Callable, NamedTuple, Optional, Union
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -113,8 +113,8 @@ class CANape:
         )
         # fmt: on
 
-        self._modules: Dict[int, Module] = {}
-        self._callbacks: Dict[EventCode, Set[Callable[[], Any]]] = {}
+        self._modules: dict[int, Module] = {}
+        self._callbacks: dict[EventCode, set[Callable[[], Any]]] = {}
 
         # register callbacks for every event type
         self._c_event_callback = EVENT_CALLBACK(self._on_event)
