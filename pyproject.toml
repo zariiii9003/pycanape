@@ -70,7 +70,8 @@ disallow_subclassing_any = true
 exclude = [
     "^docs/.*",
     "^.*venv/.*",
-    "^tests/.*"
+    "^script/.*",
+    "^tests/.*",
 ]
 
 
