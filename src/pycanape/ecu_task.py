@@ -135,7 +135,7 @@ class EcuTask:
         )
         time_ms = c_time.value / 10
         return [
-            Sample(time_ms, typing.cast(float, ptr.contents[i]))
+            Sample(time_ms, typing.cast("float", ptr.contents[i]))
             for i in range(channel_count)
         ]
 

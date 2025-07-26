@@ -4,6 +4,6 @@
 *htmlcov/
 /.idea/
 /.tox/
-/src/pycanape.egg-info/
+/src/pyCANape.egg-info/
 docs/_*
 /build/
