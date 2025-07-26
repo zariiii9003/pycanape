@@ -79,9 +79,6 @@ class BaseCalibrationObject:
         return cov
 
     def _write_calibration_object_value(self, cov: TCalibrationObjectValue) -> None:
-        if self.object_type != ObjectType.OTT_CALIBRATE:
-            err_msg = "Cannot set value to a Measurement Object."
-            raise TypeError(err_msg)
         self._dll.Asap3WriteCalibrationObject(
             self._asap3_handle,
             self._module_handle,
