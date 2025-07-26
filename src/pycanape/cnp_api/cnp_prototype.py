@@ -2726,11 +2726,11 @@ class CANapeDll:
                 f"Function '{func_name}' not found in "
                 f"{Path(self.windll._name).name} (v{self.version})"
             )
-            LOG.warning(warning_msg)
+            LOG.debug(warning_msg)
             # the function is not available, replace it with another function, that will raise a `NotImplementedError`
-            symbol = functools.partial(self._not_implemented, func_name, self.version)  # type: ignore[assignment]
+            symbol = functools.partial(self._not_implemented, func_name, self.version)
         else:
-            symbol.__name__ = func_name  # type: ignore[attr-defined]
+            symbol.__name__ = func_name
 
             if errcheck:
                 symbol.errcheck = errcheck
