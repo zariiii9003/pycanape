@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-__version__ = "0.7.2"
-
 __all__ = [
     "RC",
     "AppVersion",
@@ -49,6 +47,9 @@ __all__ = [
     "script",
     "utils",
 ]
+
+import contextlib
+from importlib.metadata import PackageNotFoundError, version
 
 from . import (
     calibration_object,
@@ -96,3 +97,6 @@ from .utils import (
     get_canape_path,
     get_canape_versions,
 )
+
+with contextlib.suppress(PackageNotFoundError):
+    __version__ = version("pycanape")
