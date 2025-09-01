@@ -21,7 +21,7 @@ jobs:
         ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
@@ -40,7 +40,7 @@ jobs:
   mypy:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
     - name: Set up Python
@@ -71,7 +71,7 @@ jobs:
   linter:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
     - name: Set up Python
@@ -88,7 +88,7 @@ jobs:
   format:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
     - name: Set up Python
@@ -106,7 +106,7 @@ jobs:
     name: Build artifacts
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
 
@@ -124,7 +124,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # 4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # 5.0.0
       with:
         persist-credentials: false
     - name: Set up Python
@@ -154,13 +154,13 @@ jobs:
     # create a new release for tagged commits
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
-    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # 4.3.0
+    - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0  # 5.0.0
       with:
         name: artifact
         path: dist
 
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be  # 2.4.0
+      uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a  # 3.0.0
       with:
         subject-path: 'dist/*'
 
