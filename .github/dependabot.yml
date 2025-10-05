@@ -2,12 +2,21 @@ version: 2
 updates:
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
-    # Workflow files stored in the default location of `.github/workflows`
-    # You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.
     directory: "/"
     schedule:
       interval: "monthly"
     groups:
       github-actions:
+        patterns:
+          - "*"
+
+  # Enable version updates for development dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    versioning-strategy: "increase-if-necessary"
+    groups:
+      dev-deps:
         patterns:
           - "*"

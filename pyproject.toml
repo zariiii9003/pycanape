@@ -34,7 +34,7 @@ dev = [
     "pytest",  # for tests
     "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
-    "ruff==0.12.5",
+    "ruff==0.12.*",
     "mypy==1.17.*",
 ]
 doc = [
