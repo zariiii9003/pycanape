@@ -21,6 +21,7 @@ MAX_OS_VERSION = 50
 
 MAX_INTERFACENAME = 32
 MAX_TEMPLATENAME = 32
+MAX_TASKNAME = 102
 
 # Definitions used by function Asap3GetApplicationSettings
 APPPARAM_PATH_MODULE = b"MODULE"

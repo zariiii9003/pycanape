@@ -131,6 +131,7 @@ CTYPES_DICT: dict[str, str] = {
     "TScriptStatus *": "ctypes.POINTER(cnp_class.enum_type)",
     "TTaskInfo *": "ctypes.POINTER(cnp_class.TTaskInfo)",
     "TTaskInfo2 *": "ctypes.POINTER(cnp_class.TTaskInfo2)",
+    "TTaskInfo3*": "ctypes.POINTER(cnp_class.TTaskInfo3)",
     "::TTime *": "ctypes.POINTER(cnp_class.TTime)",
     "TValueType *": "ctypes.POINTER(cnp_class.enum_type)",
     "version_t *": "cnp_class.version_t",

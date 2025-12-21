@@ -30,6 +30,7 @@ class CANapeVersion(IntEnum):
     CANAPE_21 = 21
     CANAPE_22 = 22
     CANAPE_23 = 23
+    CANAPE_24 = 24
 
 
 class CANapeError(Exception):

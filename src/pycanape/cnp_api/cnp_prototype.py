@@ -1127,6 +1127,29 @@ class CANapeDll:
             errcheck=self._get_last_error,
         )
 
+        self.Asap3GetEcuDriverTypeAsText = self._map_symbol(
+            func_name="Asap3GetEcuDriverTypeAsText",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                cnp_class.TModulHdl,                    # > TModulHdl module
+                ctypes.c_char_p,                        # > char* drivertype
+                ctypes.POINTER(ctypes.c_uint),          # < unsigned int * size
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3GetEcuTaskCount = self._map_symbol(
+            func_name="Asap3GetEcuTaskCount",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                cnp_class.TModulHdl,                    # > TModulHdl module
+                ctypes.POINTER(ctypes.c_uint),          # < unsigned int* noTasks
+            ],
+            errcheck=self._get_last_error,
+        )
+
         self.Asap3GetEcuTasks = self._map_symbol(
             func_name="Asap3GetEcuTasks",
             restype=ctypes.c_bool,
@@ -1149,6 +1172,19 @@ class CANapeDll:
                 ctypes.POINTER(cnp_class.TTaskInfo2),   # < TTaskInfo2 * taskInfo2
                 ctypes.POINTER(ctypes.c_ushort),        # < unsigned short *noTasks
                 ctypes.c_ushort,                        # > unsigned short maxTaskInfo
+            ],
+            errcheck=self._get_last_error,
+        )
+
+        self.Asap3GetEcuTasks3 = self._map_symbol(
+            func_name="Asap3GetEcuTasks3",
+            restype=ctypes.c_bool,
+            argtypes=[
+                cnp_class.TAsap3Hdl,                    # > TAsap3Hdl hdl
+                cnp_class.TModulHdl,                    # > TModulHdl module
+                ctypes.c_uint,                          # > unsigned int Reserved
+                ctypes.POINTER(cnp_class.TTaskInfo3),   # < TTaskInfo3* taskInfo3
+                ctypes.POINTER(ctypes.c_uint),          # < unsigned int* noTasks
             ],
             errcheck=self._get_last_error,
         )
