@@ -15,7 +15,7 @@ repos:
     - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.13.3"
+    rev: "v0.14.10"
     hooks:
       # Run the linter.
       - id: ruff-check
@@ -25,7 +25,7 @@ repos:
 
   - repo: https://github.com/woodruffw/zizmor-pre-commit
     # Zizmor version.
-    rev: v1.14.2
+    rev: v1.19.0
     hooks:
       # Run the linter.
       - id: zizmor
