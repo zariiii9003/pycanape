@@ -9,7 +9,7 @@ import re
 from ctypes.util import find_library
 from enum import IntEnum
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 try:
     import winreg
@@ -42,7 +42,7 @@ class CANapeError(Exception):
         # keep reference to args for pickling
         self._args = error_code, error_string, function
 
-    def __reduce__(self) -> Union[str, tuple[Any, ...]]:
+    def __reduce__(self) -> str | tuple[Any, ...]:
         return CANapeError, self._args, {}
 
 
@@ -78,7 +78,7 @@ def get_canape_versions() -> list[CANapeVersion]:
     return versions
 
 
-def get_canape_path(version: Optional[CANapeVersion] = None) -> Path:
+def get_canape_path(version: CANapeVersion | None = None) -> Path:
     """Return the path to the CANape installation from Windows registry.
 
     :param version:
@@ -96,7 +96,7 @@ def get_canape_path(version: Optional[CANapeVersion] = None) -> Path:
             raise FileNotFoundError(err_msg) from None
 
 
-def get_canape_data_path(version: Optional[CANapeVersion] = None) -> Path:
+def get_canape_data_path(version: CANapeVersion | None = None) -> Path:
     """Return the path to the CANape data folder from Windows registry.
 
     :param version:
@@ -114,7 +114,7 @@ def get_canape_data_path(version: Optional[CANapeVersion] = None) -> Path:
             raise FileNotFoundError(err_msg) from None
 
 
-def get_canape_dll_path(version: Optional[CANapeVersion] = None) -> Path:
+def get_canape_dll_path(version: CANapeVersion | None = None) -> Path:
     """Return the path to the CANapAPI.dll from Windows registry or PATH.
 
     :param version:

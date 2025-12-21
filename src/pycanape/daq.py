@@ -5,7 +5,6 @@
 import math
 import time
 from threading import Lock, Thread
-from typing import Optional
 
 from .canape import CANape
 from .cnp_api.cnp_constants import ErrorCodes, EventCode
@@ -38,7 +37,7 @@ class FifoReader:
         self._channels: dict[str, Sample] = {}
         self._count = 0
 
-        self._thread: Optional[Thread] = None
+        self._thread: Thread | None = None
         self._lock = Lock()
         self.stopped = True
 

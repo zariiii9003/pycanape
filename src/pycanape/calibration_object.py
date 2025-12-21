@@ -5,7 +5,7 @@
 import ctypes
 from collections.abc import Sequence
 from functools import cached_property
-from typing import TYPE_CHECKING, Final, Optional, Union
+from typing import TYPE_CHECKING, Final
 
 import numpy as np
 
@@ -33,7 +33,7 @@ class BaseCalibrationObject:
         self,
         dll: CANapeDll,
         asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
-        module_handle: Union[TModulHdl, int],
+        module_handle: TModulHdl | int,
         name: str,
         object_info: DBObjectInfo,
     ) -> None:
@@ -44,7 +44,7 @@ class BaseCalibrationObject:
         self._object_info = object_info
         self._force_upload = True
         try:
-            self._datatype: Optional[TAsap3DataType] = self._read_datatype()
+            self._datatype: TAsap3DataType | None = self._read_datatype()
         except CANapeError:
             self._datatype = None
 
@@ -341,20 +341,20 @@ class ValueBlockCalibrationObject(BaseCalibrationObject):
         self._write_calibration_object_value(cov)
 
 
-CalibrationObject = Union[
-    ScalarCalibrationObject,
-    AxisCalibrationObject,
-    CurveCalibrationObject,
-    MapCalibrationObject,
-    AsciiCalibrationObject,
-    ValueBlockCalibrationObject,
-]
+CalibrationObject = (
+    ScalarCalibrationObject
+    | AxisCalibrationObject
+    | CurveCalibrationObject
+    | MapCalibrationObject
+    | AsciiCalibrationObject
+    | ValueBlockCalibrationObject
+)
 
 
 def get_calibration_object(
     dll: CANapeDll,
     asap3_handle: TAsap3Hdl,  # type: ignore[valid-type]
-    module_handle: Union[TModulHdl, int],
+    module_handle: TModulHdl | int,
     name: str,
 ) -> CalibrationObject:
     object_info = DBObjectInfo()

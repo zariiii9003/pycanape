@@ -5,21 +5,16 @@
 import ctypes
 import functools
 import logging
-import sys
+from collections.abc import Callable
 from ctypes import wintypes
 from pathlib import Path
 from threading import RLock
-from typing import Any, Callable, Final, TypeVar, Union
+from typing import Any, Final, ParamSpec, TypeVar
 
 from packaging.version import Version
 
 from ..utils import CANapeError
 from . import cnp_class, cnp_constants
-
-if sys.version_info >= (3, 10):
-    from typing import ParamSpec
-else:
-    from typing_extensions import ParamSpec
 
 LOG = logging.getLogger("pycanape")
 
@@ -2756,7 +2751,7 @@ class CANapeDll:
         else:
             prototype = ctypes.WINFUNCTYPE(restype)
 
-        symbol: Union[ctypes._FuncPointer, Callable[..., Any]]
+        symbol: ctypes._FuncPointer | Callable[..., Any]
         try:
             symbol = prototype((func_name, self.windll))
         except AttributeError:

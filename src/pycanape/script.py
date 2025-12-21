@@ -48,7 +48,7 @@ class Script:
     def start_script(
         self,
         *,
-        command_line: Optional[str] = None,
+        command_line: str | None = None,
         current_device: Optional["Module"] = None,
     ) -> None:
         """Starts the script.

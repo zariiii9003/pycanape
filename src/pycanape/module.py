@@ -5,7 +5,7 @@ import copy
 import ctypes
 import fnmatch
 import os.path
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from .calibration_object import CalibrationObject, get_calibration_object
 from .cnp_api.cnp_class import (
@@ -57,7 +57,7 @@ class Module:
         self.asap3_handle = asap3_handle
         self.module_handle = module_handle
 
-        self._objects_cache: Optional[list[str]] = None
+        self._objects_cache: list[str] | None = None
 
     def get_database_info(self) -> DatabaseInfo:
         """Get Info concerning the database file."""

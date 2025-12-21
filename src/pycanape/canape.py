@@ -4,9 +4,10 @@
 
 import ctypes
 import warnings
+from collections.abc import Callable
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, NamedTuple, Optional, Union
+from typing import Any, NamedTuple
 
 from .cnp_api.cnp_class import (
     EVENT_CALLBACK,
@@ -54,7 +55,7 @@ class DllVersion(NamedTuple):
 class CANape:
     def __init__(
         self,
-        project_path: Union[str, Path],
+        project_path: str | Path,
         fifo_size: int = 128,
         sample_size: int = 256,
         time_out: int = 0,
@@ -89,7 +90,7 @@ class CANape:
         :param kill_open_instances:
             If True, close all open CANape instances before start.
         """
-        _dll_path: Optional[Path] = kwargs.get("_dll_path")
+        _dll_path: Path | None = kwargs.get("_dll_path")
         if _dll_path is None:
             _dll_path = get_canape_dll_path()
         self._dll = CANapeDll(_dll_path)
@@ -201,7 +202,7 @@ class CANape:
     def create_module(
         self,
         module_name: str,
-        database_filename: Union[str, Path],
+        database_filename: str | Path,
         driver: DriverType,
         channel: Channels,
         go_online: bool = True,
@@ -485,7 +486,7 @@ class CANape:
         )
         return buffer.value.decode(RC["ENCODING"])
 
-    def load_cna_file(self, cna_file: Union[str, Path]) -> None:
+    def load_cna_file(self, cna_file: str | Path) -> None:
         """Call this function to load a configuration file (CNA)."""
         self._dll.Asap3LoadCNAFile(
             self.asap3_handle, str(cna_file).encode(RC["ENCODING"])
