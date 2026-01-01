@@ -38,7 +38,7 @@ dev = [
 ]
 doc = [
     "furo",
-    "sphinx==9.*",
+    "sphinx==8.*",
     "sphinx-copybutton",
 ]
 
