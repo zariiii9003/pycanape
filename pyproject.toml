@@ -33,12 +33,12 @@ dev = [
     "pytest",  # for tests
     "pytest-cov",  # for tests
     "python-can==4.*",  # for tests
-    "ruff==0.14.*",
+    "ruff==0.15.*",
     "mypy==1.19.*",
 ]
 doc = [
     "furo",
-    "sphinx==9.*",
+    "sphinx==8.*",
     "sphinx-copybutton",
 ]
 
