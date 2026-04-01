@@ -28,11 +28,11 @@ jobs:
         ]
       fail-fast: false
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # 6.1.0
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # 6.2.0
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
@@ -48,11 +48,11 @@ jobs:
   mypy:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # 6.1.0
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # 6.2.0
       with:
         python-version: "3.13"
 
@@ -79,11 +79,11 @@ jobs:
   linter:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # 6.1.0
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # 6.2.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -96,11 +96,11 @@ jobs:
   format:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # 6.1.0
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # 6.2.0
       with:
         python-version: "3.12"
     - name: Install dependencies
@@ -114,7 +114,7 @@ jobs:
     name: Build artifacts
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
 
@@ -124,7 +124,7 @@ jobs:
     - name: Check artifacts
       run: pipx run twine check dist/*
 
-    - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # 6.0.0
+    - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # 7.0.0
       with:
         name: artifact
         path: dist/*
@@ -132,11 +132,11 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8  # 6.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # 6.0.2
       with:
         persist-credentials: false
     - name: Set up Python
-      uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548  # 6.1.0
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # 6.2.0
       with:
         python-version: "3.11"
     - name: Install dependencies
@@ -162,13 +162,13 @@ jobs:
     # create a new release for tagged commits
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     steps:
-    - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131  # 7.0.0
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # 8.0.1
       with:
         name: artifact
         path: dist
 
     - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a  # 3.0.0
+      uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32  # 4.1.0
       with:
         subject-path: 'dist/*'
 
@@ -176,6 +176,6 @@ jobs:
       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e  # 1.13.0
 
     - name: Release
-      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b  # 2.5.0
+      uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe  # 2.6.1
       with:
         files: dist/*
